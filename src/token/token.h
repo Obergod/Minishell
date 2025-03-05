@@ -1,30 +1,46 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.h                                          :+:      :+:    :+:   */
+/*   token.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 15:44:33 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/05 15:44:34 by mafioron         ###   ########.fr       */
+/*   Created: 2025/03/05 18:16:52 by mafioron          #+#    #+#             */
+/*   Updated: 2025/03/05 18:16:54 by mafioron         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSING_H
-# define PARSING_H
+#ifndef TOKEN_H
+# define TOKEN_H
 
 # include "libft.h"
+#include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
-enum		e_pipe
+enum		e_state
 {
-	START,
-	MIDLE,
-	END
+	NORMAL,
+	IN_SQUOTE,
+	IN_DQUOTE
+};
+
+
+enum		e_token_type
+{
+	T_WORD,
+	T_PIPE,
+	T_REDIR,
+	T_LOGIC,
+	T_EOF
 }
 
-/*****		A trier		******/
-
-
+typedef struct	s_token
+{
+	char			*str;
+	enum e_type		type;
+	struct s_token	*next;
+}	t_token
 
 
 #endif

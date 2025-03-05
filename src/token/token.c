@@ -1,30 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.h                                          :+:      :+:    :+:   */
+/*   token.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 15:44:33 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/05 15:44:34 by mafioron         ###   ########.fr       */
+/*   Created: 2025/03/05 18:17:02 by mafioron          #+#    #+#             */
+/*   Updated: 2025/03/05 18:17:03 by mafioron         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSING_H
-# define PARSING_H
-
-# include "libft.h"
-
-enum		e_pipe
+t_token	*tokenize(const char *input)
 {
-	START,
-	MIDLE,
-	END
+	int				i;
+	t_token			*token;
+	enum e_state	state;
+
+	i = -1;
+	t_token = malloc(sizeof(t_token));
+	state = NORMAL;
+	while (input[++i])
+	{
+		if (state == NORMAL)
+		{
+			if (input[i] == "")
+		}
+		else if (state == IN_SQUOTE)
+		{
+
+		}
+		else if (state == IN_DQUOTE)
+		{
+
+		}
+	}
 }
-
-/*****		A trier		******/
-
-
-
-
-#endif
