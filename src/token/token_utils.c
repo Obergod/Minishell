@@ -1,47 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   token.h                                            :+:      :+:    :+:   */
+/*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 18:16:52 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/05 18:16:54 by mafioron         ###   ########.fr       */
+/*   Created: 2025/03/06 17:33:03 by mafioron          #+#    #+#             */
+/*   Updated: 2025/03/06 17:33:04 by mafioron         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef TOKEN_H
-# define TOKEN_H
+#include "token.h"
 
-# include "libft.h"
-#include <string.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-
-enum		e_state
+int	is_operator(char c)
 {
-	NORMAL,
-	IN_SQUOTE,
-	IN_DQUOTE
-};
-
-
-enum		e_token_type
-{
-	T_WORD,
-	T_PIPE,
-	T_REDIR,
-	T_LOGIC,
-	T_OTHER,
-	T_EOF
+	if (c == '<' || c == '>' || c == '|' || c == '&')
+		return (1);
+	return (0);
 }
-
-typedef struct	s_token
-{
-	char			*str;
-	enum e_type		type;
-	struct s_token	*next;
-}	t_token
-
-
-#endif
