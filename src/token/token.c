@@ -29,7 +29,7 @@ t_token	*tokenize(const char *input)
 	{
 		if (state == NORMAL)
 		{
-			if (input[i] == ' ', input[i] == '\t')
+			if (input[i] == ' ' || input[i] == '\t')
 			{
 				if (nb_tok > 0)
 				{
@@ -39,15 +39,9 @@ t_token	*tokenize(const char *input)
 				}
 			}
 			else if (input[i] == '"')
-			{
 				state = IN_DQUOTE;
-				i++;
-			}
-			else if (input[i] '\'')
-			{
+			else if (input[i] == '\'')
 				state = IN_SQUOTE;
-				i++;
-			}
 			else if (is_operator(input[i]))
 			{
 				if (nb_tok > 0)
@@ -58,8 +52,7 @@ t_token	*tokenize(const char *input)
 				}
 				else
 				{
-					token->type = T_OTHER;
-//					token->type = handle_operator(input, &i);
+					token->type = handle_operator(input, &i);
 					add_token(*token, NULL, token->type);
 				}
 			}
