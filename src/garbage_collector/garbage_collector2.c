@@ -6,11 +6,12 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:49:10 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/05 18:55:54 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:26:10 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
+#include <stdio.h>
 
 /**
  * @brief Alloue de la mémoire et l'enregistre dans le collecteur
@@ -80,6 +81,20 @@ size_t	gc_count(t_gc_head *head)
 		current = current->next;
 	}
 	return (count);
+}
+
+void	gc_print(t_gc_head *head)
+{
+	t_gc *current;
+
+	if (!head)
+		return ;
+	current = head->head;
+	while (current)
+	{
+		printf("%p\n", current->data);
+		current = current->next;
+	}
 }
 
 /** */

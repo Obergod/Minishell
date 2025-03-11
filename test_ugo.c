@@ -23,7 +23,7 @@ enum    e_state
     IN_DQUOTES
 }
 
-struct token 
+struct cmd
 {
     char *command_raw; //grep -e "salut"
     char **command; //["grep"] ["-e"] ["salut"]
@@ -31,8 +31,7 @@ struct token
     enum type = COMMAND;
     enum pipe;
     s_token *prev;
-    s_token *left;
-    s_token *right;
+	s_token *next;
 }
 
 if (token.type == COMMAND)

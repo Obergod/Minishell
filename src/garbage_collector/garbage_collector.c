@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:52:33 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/05 18:54:57 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/09 20:48:34 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ int	gc_alloc(void *data, t_gc_head *head)
 	t_gc	*new;
 
 	if (!head || !data)
+		return (1);
+	if (gc_contains(data, head) == 1)
 		return (1);
 	new = malloc(sizeof(t_gc));
 	if (!new)
@@ -101,7 +103,8 @@ void	gc_destroy(t_gc_head *head)
 	while (current)
 	{
 		next = current->next;
-		free(current->data);
+		if (current->data != NULL)
+			free(current->data);
 		free(current);
 		current = next;
 	}

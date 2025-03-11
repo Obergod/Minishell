@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:52:45 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/05 18:51:46 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:24:27 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,5 +42,6 @@ void			gc_destroy(t_gc_head *head);
 void			*gc_malloc(size_t size, t_gc_head *head);
 int				gc_contains(void *ptr, t_gc_head *head);
 size_t			gc_count(t_gc_head *head);
+void			gc_print(t_gc_head *head);
 
 #endif

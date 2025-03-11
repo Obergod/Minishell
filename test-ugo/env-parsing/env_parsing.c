@@ -6,13 +6,13 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 16:48:21 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/09 21:18:25 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:25:46 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <complex.h>
 #include <stdlib.h>
-#include "parsing.h"
+#include "env_parsing.h"
 
 static int	count_words(const char *str, char c)
 {
@@ -58,29 +58,53 @@ static char	*get_next_word(const char *str, char c, int *pos, t_minishell *minis
 	return (word);
 }
 
+static char	*get_rest_of_string(const char *str, int pos, t_minishell *minishell)
+{
+	int		len;
+	char	*word;
+	int		i;
+
+	len = 0;
+	while (str[pos + len])
+		len++;
+	word = gc_malloc(sizeof(char) * (len + 1), minishell->gc);
+	if (!word)
+		return (NULL);
+	i = 0;
+	while (i < len)
+	{
+		word[i] = str[pos + i];
+		i++;
+	}
+	word[i] = '\0';
+	return (word);
+}
+
 char	**gc_split(const char *str, char c, t_minishell *minishell)
 {
 	char	**result;
-	int		words;
-	int		i;
 	int		pos;
 
 	if (!str)
 		return (NULL);
-	words = count_words(str, c);
-	result = gc_malloc(sizeof(char *) * (words + 1), minishell->gc);
+	result = gc_malloc(sizeof(char *) * 3, minishell->gc);
 	if (!result)
 		return (NULL);
-	i = 0;
 	pos = 0;
-	while (i < words)
+	result[0] = get_next_word(str, c, &pos, minishell);
+	if (str[pos] == c)
 	{
-		while (str[pos] == c)
-			pos++;
-		result[i] = get_next_word(str, c, &pos, minishell);
-		i++;
+		pos++;
+		result[1] = get_rest_of_string(str, pos, minishell);
 	}
-	result[i] = NULL;
+	else
+	{
+		result[1] = gc_malloc(sizeof(char), minishell->gc);
+		if (result[1])
+			result[1][0] = '\0';
+	}
+
+	result[2] = NULL;
 	return (result);
 }
 
@@ -125,9 +149,43 @@ static int init_head_env_parsing(char **envp, t_minishell *minishell, t_env **cu
 	return (0);
 }
 
+size_t ft_strlen(char *str)
+{
+	size_t i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
+
+static char *gc_strjoin_three(char *s1, char *s2, char *s3, t_minishell *minishell)
+{
+	char *result;
+	int i;
+	int j;
+	int k;
+
+	result = gc_malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + ft_strlen(s3) + 1), minishell->gc);
+	if (!result)
+		return (NULL);
+	i = -1;
+	j = -1;
+	k = -1;
+	while (s1[++i])
+		result[i] = s1[i];
+	while (s2[++j])
+		result[i + j] = s2[j];
+	while (s3[++k])
+		result[i + j + k] = s3[k];
+	result[i + j + k] = '\0';
+	return (result);
+}
+
+#include <stdlib.h>
+
 t_env *env_parsing(char **envp, t_minishell *minishell)
 {
-
 	t_env *current;
 	t_env *tmp;
 	char **result_split;
@@ -147,6 +205,7 @@ t_env *env_parsing(char **envp, t_minishell *minishell)
 			return (NULL);
 		tmp->key = result_split[0];
 		tmp->value = result_split[1];
+		tmp->raw = gc_strjoin_three(result_split[0], "=", result_split[1], minishell);
 		tmp->next = NULL;
 		current->next = tmp;
 		current = current->next;
@@ -164,7 +223,6 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-
 char *find_in_env(char *key, t_minishell *minishell)
 {
 	t_env *current;
@@ -173,7 +231,10 @@ char *find_in_env(char *key, t_minishell *minishell)
 	while (current)
 	{
 		if (ft_strcmp(current->key, key) == 0)
+		{
+			printf("%s\n", current->raw);
 			return (current->value);
+		}
 		current = current->next;
 	}
 	return (NULL);
@@ -191,66 +252,7 @@ int main(int ac, char **av, char **envp)
 	// aff_env(minishell.env);
 	if ((result = find_in_env(av[1], &minishell)) != NULL)
 			printf("%s\n", result);
+
+	gc_print(gc_head);
 	gc_destroy(gc_head);
-	// i = 0;
-	// gc_head = gc_init();
-	// result_split = ft_split(envp[i], '=');
-	// gc_alloc(result_split, gc_head);
-	// head = malloc(sizeof(t_env));
-	// gc_alloc(head, gc_head);
-	// head->key = result_split[0];
-	// head->value = result_split[1];
-	// head->next = NULL;
-	// // printf("%s=%s\n", head->key, head->value);
-	// current = head;
-	// while (envp[++i])
-	// {
-	// 	if (current==NULL)
-	// 	{
-	// 		result_split = ft_split(envp[i], '=');
-	// 		gc_alloc(result_split, gc_head);
-	// 		current = malloc(sizeof(t_env));
-	// 		current->key = result_split[0];
-	// 		current->value = result_split[1];
-	// 		current->next = NULL;
-	// 	}
-	// 	// printf("%s=%s\n", current->key, current->value);
-	// 	current = current->next;
-	// }
-	// aff_env(head);
 }
-
-// int main(int ac, char **av, char **envp)
-// {
-// 	char **result;
-// 	t_env *head;
-// 	t_env *current;
-// 	int i;
-
-// 	i = 0;
-// 	result = ft_split(envp[i], '=');
-// 	head = malloc(sizeof(t_env));
-// 	if (!result || !head)
-// 		return (1);
-// 	head->key = result[0];
-// 	head->value = result[1];
-// 	head->next = NULL;
-// 	while (envp[++i])
-// 	{
-// 		result = ft_split(envp[i], '=');
-// 		current = malloc(sizeof(t_env));
-// 		if (!result || !current)
-// 			return (1);
-// 		current->key = result[0];
-// 		current->value = result[1];
-// 		current->next = NULL;
-// 		current = current->next;
-// 	}
-
-// }
-
-// t_env *env_parsing(char **env)
-// {
-// 	t_env *env;
-
-// }

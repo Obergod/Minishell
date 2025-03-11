@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/09 17:42:02 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/10 18:01:37 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ typedef struct s_env
 {
 	char *key;
 	char *value;
+	char *raw;
 	struct s_env *next;
 } t_env;
 

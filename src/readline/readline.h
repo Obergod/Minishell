@@ -1,14 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_utils.c                                    :+:      :+:    :+:   */
+/*   readline.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 15:43:26 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/05 15:43:27 by mafioron         ###   ########.fr       */
+/*   Created: 2025/03/07 15:50:37 by ufalzone          #+#    #+#             */
+/*   Updated: 2025/03/07 15:50:47 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parsing.h"
+#ifndef READLINE_H
+#define READLINE_H
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
+int	ft_readline(void);
+
+#endif

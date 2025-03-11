@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:49:35 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/05 19:00:43 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/07 15:51:25 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,16 +28,16 @@
 
 */
 
-int main(void)
-{
-	t_gc_head *head;
-	void *ptr;
+// int main(void)
+// {
+// 	t_gc_head *head;
+// 	void *ptr;
 
-	head = gc_init();
-	ptr = strdup("Hello");
-	gc_alloc(ptr, head);
-	ptr = gc_malloc(sizeof(char) * 10, head);
-	gc_free(ptr, head);
-	gc_destroy(head);
-	gc_count(head);
-}
+// 	head = gc_init();
+// 	ptr = strdup("Hello");
+// 	gc_alloc(ptr, head);
+// 	ptr = gc_malloc(sizeof(char) * 10, head);
+// 	gc_free(ptr, head);
+// 	gc_destroy(head);
+// 	gc_count(head);
+// }
