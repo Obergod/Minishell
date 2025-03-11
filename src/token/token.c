@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:17:02 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/05 18:17:03 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:42:26 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(*token, buff, T_WORD);
+					add_token(*token, buff, T_WORD); //echo hello | ls
 					nb_tok = 0;
 				}
 			}
@@ -93,7 +93,7 @@ enum e_token_type	handle_operator(char *input, int *i)
 	{
 		if (next_char == '>')
 			*i++;
-		return (T_REDIR)
+		return (T_REDIR);
 	}
 	else if (op == '|')
 	{
