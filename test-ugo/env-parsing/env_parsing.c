@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 16:48:21 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/11 15:25:46 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/11 16:39:43 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,7 @@ size_t ft_strlen(char *str)
 	return (i);
 }
 
-static char *gc_strjoin_three(char *s1, char *s2, char *s3, t_minishell *minishell)
+char *gc_strjoin_three(char *s1, char *s2, char *s3, t_minishell *minishell)
 {
 	char *result;
 	int i;

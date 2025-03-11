@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:05 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/10 16:49:28 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:47:29 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ int	ft_readline(void)
 	return (0);
 }
 
-// int main(void)
-// {
-// 	ft_readline();
-// 	return (0);
-// }
+int main(void)
+{
+	ft_readline();
+	return (0);
+}

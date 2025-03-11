@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/10 18:01:37 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/11 16:45:38 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define PARSING_H
 
 #include "../../src/garbage_collector/garbage_collector.h"
+#include <stdio.h>
 
 enum    e_type
 {
@@ -44,16 +45,33 @@ typedef struct s_env
 	struct s_env *next;
 } t_env;
 
-typedef struct s_cmd
+typedef struct s_cmd //
 {
     char *command_raw; //grep -e "salut"
     char **command; //["grep"] ["-e"] ["salut"]
-    int numbr_of_params;
+    int nb_of_params;
     enum e_type type;
     enum e_pipe pipe;
     struct s_cmd *prev;
 	struct s_cmd *next;
 } t_cmd;
+
+enum	e_token_type
+{
+	T_WORD,
+	T_PIPE,
+	T_REDIR,
+	T_LOGIC,
+	T_OTHER,
+	T_EOF
+};
+
+typedef struct s_token
+{
+	char *str;
+	enum e_token_type type;
+	struct s_token *next;
+} t_token;
 
 typedef struct s_minishell
 {
