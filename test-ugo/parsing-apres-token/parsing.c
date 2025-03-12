@@ -78,7 +78,7 @@ static char	*get_rest_of_string(const char *str, int pos, t_minishell *minishell
 	return (word);
 }
 
-char	**gc_split(const char *str, char c, t_minishell *minishell)
+char	**gc_split_env(const char *str, char c, t_minishell *minishell)
 {
 	char	**result;
 	int		pos;
@@ -157,33 +157,164 @@ char	*gc_strdup(const char *s1, t_minishell *minishell)
 	return (str);
 }
 
+//<< en position 0
+//EOF sera en position 1
+//cmd en position 2
 
-t_cmd parsing(t_token *token, t_minishell *minishell)
+//< en position 0
+//infile en position 1
+//cmd en position 2
+
+//aucun operator en 0
+//commande sera en 0
+
+t_cmd	*new_cmd(t_minishell *minishell)
 {
-	t_cmd *cmd;
-	t_token *current;
-	char *result_raw;
-	int nb_params;
+	t_cmd *new;
 
-	token = current;
-	result_raw[0] = '\0';
+	new = gc_malloc(sizeof(t_cmd), minishell->gc);
+	new->command_raw = NULL;
+	new->command = NULL;
+	new->infile = NULL;
+	new->outfile = NULL;
+	new->append = -1;
+	new->heredoc = NULL;
+	new->next = NULL;
+	return (new);
+}
+
+void split_cmd(t_cmd *cmd_list, t_minishell *minishell)
+{
+	t_cmd *current;
+
+	current = cmd_list;
 	while (current)
 	{
-		if (current->type == T_WORD)
-		{
-			cmd = gc_malloc(sizeof(t_cmd), minishell->gc);
-			while (current->type == T_WORD && current)
-			{
-				result_raw = gc_strjoin_three(result_raw, " ", current->str, minishell);
-				nb_params++;
-				current = current->next;
-			}
-			cmd->command_raw = gc_strdup(result_raw, minishell);
-			cmd->command = gc_split(result_raw, ' ', minishell);
-			cmd->nb_of_params = nb_params;
-		}
+		if (current->command_raw != NULL)
+			current->command = gc_split_env(current->command_raw, ' ', minishell); //mettre vrai split
+		current = current->next;
 	}
 }
+
+void add_arg_to_cmd(t_cmd *cmd, char *str, t_minishell *minishell)
+{
+	int i;
+
+	if (cmd->command_raw == NULL)
+		cmd->command_raw = gc_strdup(str, minishell);
+	else 
+		cmd->command_raw = gc_strjoin_three(cmd->command_raw, " ", str, minishell);
+	// if (cmd->command == NULL)
+	// {
+	// 	cmd->command[0] = gc_strdup(str, minishell);
+	// 	cmd->command[1] = NULL;
+	// }
+	// else
+	// {
+	// 	i = 0;
+	// 	while (cmd->command[i])
+	// 		i++;
+	// 	cmd->command[i] = gc_strdup(str, minishell);
+	// 	cmd->command[i + 1] = NULL;
+	// }
+}
+
+
+void add_cmd_to_list(t_cmd **cmd_list, t_cmd *current)
+{
+	t_cmd *tmp;
+
+	if (cmd_list == NULL)
+		*cmd_list = current;
+	tmp = *cmd_list;
+	while (tmp)
+		tmp = tmp->next;
+	tmp->next = current;
+}
+
+t_cmd *parsing(t_token *token, t_minishell *minishell)
+{
+	t_cmd *cmd_list;
+	t_cmd *current_cmd;
+	
+	current_cmd = new_cmd(minishell);
+	while (token)
+	{
+		if (token->type == T_WORD)
+		{
+			add_arg_to_cmd(current_cmd, token->str, minishell);
+		}
+		//trouver un moyen de verifier qu'il y'a bien un token->next->str
+		else if (token->type == T_REDIR)
+		{
+			if (ft_strcmp(token->str, "<") == 0)
+			{
+				current_cmd->infile = gc_strdup(token->next->str, minishell);
+			}
+			else if(ft_strcmp(token->str, ">") == 0)
+			{
+				current_cmd->outfile = gc_strdup(token->next->str, minishell);
+				current_cmd->append = 0;
+			}
+			else if(ft_strcmp(token->str, ">>") == 0)
+			{
+				current_cmd->outfile = gc_strdup(token->next->str, minishell);
+				current_cmd->append = 1;
+			}
+			else if (ft_strcmp(token->str, "<<") == 0)
+			{
+				current_cmd->heredoc = gc_strdup(token->next->str, minishell);
+			}
+			token=token->next;
+		}
+		else if(token->type == T_PIPE)
+		{
+			add_cmd_to_list(&cmd_list, current_cmd);
+			current_cmd = new_cmd(minishell);
+		}
+		token = token->next;
+	}
+	add_cmd_to_list(&cmd_list, current_cmd);
+	split_cmd(cmd_list, minishell);
+	return(cmd_list);
+}
+
+
+
+// t_cmd parsing(t_token *token, t_minishell *minishell)
+// {
+// 	t_cmd *cmd;
+// 	t_cmd *tmp;
+// 	t_token *current;
+// 	int i;
+// 	char *result_raw;
+// 	int nb_params;
+
+// 	i = 0;
+// 	current = token;
+// 	result_raw[0] = '\0';
+// 	while (current)
+// 	{
+// 		if (current->type == T_WORD)
+// 		{
+// 			tmp = gc_malloc(sizeof(t_cmd), minishell->gc);
+// 			while (current->type == T_WORD && current)
+// 			{
+// 				result_raw = gc_strjoin_three(result_raw, " ", current->str, minishell);
+// 				nb_params++;
+// 				current = current->next;
+// 			}
+// 			tmp->command_raw = gc_strdup(result_raw + 1, minishell); // +1 pour skip l'espace du debut
+// 			tmp->command = gc_split(result_raw + 1, ' ', minishell);
+// 			tmp->nb_of_params = nb_params;
+// 			tmp->type = COMMAND;
+// 			cmd = tmp;
+// 		}
+
+// 		i++;
+// 	}
+
+// }
 
 int main()
 {

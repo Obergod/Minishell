@@ -21,6 +21,7 @@ enum    e_type
     COMMAND,
     PIPE,
     OPERATOR,
+
 };
 
 enum    e_pipe
@@ -48,12 +49,13 @@ typedef struct s_env
 typedef struct s_cmd //
 {
     char *command_raw; //grep -e "salut"
-    char **command; //["grep"] ["-e"] ["salut"]
-    int nb_of_params;
-    enum e_type type;
-    enum e_pipe pipe;
-    struct s_cmd *prev;
-	struct s_cmd *next;
+    char **command; //["grep"] ["-e"] ["salut"] [NULL]
+    char *infile; //file d'entree
+	char *outfile; //file de sortie
+	int append; //>> ou pas
+	char *heredoc; //delimiteur
+	struct s_cmd *prev;
+	struct s_cmd *next; //des que ya un pipe on passe au prochain
 } t_cmd;
 
 enum	e_token_type
@@ -62,8 +64,7 @@ enum	e_token_type
 	T_PIPE,
 	T_REDIR,
 	T_LOGIC,
-	T_OTHER,
-	T_EOF
+	T_OTHER
 };
 
 typedef struct s_token
