@@ -1,0 +1,360 @@
+
+[0;36m=== Test 1: Commande simple ===
+Commande: ls -la[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: ls -la
+Command Args: [ls] [-la]
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: ls -la
+Command Args: [ls] [-la] 
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+
+[0;36m=== Test 2: Commande avec redirection entrée ===
+Commande: cat < input.txt[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: cat
+Command Args: [cat]
+Infile: input.txt
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: cat
+Command Args: [cat] 
+Infile: input.txt
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+
+[0;36m=== Test 3: Commande avec redirection sortie ===
+Commande: echo hello > output.txt[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: echo hello
+Command Args: [echo] [hello]
+Infile: NULL
+Outfile: output.txt
+Append: 0
+Heredoc: NULL[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: echo hello
+Command Args: [echo] [hello] 
+Infile: NULL
+Outfile: output.txt
+Append: 0
+Heredoc: NULL[0m
+-------------------
+
+[0;36m=== Test 4: Commande avec pipe ===
+Commande: ls -l | grep test[0m
+[0;36mCommande 1:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: ls -l
+Command Args: [ls] [-l]
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: ls -l
+Command Args: [ls] [-l] 
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+[0;36mCommande 2:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: grep test
+Command Args: [grep] [test]
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: grep test
+Command Args: [grep] [test] 
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+
+[0;36m=== Test 5: Commande complexe ===
+Commande: cat < input.txt | grep pattern | wc -l >> result.txt[0m
+[0;36mCommande 1:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: cat
+Command Args: [cat]
+Infile: input.txt
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: cat
+Command Args: [cat] 
+Infile: input.txt
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+[0;36mCommande 2:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: grep pattern
+Command Args: [grep] [pattern]
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: grep -e pattern
+Command Args: [grep] [-e] [pattern] 
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+[0;36mCommande 3:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: wc -l
+Command Args: [wc] [-l]
+Infile: NULL
+Outfile: result.txt
+Append: 1
+Heredoc: NULL[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: wc -l
+Command Args: [wc] [-l] 
+Infile: NULL
+Outfile: result.txt
+Append: 1
+Heredoc: NULL[0m
+-------------------
+
+[0;36m=== Test 6: Commande avec heredoc ===
+Commande: cat << EOF[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: cat
+Command Args: [cat]
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: EOF[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: cat
+Command Args: [cat] 
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: EOF[0m
+-------------------
+
+[0;36m=== Test 7: Redirection sans fichier ===
+[0mCommande: cat < [0;31m
+[0;33m(Ce test devrait générer une erreur car il manque le fichier après <)[0m
+ERR_SYNTAX_NEWLINE
+[0;31mLe parsing a retourné NULL (erreur détectée)[0m
+
+[0;36m=== Test 8: Pipe sans commande après ===
+[0mCommande: ls | [0;31m
+[0;33m(Ce test devrait générer une erreur car il manque une commande après |)[0m
+ERR_SYNTAX_PIPE
+
+[0;36m=== Test 9: Pipe sans commande avant ===
+[0;31mCommande: | ls[0m
+[0;33m(Ce test devrait générer une erreur car il manque une commande avant |)[0m
+ERR_SYNTAX_PIPE
+
+[0;36m=== Test 10: Multiples redirections du même type ===
+[0mCommande: cat < file1.txt < file2.txt(null)
+[0;33m(Ce test vérifie comment votre code gère plusieurs redirections du même type - seule la dernière devrait être prise en compte)[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: devrait contenir la commande brute
+Command Args: devrait contenir les arguments séparés
+Infile: devrait contenir le fichier d'entrée si présent
+Outfile: devrait contenir le fichier de sortie si présent
+Append: devrait être 1 pour >> ou 0 pour > ou -1 si absent
+Heredoc: devrait contenir le délimiteur si présent[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: cat
+Command Args: [cat] 
+Infile: file2.txt
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+
+[0;36m=== Test 11: Redirections multiples de différents types ===
+[0mCommande: cat < input.txt > output.txt >> append.txt << EOF(null)
+[0;33m(Ce test vérifie comment votre code gère plusieurs redirections de types différents)[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: devrait contenir la commande brute
+Command Args: devrait contenir les arguments séparés
+Infile: devrait contenir le fichier d'entrée si présent
+Outfile: devrait contenir le fichier de sortie si présent
+Append: devrait être 1 pour >> ou 0 pour > ou -1 si absent
+Heredoc: devrait contenir le délimiteur si présent[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: cat
+Command Args: [cat] 
+Infile: NULL
+Outfile: append.txt
+Append: 1
+Heredoc: EOF[0m
+-------------------
+
+[0;36m=== Test 12: Pipes multiples sans commandes entre eux ===
+[0;31mCommande: ls | | grep test[0m
+[0;33m(Ce test devrait générer une erreur car il y a deux pipes consécutifs)[0m
+ERR_SYNTAX_PIPE
+
+[0;36m=== Test 13: Commande très complexe ===
+[0mCommande: cat < in1.txt < in2.txt | grep pattern > out1.txt | sort | uniq >> out2.txt << EOF | wc -l(null)
+[0;33m(Ce test vérifie comment votre code gère une commande très complexe avec de nombreuses redirections et pipes)[0m
+[0;36mCommande 1:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: devrait contenir la commande brute
+Command Args: devrait contenir les arguments séparés
+Infile: devrait contenir le fichier d'entrée si présent
+Outfile: devrait contenir le fichier de sortie si présent
+Append: devrait être 1 pour >> ou 0 pour > ou -1 si absent
+Heredoc: devrait contenir le délimiteur si présent[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: cat
+Command Args: [cat] 
+Infile: in2.txt
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+[0;36mCommande 2:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: devrait contenir la commande brute
+Command Args: devrait contenir les arguments séparés
+Infile: devrait contenir le fichier d'entrée si présent
+Outfile: devrait contenir le fichier de sortie si présent
+Append: devrait être 1 pour >> ou 0 pour > ou -1 si absent
+Heredoc: devrait contenir le délimiteur si présent[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: grep pattern
+Command Args: [grep] [pattern] 
+Infile: NULL
+Outfile: out1.txt
+Append: 0
+Heredoc: NULL[0m
+-------------------
+[0;36mCommande 3:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: devrait contenir la commande brute
+Command Args: devrait contenir les arguments séparés
+Infile: devrait contenir le fichier d'entrée si présent
+Outfile: devrait contenir le fichier de sortie si présent
+Append: devrait être 1 pour >> ou 0 pour > ou -1 si absent
+Heredoc: devrait contenir le délimiteur si présent[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: sort
+Command Args: [sort] 
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+[0;36mCommande 4:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: devrait contenir la commande brute
+Command Args: devrait contenir les arguments séparés
+Infile: devrait contenir le fichier d'entrée si présent
+Outfile: devrait contenir le fichier de sortie si présent
+Append: devrait être 1 pour >> ou 0 pour > ou -1 si absent
+Heredoc: devrait contenir le délimiteur si présent[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: uniq
+Command Args: [uniq] 
+Infile: NULL
+Outfile: out2.txt
+Append: 1
+Heredoc: EOF[0m
+-------------------
+[0;36mCommande 5:[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: devrait contenir la commande brute
+Command Args: devrait contenir les arguments séparés
+Infile: devrait contenir le fichier d'entrée si présent
+Outfile: devrait contenir le fichier de sortie si présent
+Append: devrait être 1 pour >> ou 0 pour > ou -1 si absent
+Heredoc: devrait contenir le délimiteur si présent[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: wc -l
+Command Args: [wc] [-l] 
+Infile: NULL
+Outfile: NULL
+Append: -1
+Heredoc: NULL[0m
+-------------------
+
+[0;36m=== Test 14: Redirection sans commande ===
+[0;31mCommande: > output.txt[0m
+[0;33m(Ce test devrait générer une erreur car il n'y a pas de commande avant la redirection)[0m
+[0;32mRésultat attendu:[0m
+[0;32m-------------------
+[0;32mCommand Raw: devrait contenir la commande brute
+Command Args: devrait contenir les arguments séparés
+Infile: devrait contenir le fichier d'entrée si présent
+Outfile: devrait contenir le fichier de sortie si présent
+Append: devrait être 1 pour >> ou 0 pour > ou -1 si absent
+Heredoc: devrait contenir le délimiteur si présent[0m
+[0m-------------------
+[0;34mRésultat réel:[0m
+[0;34mCommand Raw: NULL
+Command Args: NULL
+Infile: NULL
+Outfile: output.txt
+Append: 0
+Heredoc: NULL[0m
+-------------------
+
+[0;36m=== Test 15: Commande vide ===
+[0;31mCommande: (aucun token)[0m
+[0;33m(Ce test vérifie comment votre code gère une commande vide)[0m
+ERR_SYNTAX_TOKEN
+[0;31mLe parsing a retourné NULL (commande vide)[0m

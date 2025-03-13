@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/11 16:45:38 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:40:16 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,14 @@ enum	e_token_type
 	T_OTHER
 };
 
+enum	error_parsing
+{
+	SUCCESS,
+	ERR_SYNTAX_REDIRECT, //Redirection sans argument
+	ERR_SYNTAX_PIPE, // Erreur de pipe
+	ERR_SYNTAX_TOKEN // Toutes autres erreurs
+};
+
 typedef struct s_token
 {
 	char *str;
@@ -80,5 +88,18 @@ typedef struct s_minishell
 	t_cmd *cmd;
 	t_gc_head *gc;
 } t_minishell;
+
+// Déclarations des fonctions
+t_token *create_token(char *str, enum e_token_type type, t_minishell *minishell);
+void add_token(t_token **head, t_token *new_token);
+void print_cmd(t_cmd *cmd, int test_type);
+t_cmd *parsing(t_token *token, t_minishell *minishell);
+int ft_strcmp(const char *s1, const char *s2);
+char **gc_split(const char *s, char c, t_minishell *minishell);
+char *gc_strdup(const char *s1, t_minishell *minishell);
+char *gc_strjoin_three(char *s1, char *s2, char *s3, t_minishell *minishell);
+void print_cmd_simple(t_cmd *cmd);
+void test_parsing_colorized(t_minishell *minishell);
+void test_parsing_simple(t_minishell *minishell);
 
 #endif
