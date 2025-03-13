@@ -22,7 +22,7 @@ t_token	*tokenize(const char *input)
 
 	i = -1;
 	nb_tok = 0;
-	buff = malloc(sizeof(char) * ft_strlen(input));
+	buff = malloc(sizeof(char) * ft_strlen(input) + 1);
 	token = NULL;
 	state = NORMAL	;
 	while (input[++i])
@@ -52,8 +52,9 @@ t_token	*tokenize(const char *input)
 				}
 				else
 				{
+					buff = operator_str(input, i);
 					token->type = handle_operator(input, &i);
-					add_token(*token, NULL, token->type);
+					add_token(*token, buff, token->type);
 				}
 			}
 			else
@@ -76,6 +77,27 @@ t_token	*tokenize(const char *input)
 	}
 }
 
+char	*operator_str(char *input, int i)
+{
+	char	*buff;
+
+	if (is_operator(input[i + 1]) && input[i + 1] != input[i])
+		return (error);
+	if (is_operator(input[i + 1]))
+	{
+		buff[0] = input[i];
+		buff[1] = input[i + 1];
+		buff[2] = '\0';
+	}
+	else
+	{
+		buff[0] = input[i];
+		buff[1] = '\0';
+	}
+	return (buff);
+}
+
+
 enum e_token_type	handle_operator(char *input, int *i)
 {
 	char	op;
@@ -86,20 +108,20 @@ enum e_token_type	handle_operator(char *input, int *i)
 	if (op == '<')
 	{
 		if (next_char == '<')
-			*i++;
+			(*i++);
 		return (T_REDIR);
 	}
 	else if (op == '>')
 	{
 		if (next_char == '>')
-			*i++;
+			(*i++);
 		return (T_REDIR);
 	}
 	else if (op == '|')
 	{
 		if (next_char == '|')
 		{
-			*i++;
+			(*i++);
 			return (T_LOGIC);
 		}
 		return (T_PIPE);
@@ -108,14 +130,14 @@ enum e_token_type	handle_operator(char *input, int *i)
 	{
 		if (next_char == '&')
 		{
-			*i++;
+			(*i++);
 			return (T_LOGIC);
 		}
 //		exit_and_cleanup;
 	}
 }
 
-void	add_back(t_token **token, char *buff, enum e_token_type type)
+void	add_back(t_token **token, char *buff, enum e_token_type type, int *i)
 {
 	t_token	*new_token;
 	t_token	*tmp;
@@ -126,13 +148,9 @@ void	add_back(t_token **token, char *buff, enum e_token_type type)
 //		clean_up_and_exit();
 	new_token->type = type;
 	new_token->next = NULL;
-	if (type == T_WORD)
-	{
-		new_token->str = ft_strdup(buff);
+	new_token->str = ft_strdup(buff);
 		if (!new_token->str)
 //			clean_up_and_exit;
-	else
-	//	handle_other_str();
 	if (*token == NULL)
 		*token = new_token;
 	else
