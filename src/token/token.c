@@ -34,7 +34,7 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(*token, buff, T_WORD); //echo hello | ls
+					add_token(&token, buff, T_WORD, i);
 					nb_tok = 0;
 				}
 			}
@@ -47,14 +47,14 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(*token, buff, T_WORD);
+					add_token(&token, buff, T_WORD, i);
 					nb_tok = 0;
 				}
 				else
 				{
 					buff = operator_str(input, i);
 					token->type = handle_operator(input, &i);
-					add_token(*token, buff, token->type);
+					add_token(&token, buff, token->type, i);
 				}
 			}
 			else
@@ -77,12 +77,10 @@ t_token	*tokenize(const char *input)
 	}
 }
 
-char	*operator_str(char *input, int i)
+char	*operator_str(const char *input, int i)
 {
 	char	*buff;
 
-	if (is_operator(input[i + 1]) && input[i + 1] != input[i])
-		return (error);
 	if (is_operator(input[i + 1]))
 	{
 		buff[0] = input[i];
@@ -98,7 +96,7 @@ char	*operator_str(char *input, int i)
 }
 
 
-enum e_token_type	handle_operator(char *input, int *i)
+enum e_token_type	handle_operator(const char *input, int *i)
 {
 	char	op;
 	char	next_char;
@@ -137,7 +135,7 @@ enum e_token_type	handle_operator(char *input, int *i)
 	}
 }
 
-void	add_back(t_token **token, char *buff, enum e_token_type type, int *i)
+void	add_token(t_token **token, char *buff, enum e_token_type type, int i)
 {
 	t_token	*new_token;
 	t_token	*tmp;
@@ -161,5 +159,4 @@ void	add_back(t_token **token, char *buff, enum e_token_type type, int *i)
 		tmp->next = new_token;
 	}
 }
-
 

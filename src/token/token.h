@@ -13,10 +13,8 @@
 #ifndef TOKEN_H
 # define TOKEN_H
 
-# include "libft.h"
+# include "../../full_libft/include/libft.h"
 #include <string.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 
 enum		e_state
 {
@@ -34,14 +32,24 @@ enum		e_token_type
 	T_LOGIC,
 	T_OTHER,
 	T_EOF
-}
+};
 
 typedef struct	s_token
 {
 	char			*str;
-	enum e_type		type;
+	enum e_token_type		type;
 	struct s_token	*next;
-}	t_token
+}	t_token;
 
+/*****		A trier			*****/
+t_token	*tokenize(const char *input);
+
+
+
+/*****		token_utils		*****/
+int					is_operator(char c);
+char				*operator_str(const char *input, int i);
+enum e_token_type	handle_operator(const char *input, int *i);
+void				add_token(t_token **token, char *buff, enum e_token_type type, int i);
 
 #endif
