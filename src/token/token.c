@@ -34,7 +34,7 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(&token, buff, T_WORD, i);
+					add_token(&token, buff, T_WORD);
 					nb_tok = 0;
 				}
 			}
@@ -47,14 +47,14 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(&token, buff, T_WORD, i);
+					add_token(&token, buff, T_WORD);
 					nb_tok = 0;
 				}
 				else
 				{
 					buff = operator_str(input, i);
 					token->type = handle_operator(input, &i);
-					add_token(&token, buff, token->type, i);
+					add_token(&token, buff, token->type);
 				}
 			}
 			else
@@ -75,6 +75,15 @@ t_token	*tokenize(const char *input)
 				buff[nb_tok++] = input[i];
 		}
 	}
+	if (!token)
+	{
+		if (nb_tok > 0)
+		{
+			buff[nb_tok] = '\0';
+			add_token(&token, buff, T_WORD);
+		}
+	}
+	return (token);
 }
 
 char	*operator_str(const char *input, int i)
@@ -135,19 +144,19 @@ enum e_token_type	handle_operator(const char *input, int *i)
 	}
 }
 
-void	add_token(t_token **token, char *buff, enum e_token_type type, int i)
+void	add_token(t_token **token, char *buff, enum e_token_type type)
 {
 	t_token	*new_token;
 	t_token	*tmp;
 	char	op[2];
 
 	new_token = malloc(sizeof(t_token));
-	if (!new_token)
+//	if (!new_token)
 //		clean_up_and_exit();
 	new_token->type = type;
 	new_token->next = NULL;
 	new_token->str = ft_strdup(buff);
-		if (!new_token->str)
+//		if (!new_token->str)
 //			clean_up_and_exit;
 	if (*token == NULL)
 		*token = new_token;
