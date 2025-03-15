@@ -47,7 +47,7 @@ t_token	*tokenize(const char *input);
 
 /*****		token_utils		*****/
 int					is_operator(char c);
-char				*operator_str(const char *input, int i);
+void				operator_str(const char *input, char *buff, int i);
 enum e_token_type	handle_operator(const char *input, int *i);
 void				add_token(t_token **token, char *buff, enum e_token_type type);
 

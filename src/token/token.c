@@ -14,11 +14,12 @@
 
 t_token	*tokenize(const char *input)
 {
-	int				i;
-	t_token			*token;
-	enum e_state	state;
-	int				nb_tok;
-	char			*buff;
+	int					i;
+	t_token				*token;
+	enum e_state		state;
+	enum e_token_type	type;
+	int					nb_tok;
+	char				*buff;
 
 	i = -1;
 	nb_tok = 0;
@@ -52,9 +53,9 @@ t_token	*tokenize(const char *input)
 				}
 				else
 				{
-					buff = operator_str(input, i);
-					token->type = handle_operator(input, &i);
-					add_token(&token, buff, token->type);
+					operator_str(input, buff, i);
+					type = handle_operator(input, &i);
+					add_token(&token, buff, type);
 				}
 			}
 			else
@@ -75,20 +76,16 @@ t_token	*tokenize(const char *input)
 				buff[nb_tok++] = input[i];
 		}
 	}
-	if (!token)
-	{
 		if (nb_tok > 0)
 		{
 			buff[nb_tok] = '\0';
 			add_token(&token, buff, T_WORD);
 		}
-	}
 	return (token);
 }
 
-char	*operator_str(const char *input, int i)
+void	operator_str(const char *input, char *buff, int i)
 {
-	char	*buff;
 
 	if (is_operator(input[i + 1]))
 	{
@@ -101,7 +98,6 @@ char	*operator_str(const char *input, int i)
 		buff[0] = input[i];
 		buff[1] = '\0';
 	}
-	return (buff);
 }
 
 
@@ -115,20 +111,20 @@ enum e_token_type	handle_operator(const char *input, int *i)
 	if (op == '<')
 	{
 		if (next_char == '<')
-			(*i++);
+			(*i)++;
 		return (T_REDIR);
 	}
 	else if (op == '>')
 	{
 		if (next_char == '>')
-			(*i++);
+			(*i)++;
 		return (T_REDIR);
 	}
 	else if (op == '|')
 	{
 		if (next_char == '|')
 		{
-			(*i++);
+			(*i)++;
 			return (T_LOGIC);
 		}
 		return (T_PIPE);
@@ -137,7 +133,7 @@ enum e_token_type	handle_operator(const char *input, int *i)
 	{
 		if (next_char == '&')
 		{
-			(*i++);
+			(*i)++;
 			return (T_LOGIC);
 		}
 //		exit_and_cleanup;
@@ -168,4 +164,3 @@ void	add_token(t_token **token, char *buff, enum e_token_type type)
 		tmp->next = new_token;
 	}
 }
-
