@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "token.h"
+#include "expansion.h"
 
 t_token	*tokenize(const char *input)
 {
@@ -20,12 +21,13 @@ t_token	*tokenize(const char *input)
 	enum e_token_type	type;
 	int					nb_tok;
 	char				*buff;
+	char                *expanded;
 
 	i = -1;
 	nb_tok = 0;
 	buff = malloc(sizeof(char) * ft_strlen(input) + 1);
 	token = NULL;
-	state = NORMAL	;
+	state = NORMAL;
 	while (input[++i])
 	{
 		if (state == NORMAL)
@@ -35,7 +37,12 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(&token, buff, T_WORD);
+					expanded = expand_variables(buff);
+					if (expanded)
+					{
+						add_token(&token, expanded, T_WORD);
+						free(expanded);
+					}
 					nb_tok = 0;
 				}
 			}
@@ -48,15 +55,17 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(&token, buff, T_WORD);
+					expanded = expand_variables(buff);
+					if (expanded)
+					{
+						add_token(&token, expanded, T_WORD);
+						free(expanded);
+					}
 					nb_tok = 0;
 				}
-				else
-				{
-					operator_str(input, buff, i);
-					type = handle_operator(input, &i);
-					add_token(&token, buff, type);
-				}
+				operator_str(input, buff, i);
+				type = handle_operator(input, &i);
+				add_token(&token, buff, type);
 			}
 			else
 				buff[nb_tok++] = input[i];
@@ -76,11 +85,17 @@ t_token	*tokenize(const char *input)
 				buff[nb_tok++] = input[i];
 		}
 	}
-		if (nb_tok > 0)
+	if (nb_tok > 0)
+	{
+		buff[nb_tok] = '\0';
+		expanded = expand_variables(buff);
+		if (expanded)
 		{
-			buff[nb_tok] = '\0';
-			add_token(&token, buff, T_WORD);
+			add_token(&token, expanded, T_WORD);
+			free(expanded);
 		}
+	}
+	free(buff);
 	return (token);
 }
 
@@ -138,6 +153,7 @@ enum e_token_type	handle_operator(const char *input, int *i)
 		}
 //		exit_and_cleanup;
 	}
+	return (-1);
 }
 
 void	add_token(t_token **token, char *buff, enum e_token_type type)
