@@ -35,9 +35,10 @@ enum		e_token_type
 
 typedef struct	s_token
 {
-	char			*str;
-	enum e_token_type		type;
-	struct s_token	*next;
+	char				*str;
+	enum e_token_type	type;
+	enum e_state		state;
+	struct s_token		*next;
 }	t_token;
 
 /*****		A trier			*****/
@@ -49,6 +50,6 @@ t_token	*tokenize(const char *input);
 int					is_operator(char c);
 void				operator_str(const char *input, char *buff, int i);
 enum e_token_type	handle_operator(const char *input, int *i);
-void				add_token(t_token **token, char *buff, enum e_token_type type);
+void				add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state);
 
 #endif

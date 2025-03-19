@@ -98,5 +98,6 @@ long				ft_atol(const char *nptr);
 int					ft_strcmp(const char *s1, const char *s2);
 void				ft_free_split(char	**split);
 int					ft_atoi_base(char *nbr, char *base_from);
+char				*ft_strstr(const char *big, const char *little);
 
 #endif

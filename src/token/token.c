@@ -17,6 +17,7 @@ t_token	*tokenize(const char *input)
 	int					i;
 	t_token				*token;
 	enum e_state		state;
+	enum e_state		token_state;
 	enum e_token_type	type;
 	int					nb_tok;
 	char				*buff;
@@ -26,6 +27,7 @@ t_token	*tokenize(const char *input)
 	buff = malloc(sizeof(char) * ft_strlen(input) + 1);
 	token = NULL;
 	state = NORMAL;
+	token_state = NORMAL;
 	while (input[++i])
 	{
 		if (state == NORMAL)
@@ -35,48 +37,70 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(&token, buff, T_WORD);
+					add_token(&token, buff, T_WORD, token_state);
 					nb_tok = 0;
+					token_state = state;
 				}
 			}
 			else if (input[i] == '"')
+			{
 				state = IN_DQUOTE;
+				if (nb_tok == 0)
+					token_state = state;
+			}
 			else if (input[i] == '\'')
+			{
 				state = IN_SQUOTE;
+				if (nb_tok == 0)
+					token_state = state;
+			}
 			else if (is_operator(input[i]))
 			{
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(&token, buff, T_WORD);
+					add_token(&token, buff, T_WORD, token_state);
 					nb_tok = 0;
+					token_state = state;
 				}
 				operator_str(input, buff, i);
 				type = handle_operator(input, &i);
-				add_token(&token, buff, type);
+				add_token(&token, buff, type, NORMAL);
 			}
 			else
+			{
+				if (nb_tok == 0)
+					token_state = state;
 				buff[nb_tok++] = input[i];
+			}
 		}
 		else if (state == IN_SQUOTE)
 		{
 			if (input[i] == '\'')
 				state = NORMAL;
 			else
+			{
+				if (nb_tok == 0)
+					token_state = state;
 				buff[nb_tok++] = input[i];
+			}
 		}
 		else if (state == IN_DQUOTE)
 		{
 			if (input[i] == '"')
 				state = NORMAL;
 			else
+			{
+				if (nb_tok == 0)
+					token_state = state;
 				buff[nb_tok++] = input[i];
+			}
 		}
 	}
 	if (nb_tok > 0)
 	{
 		buff[nb_tok] = '\0';
-		add_token(&token, buff, T_WORD);
+		add_token(&token, buff, T_WORD, token_state);
 	}
 	free(buff);
 	return (token);
@@ -139,7 +163,7 @@ enum e_token_type	handle_operator(const char *input, int *i)
 	return (-1);
 }
 
-void	add_token(t_token **token, char *buff, enum e_token_type type)
+void	add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state)
 {
 	t_token	*new_token;
 	t_token	*tmp;
@@ -149,6 +173,7 @@ void	add_token(t_token **token, char *buff, enum e_token_type type)
 //	if (!new_token)
 //		clean_up_and_exit();
 	new_token->type = type;
+	new_token->state = state;
 	new_token->next = NULL;
 	new_token->str = ft_strdup(buff);
 //		if (!new_token->str)

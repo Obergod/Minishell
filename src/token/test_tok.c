@@ -7,11 +7,9 @@ int	main(int ac, char **av)
 	token = tokenize(av[1]);
 	while (token)
 	{
-	//	if (token->str)
-			printf("str : %s\n", token->str);
-	//	else
-	//		printf("no str\n");
+		printf("str : %s\n", token->str);
 		printf("t_type : %u\n", token->type);
+		printf("state : %u\n\n", token->state);
 		token = token->next;
 	}
 	//if (token->str)

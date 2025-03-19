@@ -27,7 +27,7 @@ SRC = ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c \
 	ft_putendl_fd.c ft_putnbr_fd.c \
 	ft_lstnew.c ft_lstadd_front.c ft_lstsize.c ft_lstlast.c ft_lstadd_back.c \
 	ft_lstdelone.c ft_lstclear.c ft_lstiter.c ft_lstmap.c ft_swap.c ft_atol.c \
-	ft_strcmp.c ft_abs.c ft_atoi_base.c ft_free_split.c
+	ft_strcmp.c ft_abs.c ft_atoi_base.c ft_free_split.c ft_strstr.c
 
 SRCS = $(addprefix $(SRCS_DIR), $(SRC))
 OBJ = $(SRCS:.c=.o)
