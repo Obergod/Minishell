@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 18:00:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/13 18:25:43 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:53:29 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -547,11 +547,12 @@ void test_parsing_simple(t_minishell *minishell)
 	// Test 14: Redirection avant la commande (grep)
 	tokens = NULL;
 	printf("\nTest 14: Redirection avant la commande (grep)\n");
-	printf("Commande: < input.txt grep PATTERN\n");
+	printf("Commande: < input.txt grep -e UN MOT TRES TRES TRES LONG asdaisdj asdioasjd asdoiasj dasoid234234 2342 234sfdf\n");
 	add_token(&tokens, create_token("<", T_REDIR, minishell));
 	add_token(&tokens, create_token("input.txt", T_WORD, minishell));
 	add_token(&tokens, create_token("grep", T_WORD, minishell));
-	add_token(&tokens, create_token("PATTERN", T_WORD, minishell));
+	add_token(&tokens, create_token("-e", T_WORD, minishell));
+	add_token(&tokens, create_token("UN MOT TRES TRES TRES LONG asdaisdj asdioasjd asdoiasj dasoid234234 2342 234sfd3485237562347863428563473734263477777&@#*^@#!^@$$^@#@#@#$@$f\0", T_WORD, minishell));
 
 	result = parsing(tokens, minishell);
 	if (result)

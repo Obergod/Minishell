@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/13 18:31:51 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:54:56 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,10 +194,16 @@ enum error_parsing check_parsing(t_token *token_p)
 t_cmd	*new_cmd(t_minishell *minishell)
 {
 	t_cmd *new;
+	int i;
 
 	new = gc_malloc(sizeof(t_cmd), minishell->gc);
 	new->command_raw = NULL;
-	new->command = NULL;
+	new->command = gc_malloc(sizeof(char *) * 4, minishell->gc);
+	i = -1;
+	while (++i < 4)
+		new->command[i] = NULL;
+	new->_arg_capacity = 4;
+	new->_arg_count = 0;
 	new->infile = NULL;
 	new->outfile = NULL;
 	new->append = -1;
@@ -219,27 +225,53 @@ void split_cmd(t_cmd *cmd_list, t_minishell *minishell)
 	}
 }
 
+char **gc_strdup_array_size(char **s1, size_t size, t_gc_head *gc)
+{
+	int i;
+	int j;
+	char *new_str;
+	char **new_array;
+
+	j = 0;
+	new_array = gc_malloc((sizeof(char *) * size) + 1, gc);
+	while (s1[j])
+	{
+		new_str = gc_malloc((sizeof(char) * ft_strlen(s1[j]) + 1), gc);
+		if (!new_str)
+			return (NULL);
+		i = 0;
+		while (s1[j][i])
+		{
+			new_str[i] = s1[j][i];
+			i++;
+		}
+		new_str[i] = '\0';
+		new_array[j] = new_str;
+		j++;
+	}
+	new_array[j] = NULL;
+	return (new_array);
+}
+
 void add_arg_to_cmd(t_cmd *cmd, char *str, t_minishell *minishell)
 {
 	int i;
+	char **tmp;
 
 	if (cmd->command_raw == NULL)
 		cmd->command_raw = gc_strdup(str, minishell);
 	else
 		cmd->command_raw = gc_strjoin_three(cmd->command_raw, " ", str, minishell);
-	// if (cmd->command == NULL)
-	// {
-	// 	cmd->command[0] = gc_strdup(str, minishell);
-	// 	cmd->command[1] = NULL;
-	// }
-	// else
-	// {
-	// 	i = 0;
-	// 	while (cmd->command[i])
-	// 		i++;
-	// 	cmd->command[i] = gc_strdup(str, minishell);
-	// 	cmd->command[i + 1] = NULL;
-	// }
+	if (cmd->_arg_count >= cmd->_arg_capacity - 1)
+	{
+		cmd->command = gc_strdup_array_size(cmd->command, cmd->_arg_capacity * 2, minishell->gc);
+		cmd->_arg_capacity = cmd->_arg_capacity * 2;
+
+	} else {
+		cmd->command[cmd->_arg_count] = gc_strdup(str, minishell);
+		cmd->command[cmd->_arg_count + 1] = NULL;
+		cmd->_arg_count++;
+	}
 }
 
 void add_cmd_to_list(t_cmd **cmd_list, t_cmd *current)
@@ -293,13 +325,9 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 	while (token)
 	{
 		if (token->type == T_WORD)
-		{
 			add_arg_to_cmd(current_cmd, token->str, minishell);
-		}
 		else if (token->type == T_REDIR)
 		{
-			// if (token->next && token->next->str != NULL && token->next->type == T_WORD)
-			// {
 				if (ft_strcmp(token->str, "<") == 0)
 				{
 					current_cmd->infile = gc_strdup(token->next->str, minishell);
@@ -319,13 +347,6 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 					current_cmd->heredoc = gc_strdup(token->next->str, minishell);
 					current_cmd->infile = NULL;
 				}
-			// }
-			// else
-			// {
-			//  //erreur de parsing, pas de fichier apres la redirection
-			// 	printf("error\n");
-			// 	return (NULL);
-			// }
 			token=token->next;
 		}
 		else if(token->type == T_PIPE)
@@ -336,46 +357,9 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 		token = token->next;
 	}
 	add_cmd_to_list(&cmd_list, current_cmd);
-	split_cmd(cmd_list, minishell);
+	// split_cmd(cmd_list, minishell);
 	return(cmd_list);
 }
-
-
-
-// t_cmd parsing(t_token *token, t_minishell *minishell)
-// {
-// 	t_cmd *cmd;
-// 	t_cmd *tmp;
-// 	t_token *current;
-// 	int i;
-// 	char *result_raw;
-// 	int nb_params;
-
-// 	i = 0;
-// 	current = token;
-// 	result_raw[0] = '\0';
-// 	while (current)
-// 	{
-// 		if (current->type == T_WORD)
-// 		{
-// 			tmp = gc_malloc(sizeof(t_cmd), minishell->gc);
-// 			while (current->type == T_WORD && current)
-// 			{
-// 				result_raw = gc_strjoin_three(result_raw, " ", current->str, minishell);
-// 				nb_params++;
-// 				current = current->next;
-// 			}
-// 			tmp->command_raw = gc_strdup(result_raw + 1, minishell); // +1 pour skip l'espace du debut
-// 			tmp->command = gc_split(result_raw + 1, ' ', minishell);
-// 			tmp->nb_of_params = nb_params;
-// 			tmp->type = COMMAND;
-// 			cmd = tmp;
-// 		}
-
-// 		i++;
-// 	}
-
-// }
 
 // Fonction pour créer un token et l'ajouter à la liste
 t_token *create_token(char *str, enum e_token_type type, t_minishell *minishell)
@@ -439,8 +423,8 @@ void print_cmd(t_cmd *cmd, int test_type)
 			printf("Append: -1\n");
 			printf("Heredoc: NULL%s\n", reset);
 			break;
-		case 3: // Redirection sortie: echo hello > output.txt
-			printf("%sCommand Raw: echo hello\n", green);
+		case 3: // Redirection lsortie: echo hello > output.txt
+			printf("%sCommand Raw: echo helo\n", green);
 			printf("Command Args: [echo] [hello]\n");
 			printf("Infile: NULL\n");
 			printf("Outfile: output.txt\n");
@@ -607,14 +591,14 @@ void test_parsing(t_minishell *minishell)
 
 	// Test 5: Commande complexe avec plusieurs redirections et pipes
 	printf("\n%s=== Test 5: Commande complexe ===\n", cyan);
-	printf("Commande: cat < input.txt | grep pattern | wc -l >> result.txt%s\n", reset);
+	printf("Commande: cat < input.txt | grep -e test de la commande plutot longue ou quoi la team sadjasdjasuidhasd asuidh asidhas dhasiudh asiudh asd | wc -l >> result.txt%s\n", reset);
 	add_token(&tokens, create_token("cat", T_WORD, minishell));
 	add_token(&tokens, create_token("<", T_REDIR, minishell));
 	add_token(&tokens, create_token("input.txt", T_WORD, minishell));
 	add_token(&tokens, create_token("|", T_PIPE, minishell));
 	add_token(&tokens, create_token("grep", T_WORD, minishell));
 	add_token(&tokens, create_token("-e", T_WORD, minishell));
-	add_token(&tokens, create_token("pattern", T_WORD, minishell));
+	add_token(&tokens, create_token("test de la commande plutot longue ou quoi la team sadjasdjasuidhasd asuidh asidhas dhasiudh asiudh asd", T_WORD, minishell));
 	add_token(&tokens, create_token("|", T_PIPE, minishell));
 	add_token(&tokens, create_token("wc", T_WORD, minishell));
 	add_token(&tokens, create_token("-l", T_WORD, minishell));

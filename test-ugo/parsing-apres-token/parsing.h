@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/13 17:40:16 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:13:03 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ typedef struct s_cmd //
 {
     char *command_raw; //grep -e "salut"
     char **command; //["grep"] ["-e"] ["salut"] [NULL]
+	size_t _arg_count;
+	size_t _arg_capacity;
     char *infile; //file d'entree
 	char *outfile; //file de sortie
 	int append; //>> ou pas
