@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "token.h"
-#include "expansion.h"
 
 t_token	*tokenize(const char *input)
 {
@@ -21,7 +20,6 @@ t_token	*tokenize(const char *input)
 	enum e_token_type	type;
 	int					nb_tok;
 	char				*buff;
-	char                *expanded;
 
 	i = -1;
 	nb_tok = 0;
@@ -37,12 +35,7 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					expanded = expand_variables(buff);
-					if (expanded)
-					{
-						add_token(&token, expanded, T_WORD);
-						free(expanded);
-					}
+					add_token(&token, buff, T_WORD);
 					nb_tok = 0;
 				}
 			}
@@ -55,12 +48,7 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					expanded = expand_variables(buff);
-					if (expanded)
-					{
-						add_token(&token, expanded, T_WORD);
-						free(expanded);
-					}
+					add_token(&token, buff, T_WORD);
 					nb_tok = 0;
 				}
 				operator_str(input, buff, i);
@@ -88,12 +76,7 @@ t_token	*tokenize(const char *input)
 	if (nb_tok > 0)
 	{
 		buff[nb_tok] = '\0';
-		expanded = expand_variables(buff);
-		if (expanded)
-		{
-			add_token(&token, expanded, T_WORD);
-			free(expanded);
-		}
+		add_token(&token, buff, T_WORD);
 	}
 	free(buff);
 	return (token);
