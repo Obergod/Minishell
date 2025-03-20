@@ -16,6 +16,8 @@
 # include "../../full_libft/include/libft.h"
 #include <string.h>
 
+extern int g_exit_status;
+
 enum		e_state
 {
 	NORMAL,

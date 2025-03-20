@@ -108,7 +108,6 @@ t_token	*tokenize(const char *input)
 
 void	operator_str(const char *input, char *buff, int i)
 {
-
 	if (is_operator(input[i + 1]))
 	{
 		buff[0] = input[i];

@@ -11,27 +11,65 @@
 /* ************************************************************************** */
 
 #include "token.h"
+#include "expand.h"
 
 t_token	*expand_vars(t_token *token)
 {
 	char	*new_str;
-	char	*full_var;
-	int		full_len;
+	t_token	*head;
 
+	head = token;
 	while (token)
 	{
 		if (token->type != T_WORD || token->state == IN_SQUOTE
 				|| !ft_strchr(token->str, '$'))
-			token = token->next
+			token = token->next;
 		else
 		{
-			full_len = get_full_len()
-			
+			new_str = expand_str(token->str);
+			if (!new_str)
+			//	cleanup_and_exit();
+			free(token->str);
+			token->str = new_str;
+			token = token->next;
 		}
 	}
+	return (head);
 }
 
+char	*expand_str(char *str)
+{
+	char	*full_var;
+	int		full_len;
+	char	*new_str;
+	int		i;
+	int		j;
 
+	i = 0;
+	j = 0;
+	full_len = get_full_len(str);
+	if (full_len < 0)
+		return (NULL);
+	new_str = ft_calloc(full_len + 1, sizeof(char));
+	if (!new_str)
+		return (NULL);
+	while (str[i])
+	{
+		if (str[i] == '$' && str[i + 1])
+		{
+			i++;
+			full_var = get_vars(str, &i);
+			if (!full_var)
+				return (NULL);
+			ft_strlcpy(new_str + j, full_var, ft_strlen(full_var));
+			j += ft_strlen(full_var);
+			free(full_var);
+		}
+		else
+			new_str[j++] = str[i++];
+	}
+	return (new_str);
+}
 
 char	*get_vars(char *str, int *i)
 {
@@ -78,10 +116,10 @@ int	get_full_len(char *str)
 		if (str[i] == '$' && str[i + 1])
 		{
 			i++;
-			full_var = get_var(str, &i);
+			full_var = get_vars(str, &i);
 			if (!full_var)
-				return (NULL);
-			full_len += ft_strlen(res);
+				return (0);
+			full_len += ft_strlen(full_var);
 		}
 		else
 		{
