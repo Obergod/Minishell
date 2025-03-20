@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/19 18:54:56 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/20 16:28:51 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,28 @@ char	*gc_strdup(const char *s1, t_minishell *minishell)
 //aucun operator en 0
 //commande sera en 0
 
+//status : 0 = debut
+//status : 1 = fin
+static enum error_parsing start_end_check_parsing(t_token *token, int status)
+{
+	if (status == 0)
+	{
+		if (token->type == T_PIPE)
+			return (ERR_SYNTAX_PIPE);
+		if (token->type == T_LOGIC)
+			return (ERR_SYNTAX_LOGIC);
+	}
+	else if (status == 1)
+	{
+		if (token->type == T_REDIR) //si ca se finit par une redirection
+			return (ERR_SYNTAX_REDIRECT);
+		if (token->type == T_PIPE) //si ca se finit par un pipe
+			return (ERR_SYNTAX_PIPE);
+		if (token->type == T_LOGIC)
+			return (ERR_SYNTAX_PIPE);
+	}
+	return (SUCCESS);
+}
 
 enum error_parsing check_parsing(t_token *token_p)
 {
@@ -172,21 +194,21 @@ enum error_parsing check_parsing(t_token *token_p)
 	token = token_p;
 	if (!token)
 		return (ERR_SYNTAX_TOKEN);
-	if (token->type == T_PIPE)
-		return (ERR_SYNTAX_PIPE);
+	if (start_end_check_parsing(token, 0) != SUCCESS)
+		return (start_end_check_parsing(token, 0));
 	while (token->next)
 	{
 		if (token->next && token->type == T_PIPE && token->next->type == T_PIPE)
 			return (ERR_SYNTAX_PIPE);
 		if (token->next && token->type == T_REDIR && token->next->type != T_WORD)
 			return (ERR_SYNTAX_REDIRECT);
+		if (token->next && token->type == T_LOGIC && token->next->type == T_LOGIC)
+			return (ERR_SYNTAX_LOGIC);
 		token = token->next;
 	}
 	//on est au dernier token de la liste
-	if (token->type == T_REDIR) //si ca se finit par une redirection
-		return (ERR_SYNTAX_REDIRECT);
-	if (token->type == T_PIPE) //si case finit
-		return (ERR_SYNTAX_PIPE);
+	if (start_end_check_parsing(token, 1) != SUCCESS)
+		return (start_end_check_parsing(token, 1));
 	return (SUCCESS);
 }
 
@@ -289,7 +311,7 @@ void add_cmd_to_list(t_cmd **cmd_list, t_cmd *current)
 	tmp->next = current;
 }
 
-void print_error(enum error_parsing error)
+void print_error(enum error_parsing error, char *str)
 {
     switch (error)
     {
@@ -319,7 +341,7 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 	current_cmd = new_cmd(minishell);
 	if (check_parsing(token) != SUCCESS)
 	{
-		print_error(check_parsing(token));
+		print_error(check_parsing(token), NULL);
 		return (NULL);
 	}
 	while (token)

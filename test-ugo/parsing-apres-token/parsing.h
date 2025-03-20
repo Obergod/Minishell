@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/19 18:13:03 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/20 15:59:54 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ typedef struct s_cmd //
 	char *outfile; //file de sortie
 	int append; //>> ou pas
 	char *heredoc; //delimiteur
-	struct s_cmd *prev;
 	struct s_cmd *next; //des que ya un pipe on passe au prochain
 } t_cmd;
 
@@ -74,6 +73,7 @@ enum	error_parsing
 	SUCCESS,
 	ERR_SYNTAX_REDIRECT, //Redirection sans argument
 	ERR_SYNTAX_PIPE, // Erreur de pipe
+	ERR_SYNTAX_LOGIC, //Erreur d'operateur
 	ERR_SYNTAX_TOKEN // Toutes autres erreurs
 };
 

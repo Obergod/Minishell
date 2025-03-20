@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:05 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/11 15:47:29 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/20 15:23:20 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@ static char	*ft_add_readline(const char *prompt, char **stock)
 	return (*stock);
 }
 
-volatile sig_atomic_t	g_signal_received = 0;
-
 // Gestionnaire de signal
 static void	handle_signal(int sig)
 {
@@ -37,7 +35,6 @@ static void	handle_signal(int sig)
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
-		g_signal_received = 1;
 	}
 	else if (sig == SIGTERM) // Ctrl + D
 	{

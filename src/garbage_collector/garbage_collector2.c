@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:49:10 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/11 15:26:10 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/20 15:24:08 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,5 +96,3 @@ void	gc_print(t_gc_head *head)
 		current = current->next;
 	}
 }
-
-/** */

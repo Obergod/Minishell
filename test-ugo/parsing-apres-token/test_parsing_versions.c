@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 18:00:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/19 18:53:29 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/20 16:28:53 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,7 +226,49 @@ void test_parsing_colorized(t_minishell *minishell)
 
 	result = parsing(tokens, minishell);
 	if (result)
-		print_cmd(result, 0);
+		print_cmd(result, 10);
+	else
+		printf("%sLe parsing a retourné NULL (erreur détectée)%s\n", red, reset);
+
+	// Test 11: Pipeline complexe avec redirections multiples
+	tokens = NULL;
+	printf("\n%s=== Test 11: Pipeline complexe avec redirections multiples ===\n", cyan);
+	printf("Commande: cat < in1.txt < in2.txt | grep pattern > out1.txt | sort | uniq >> out2.txt << EOF | wc -l%s\n", reset);
+	printf("%s(Ce test vérifie la gestion des redirections multiples dans un pipeline complexe)%s\n", yellow, reset);
+	add_token(&tokens, create_token("cat", T_WORD, minishell));
+	add_token(&tokens, create_token("<", T_REDIR, minishell));
+	add_token(&tokens, create_token("in1.txt", T_WORD, minishell));
+	add_token(&tokens, create_token("<", T_REDIR, minishell));
+	add_token(&tokens, create_token("in2.txt", T_WORD, minishell));
+	add_token(&tokens, create_token("|", T_PIPE, minishell));
+	add_token(&tokens, create_token("grep", T_WORD, minishell));
+	add_token(&tokens, create_token("pattern", T_WORD, minishell));
+	add_token(&tokens, create_token(">", T_REDIR, minishell));
+	add_token(&tokens, create_token("out1.txt", T_WORD, minishell));
+	add_token(&tokens, create_token("|", T_PIPE, minishell));
+	add_token(&tokens, create_token("sort", T_WORD, minishell));
+	add_token(&tokens, create_token("|", T_PIPE, minishell));
+	add_token(&tokens, create_token("uniq", T_WORD, minishell));
+	add_token(&tokens, create_token(">>", T_REDIR, minishell));
+	add_token(&tokens, create_token("out2.txt", T_WORD, minishell));
+	add_token(&tokens, create_token("<<", T_REDIR, minishell));
+	add_token(&tokens, create_token("EOF", T_WORD, minishell));
+	add_token(&tokens, create_token("|", T_PIPE, minishell));
+	add_token(&tokens, create_token("wc", T_WORD, minishell));
+	add_token(&tokens, create_token("-l", T_WORD, minishell));
+
+	result = parsing(tokens, minishell);
+	if (result)
+	{
+		t_cmd *current = result;
+		int cmd_num = 1;
+		while (current)
+		{
+			printf("%sCommande %d:%s\n", cyan, cmd_num++, reset);
+			print_cmd(current, 11);
+			current = current->next;
+		}
+	}
 	else
 		printf("%sLe parsing a retourné NULL (erreur détectée)%s\n", red, reset);
 }
@@ -265,57 +307,18 @@ void test_parsing_simple(t_minishell *minishell)
 	t_cmd *result;
 	t_cmd *current;
 	int cmd_num;
+	char *red = "\033[0;31m";     // Rouge pour les erreurs
+	char *reset = "\033[0m";     // Réinitialisation de la couleur
 
-	printf("=== TESTS DE BASE ===\n");
+	printf("=== TESTS DE PARSING COMPLEXES ===\n");
 
-	// Test 1: Commande simple
-	printf("\nTest 1: Commande simple\n");
-	printf("Commande: ls -la\n");
+	// Test 1: Opérateurs logiques consécutifs
+	printf("\nTest 1: Opérateurs logiques consécutifs\n");
+	printf("Commande: ls && && grep test\n");
+	printf("Résultat attendu: ERREUR (ERR_SYNTAX_LOGIC)\n");
 	add_token(&tokens, create_token("ls", T_WORD, minishell));
-	add_token(&tokens, create_token("-la", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL\n");
-
-	// Test 2: Commande avec redirection entrée
-	tokens = NULL;
-	printf("\nTest 2: Commande avec redirection entrée\n");
-	printf("Commande: cat < input.txt\n");
-	add_token(&tokens, create_token("cat", T_WORD, minishell));
-	add_token(&tokens, create_token("<", T_REDIR, minishell));
-	add_token(&tokens, create_token("input.txt", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL\n");
-
-	// Test 3: Commande avec redirection sortie
-	tokens = NULL;
-	printf("\nTest 3: Commande avec redirection sortie\n");
-	printf("Commande: echo hello > output.txt\n");
-	add_token(&tokens, create_token("echo", T_WORD, minishell));
-	add_token(&tokens, create_token("hello", T_WORD, minishell));
-	add_token(&tokens, create_token(">", T_REDIR, minishell));
-	add_token(&tokens, create_token("output.txt", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL\n");
-
-	// Test 4: Commande avec pipe
-	tokens = NULL;
-	printf("\nTest 4: Commande avec pipe\n");
-	printf("Commande: ls -l | grep test\n");
-	add_token(&tokens, create_token("ls", T_WORD, minishell));
-	add_token(&tokens, create_token("-l", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
+	add_token(&tokens, create_token("&&", T_LOGIC, minishell));
+	add_token(&tokens, create_token("&&", T_LOGIC, minishell));
 	add_token(&tokens, create_token("grep", T_WORD, minishell));
 	add_token(&tokens, create_token("test", T_WORD, minishell));
 
@@ -332,47 +335,18 @@ void test_parsing_simple(t_minishell *minishell)
 		}
 	}
 	else
-		printf("Le parsing a retourné NULL\n");
+		printf("Le parsing a retourné NULL (erreur détectée)\n");
 
-	// Test 5: Commande complexe avec plusieurs redirections et pipes
+	// Test 2: Chaînes vides et espaces
 	tokens = NULL;
-	printf("\nTest 5: Commande complexe\n");
-	printf("Commande: cat < input.txt | grep pattern | wc -l >> result.txt\n");
-	add_token(&tokens, create_token("cat", T_WORD, minishell));
-	add_token(&tokens, create_token("<", T_REDIR, minishell));
-	add_token(&tokens, create_token("input.txt", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-	add_token(&tokens, create_token("grep", T_WORD, minishell));
-	add_token(&tokens, create_token("pattern", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-	add_token(&tokens, create_token("wc", T_WORD, minishell));
-	add_token(&tokens, create_token("-l", T_WORD, minishell));
-	add_token(&tokens, create_token(">>", T_REDIR, minishell));
-	add_token(&tokens, create_token("result.txt", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-	{
-		current = result;
-		cmd_num = 1;
-		while (current)
-		{
-			printf("Commande %d:\n", cmd_num++);
-			print_cmd_simple(current);
-			current = current->next;
-		}
-	}
-	else
-		printf("Le parsing a retourné NULL\n");
-
-	printf("\n=== TESTS CAS D'ERREUR ===\n");
-
-	// Test 6: Redirection sans fichier
-	tokens = NULL;
-	printf("\nTest 6: Redirection sans fichier\n");
-	printf("Commande: cat <\n");
-	add_token(&tokens, create_token("cat", T_WORD, minishell));
-	add_token(&tokens, create_token("<", T_REDIR, minishell));
+	printf("\nTest 2: Chaînes vides et espaces\n");
+	printf("Commande: echo \"\" '' \" \" \"  \"\n");
+	printf("Résultat attendu: Commande avec 5 arguments vides\n");
+	add_token(&tokens, create_token("echo", T_WORD, minishell));
+	add_token(&tokens, create_token("", T_WORD, minishell));
+	add_token(&tokens, create_token("", T_WORD, minishell));
+	add_token(&tokens, create_token(" ", T_WORD, minishell));
+	add_token(&tokens, create_token("  ", T_WORD, minishell));
 
 	result = parsing(tokens, minishell);
 	if (result)
@@ -380,32 +354,11 @@ void test_parsing_simple(t_minishell *minishell)
 	else
 		printf("Le parsing a retourné NULL (erreur détectée)\n");
 
-	// Test 7: Pipe sans commande après
+	// Test 3: Redirections multiples et complexes
 	tokens = NULL;
-	printf("\nTest 7: Pipe sans commande après\n");
-	printf("Commande: ls |\n");
-	add_token(&tokens, create_token("ls", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-	{
-		current = result;
-		cmd_num = 1;
-		while (current)
-		{
-			printf("Commande %d:\n", cmd_num++);
-			print_cmd_simple(current);
-			current = current->next;
-		}
-	}
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 8: Multiples redirections
-	tokens = NULL;
-	printf("\nTest 8: Multiples redirections\n");
-	printf("Commande: cat < file1.txt < file2.txt > out1.txt > out2.txt\n");
+	printf("\nTest 3: Redirections multiples et complexes\n");
+	printf("Commande: cat < file1.txt < file2.txt > out1.txt > out2.txt >> append.txt%s\n", reset);
+	printf("Résultat attendu: Dernière redirection de chaque type prise en compte\n");
 	add_token(&tokens, create_token("cat", T_WORD, minishell));
 	add_token(&tokens, create_token("<", T_REDIR, minishell));
 	add_token(&tokens, create_token("file1.txt", T_WORD, minishell));
@@ -415,247 +368,20 @@ void test_parsing_simple(t_minishell *minishell)
 	add_token(&tokens, create_token("out1.txt", T_WORD, minishell));
 	add_token(&tokens, create_token(">", T_REDIR, minishell));
 	add_token(&tokens, create_token("out2.txt", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 9: Complexe avec heredoc
-	tokens = NULL;
-	printf("\nTest 9: Complexe avec heredoc\n");
-	printf("Commande: cat << EOF | grep pattern >> result.txt\n");
-	add_token(&tokens, create_token("cat", T_WORD, minishell));
-	add_token(&tokens, create_token("<<", T_REDIR, minishell));
-	add_token(&tokens, create_token("EOF", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-	add_token(&tokens, create_token("grep", T_WORD, minishell));
-	add_token(&tokens, create_token("pattern", T_WORD, minishell));
 	add_token(&tokens, create_token(">>", T_REDIR, minishell));
-	add_token(&tokens, create_token("result.txt", T_WORD, minishell));
+	add_token(&tokens, create_token("append.txt", T_WORD, minishell));
 
 	result = parsing(tokens, minishell);
 	if (result)
-	{
-		current = result;
-		cmd_num = 1;
-		while (current)
-		{
-			printf("Commande %d:\n", cmd_num++);
-			print_cmd_simple(current);
-			current = current->next;
-		}
-	}
+		print_cmd(result, 3);
 	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
+		printf("%sLe parsing a retourné NULL (erreur détectée)%s\n", red, reset);
 
-	// Test 10: Redirection avant commande
+	// Test 4: Pipes consécutifs
 	tokens = NULL;
-	printf("\nTest 10: Redirection avant commande\n");
-	printf("Commande: < input.txt cat\n");
-	add_token(&tokens, create_token("<", T_REDIR, minishell));
-	add_token(&tokens, create_token("input.txt", T_WORD, minishell));
-	add_token(&tokens, create_token("cat", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// NOUVEAUX TESTS SUPPLÉMENTAIRES
-	printf("\n=== TESTS SUPPLÉMENTAIRES ===\n");
-
-	// Test 11: Heredoc avec pipe et grep
-	tokens = NULL;
-	printf("\nTest 11: Heredoc avec pipe et grep\n");
-	printf("Commande: cat << EOF | grep \"hello there\"\n");
-	add_token(&tokens, create_token("cat", T_WORD, minishell));
-	add_token(&tokens, create_token("<<", T_REDIR, minishell));
-	add_token(&tokens, create_token("EOF", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-	add_token(&tokens, create_token("grep", T_WORD, minishell));
-	add_token(&tokens, create_token("hello there", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-	{
-		current = result;
-		cmd_num = 1;
-		while (current)
-		{
-			printf("Commande %d:\n", cmd_num++);
-			print_cmd_simple(current);
-			current = current->next;
-		}
-	}
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 12: Redirections multiples d'entrée et sortie
-	tokens = NULL;
-	printf("\nTest 12: Redirections multiples d'entrée et sortie\n");
-	printf("Commande: cat -e < input1.txt < input2.txt >> output.txt\n");
-	add_token(&tokens, create_token("cat", T_WORD, minishell));
-	add_token(&tokens, create_token("-e", T_WORD, minishell));
-	add_token(&tokens, create_token("<", T_REDIR, minishell));
-	add_token(&tokens, create_token("input1.txt", T_WORD, minishell));
-	add_token(&tokens, create_token("<", T_REDIR, minishell));
-	add_token(&tokens, create_token("input2.txt", T_WORD, minishell));
-	add_token(&tokens, create_token(">>", T_REDIR, minishell));
-	add_token(&tokens, create_token("output.txt", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 13: Pipeline complexe à quatre commandes
-	tokens = NULL;
-	printf("\nTest 13: Pipeline complexe à quatre commandes\n");
-	printf("Commande: ls -la | grep minishell | sort | uniq | wc -l\n");
-	add_token(&tokens, create_token("ls", T_WORD, minishell));
-	add_token(&tokens, create_token("-la", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-	add_token(&tokens, create_token("grep", T_WORD, minishell));
-	add_token(&tokens, create_token("minishell", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-	add_token(&tokens, create_token("sort", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-	add_token(&tokens, create_token("uniq", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-	add_token(&tokens, create_token("wc", T_WORD, minishell));
-	add_token(&tokens, create_token("-l", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-	{
-		current = result;
-		cmd_num = 1;
-		while (current)
-		{
-			printf("Commande %d:\n", cmd_num++);
-			print_cmd_simple(current);
-			current = current->next;
-		}
-	}
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 14: Redirection avant la commande (grep)
-	tokens = NULL;
-	printf("\nTest 14: Redirection avant la commande (grep)\n");
-	printf("Commande: < input.txt grep -e UN MOT TRES TRES TRES LONG asdaisdj asdioasjd asdoiasj dasoid234234 2342 234sfdf\n");
-	add_token(&tokens, create_token("<", T_REDIR, minishell));
-	add_token(&tokens, create_token("input.txt", T_WORD, minishell));
-	add_token(&tokens, create_token("grep", T_WORD, minishell));
-	add_token(&tokens, create_token("-e", T_WORD, minishell));
-	add_token(&tokens, create_token("UN MOT TRES TRES TRES LONG asdaisdj asdioasjd asdoiasj dasoid234234 2342 234sfd3485237562347863428563473734263477777&@#*^@#!^@$$^@#@#@#$@$f\0", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 15: Guillemets mixtes et noms de fichiers avec espaces
-	tokens = NULL;
-	printf("\nTest 15: Guillemets mixtes et noms de fichiers avec espaces\n");
-	printf("Commande: echo \"hello 'buddy' \" < 'in file.txt' | cat -e >> \"out file.txt\"\n");
-	add_token(&tokens, create_token("echo", T_WORD, minishell));
-	add_token(&tokens, create_token("hello 'buddy' ", T_WORD, minishell));
-	add_token(&tokens, create_token("<", T_REDIR, minishell));
-	add_token(&tokens, create_token("in file.txt", T_WORD, minishell));
-	add_token(&tokens, create_token("|", T_PIPE, minishell));
-	add_token(&tokens, create_token("cat", T_WORD, minishell));
-	add_token(&tokens, create_token("-e", T_WORD, minishell));
-	add_token(&tokens, create_token(">>", T_REDIR, minishell));
-	add_token(&tokens, create_token("out file.txt", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-	{
-		current = result;
-		cmd_num = 1;
-		while (current)
-		{
-			printf("Commande %d:\n", cmd_num++);
-			print_cmd_simple(current);
-			current = current->next;
-		}
-	}
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 16: Variables d'environnement
-	tokens = NULL;
-	printf("\nTest 16: Variables d'environnement\n");
-	printf("Commande: echo $USER$HOME/test\n");
-	add_token(&tokens, create_token("echo", T_WORD, minishell));
-	add_token(&tokens, create_token("$USER$HOME/test", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 17: Guillemets non fermés
-	tokens = NULL;
-	printf("\nTest 17: Guillemets non fermés\n");
-	printf("Commande: echo \"This is not closed\n");
-	add_token(&tokens, create_token("echo", T_WORD, minishell));
-	add_token(&tokens, create_token("This is not closed", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 18: Redirection sans fichier (autre syntaxe)
-	tokens = NULL;
-	printf("\nTest 18: Redirection sans fichier (autre syntaxe)\n");
-	printf("Commande: cat >\n");
-	add_token(&tokens, create_token("cat", T_WORD, minishell));
-	add_token(&tokens, create_token(">", T_REDIR, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 19: Opérateurs logiques (OR)
-	tokens = NULL;
-	printf("\nTest 19: Opérateurs logiques (OR)\n");
-	printf("Commande: ls || grep something\n");
-	add_token(&tokens, create_token("ls", T_WORD, minishell));
-	add_token(&tokens, create_token("||", T_LOGIC, minishell));
-	add_token(&tokens, create_token("grep", T_WORD, minishell));
-	add_token(&tokens, create_token("something", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-	{
-		current = result;
-		cmd_num = 1;
-		while (current)
-		{
-			printf("Commande %d:\n", cmd_num++);
-			print_cmd_simple(current);
-			current = current->next;
-		}
-	}
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 20: Pipes consécutifs
-	tokens = NULL;
-	printf("\nTest 20: Pipes consécutifs\n");
+	printf("\nTest 4: Pipes consécutifs\n");
 	printf("Commande: ls | | grep test\n");
+	printf("Résultat attendu: ERREUR (ERR_SYNTAX_PIPE)\n");
 	add_token(&tokens, create_token("ls", T_WORD, minishell));
 	add_token(&tokens, create_token("|", T_PIPE, minishell));
 	add_token(&tokens, create_token("|", T_PIPE, minishell));
@@ -677,10 +403,38 @@ void test_parsing_simple(t_minishell *minishell)
 	else
 		printf("Le parsing a retourné NULL (erreur détectée)\n");
 
-	// Test 21: Heredoc avec pipe et redirection
+	// Test 5: Opérateurs logiques au début/fin
 	tokens = NULL;
-	printf("\nTest 21: Heredoc avec pipe et redirection\n");
+	printf("\nTest 5: Opérateurs logiques au début/fin\n");
+	printf("Commande: && ls || grep test ||\n");
+	printf("Résultat attendu: ERREUR (ERR_SYNTAX_LOGIC)\n");
+	add_token(&tokens, create_token("&&", T_LOGIC, minishell));
+	add_token(&tokens, create_token("ls", T_WORD, minishell));
+	add_token(&tokens, create_token("||", T_LOGIC, minishell));
+	add_token(&tokens, create_token("grep", T_WORD, minishell));
+	add_token(&tokens, create_token("test", T_WORD, minishell));
+	add_token(&tokens, create_token("||", T_LOGIC, minishell));
+
+	result = parsing(tokens, minishell);
+	if (result)
+	{
+		current = result;
+		cmd_num = 1;
+		while (current)
+		{
+			printf("Commande %d:\n", cmd_num++);
+			print_cmd_simple(current);
+			current = current->next;
+		}
+	}
+	else
+		printf("Le parsing a retourné NULL (erreur détectée)\n");
+
+	// Test 6: Heredoc avec pipe et redirection
+	tokens = NULL;
+	printf("\nTest 6: Heredoc avec pipe et redirection\n");
 	printf("Commande: cat <<EOF | wc -l > out.txt\n");
+	printf("Résultat attendu: Commande avec heredoc, pipe et redirection\n");
 	add_token(&tokens, create_token("cat", T_WORD, minishell));
 	add_token(&tokens, create_token("<<", T_REDIR, minishell));
 	add_token(&tokens, create_token("EOF", T_WORD, minishell));
@@ -705,10 +459,11 @@ void test_parsing_simple(t_minishell *minishell)
 	else
 		printf("Le parsing a retourné NULL (erreur détectée)\n");
 
-	// Test 22: Guillemets échappés et noms de fichiers avec espaces
+	// Test 7: Guillemets échappés et noms de fichiers avec espaces
 	tokens = NULL;
-	printf("\nTest 22: Guillemets échappés et noms de fichiers avec espaces\n");
-	printf("Commande: grep \\\"hello world\\\" < \\\"input file.txt\\\" >> \\\"my output file.txt\"\n");
+	printf("\nTest 7: Guillemets échappés et noms de fichiers avec espaces\n");
+	printf("Commande: grep \\\"hello world\\\" < \\\"input file.txt\\\" >> \\\"my output file.txt\\\"%s\n", reset);
+	printf("Résultat attendu: Commande avec arguments échappés et fichiers avec espaces\n");
 	add_token(&tokens, create_token("grep", T_WORD, minishell));
 	add_token(&tokens, create_token("\"hello world\"", T_WORD, minishell));
 	add_token(&tokens, create_token("<", T_REDIR, minishell));
@@ -722,53 +477,141 @@ void test_parsing_simple(t_minishell *minishell)
 	else
 		printf("Le parsing a retourné NULL (erreur détectée)\n");
 
-	// Test 23: Guillemets vides et espaces
+	// Test 8: Pipeline complexe avec opérateurs logiques
 	tokens = NULL;
-	printf("\nTest 23: Guillemets vides et espaces\n");
-	printf("Commande: echo \"\" \"\" \"test\" '' \" \"\n");
-	add_token(&tokens, create_token("echo", T_WORD, minishell));
-	add_token(&tokens, create_token("", T_WORD, minishell));
-	add_token(&tokens, create_token("", T_WORD, minishell));
+	printf("\nTest 8: Pipeline complexe avec opérateurs logiques\n");
+	printf("Commande: ls -la | grep test && cat file.txt || wc -l\n");
+	printf("Résultat attendu: Pipeline avec opérateurs logiques\n");
+	add_token(&tokens, create_token("ls", T_WORD, minishell));
+	add_token(&tokens, create_token("-la", T_WORD, minishell));
+	add_token(&tokens, create_token("|", T_PIPE, minishell));
+	add_token(&tokens, create_token("grep", T_WORD, minishell));
 	add_token(&tokens, create_token("test", T_WORD, minishell));
-	add_token(&tokens, create_token("", T_WORD, minishell));
-	add_token(&tokens, create_token(" ", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 24: Redirections multiples de sortie
-	tokens = NULL;
-	printf("\nTest 24: Redirections multiples de sortie\n");
-	printf("Commande: echo coucou > test1.txt >> test2.txt\n");
-	add_token(&tokens, create_token("echo", T_WORD, minishell));
-	add_token(&tokens, create_token("coucou", T_WORD, minishell));
-	add_token(&tokens, create_token(">", T_REDIR, minishell));
-	add_token(&tokens, create_token("test1.txt", T_WORD, minishell));
-	add_token(&tokens, create_token(">>", T_REDIR, minishell));
-	add_token(&tokens, create_token("test2.txt", T_WORD, minishell));
-
-	result = parsing(tokens, minishell);
-	if (result)
-		print_cmd_simple(result);
-	else
-		printf("Le parsing a retourné NULL (erreur détectée)\n");
-
-	// Test 25: Espaces multiples dans la commande
-	tokens = NULL;
-	printf("\nTest 25: Espaces multiples dans la commande\n");
-	printf("Commande: cat       file1    file2            >        file3\n");
+	add_token(&tokens, create_token("&&", T_LOGIC, minishell));
 	add_token(&tokens, create_token("cat", T_WORD, minishell));
-	add_token(&tokens, create_token("file1", T_WORD, minishell));
-	add_token(&tokens, create_token("file2", T_WORD, minishell));
+	add_token(&tokens, create_token("file.txt", T_WORD, minishell));
+	add_token(&tokens, create_token("||", T_LOGIC, minishell));
+	add_token(&tokens, create_token("wc", T_WORD, minishell));
+	add_token(&tokens, create_token("-l", T_WORD, minishell));
+
+	result = parsing(tokens, minishell);
+	if (result)
+	{
+		current = result;
+		cmd_num = 1;
+		while (current)
+		{
+			printf("Commande %d:\n", cmd_num++);
+			print_cmd_simple(current);
+			current = current->next;
+		}
+	}
+	else
+		printf("Le parsing a retourné NULL (erreur détectée)\n");
+
+	// Test 9: Redirections sans fichier
+	tokens = NULL;
+	printf("\nTest 9: Redirections sans fichier\n");
+	printf("Commande: cat < > >>\n");
+	printf("Résultat attendu: ERREUR (ERR_SYNTAX_REDIRECT)\n");
+	add_token(&tokens, create_token("cat", T_WORD, minishell));
+	add_token(&tokens, create_token("<", T_REDIR, minishell));
 	add_token(&tokens, create_token(">", T_REDIR, minishell));
-	add_token(&tokens, create_token("file3", T_WORD, minishell));
+	add_token(&tokens, create_token(">>", T_REDIR, minishell));
 
 	result = parsing(tokens, minishell);
 	if (result)
 		print_cmd_simple(result);
+	else
+		printf("Le parsing a retourné NULL (erreur détectée)\n");
+
+	// Test 10: Commandes vides avec opérateurs
+	tokens = NULL;
+	printf("\nTest 10: Commandes vides avec opérateurs\n");
+	printf("Commande: \"\" && \"\" || \"\"\n");
+	printf("Résultat attendu: Commande avec arguments vides\n");
+	add_token(&tokens, create_token("", T_WORD, minishell));
+	add_token(&tokens, create_token("&&", T_LOGIC, minishell));
+	add_token(&tokens, create_token("", T_WORD, minishell));
+	add_token(&tokens, create_token("||", T_LOGIC, minishell));
+	add_token(&tokens, create_token("", T_WORD, minishell));
+
+	result = parsing(tokens, minishell);
+	if (result)
+	{
+		current = result;
+		cmd_num = 1;
+		while (current)
+		{
+			printf("Commande %d:\n", cmd_num++);
+			print_cmd_simple(current);
+			current = current->next;
+		}
+	}
+	else
+		printf("Le parsing a retourné NULL (erreur détectée)\n");
+
+	// Test 11: Heredoc avec pipe et redirection multiple
+	tokens = NULL;
+	printf("\nTest 11: Heredoc avec pipe et redirection multiple\n");
+	printf("Commande: cat <<EOF | grep test > out1.txt >> out2.txt\n");
+	printf("Résultat attendu: Commande avec heredoc, pipe et redirections multiples\n");
+	add_token(&tokens, create_token("cat", T_WORD, minishell));
+	add_token(&tokens, create_token("<<", T_REDIR, minishell));
+	add_token(&tokens, create_token("EOF", T_WORD, minishell));
+	add_token(&tokens, create_token("|", T_PIPE, minishell));
+	add_token(&tokens, create_token("grep", T_WORD, minishell));
+	add_token(&tokens, create_token("test", T_WORD, minishell));
+	add_token(&tokens, create_token(">", T_REDIR, minishell));
+	add_token(&tokens, create_token("out1.txt", T_WORD, minishell));
+	add_token(&tokens, create_token(">>", T_REDIR, minishell));
+	add_token(&tokens, create_token("out2.txt", T_WORD, minishell));
+
+	result = parsing(tokens, minishell);
+	if (result)
+	{
+		current = result;
+		cmd_num = 1;
+		while (current)
+		{
+			printf("Commande %d:\n", cmd_num++);
+			print_cmd_simple(current);
+			current = current->next;
+		}
+	}
+	else
+		printf("Le parsing a retourné NULL (erreur détectée)\n");
+
+	// Test 12: Opérateurs logiques avec redirections
+	tokens = NULL;
+	printf("\nTest 12: Opérateurs logiques avec redirections\n");
+	printf("Commande: ls > out.txt && cat < in.txt || grep test >> log.txt\n");
+	printf("Résultat attendu: Commandes avec opérateurs logiques et redirections\n");
+	add_token(&tokens, create_token("ls", T_WORD, minishell));
+	add_token(&tokens, create_token(">", T_REDIR, minishell));
+	add_token(&tokens, create_token("out.txt", T_WORD, minishell));
+	add_token(&tokens, create_token("&&", T_LOGIC, minishell));
+	add_token(&tokens, create_token("cat", T_WORD, minishell));
+	add_token(&tokens, create_token("<", T_REDIR, minishell));
+	add_token(&tokens, create_token("in.txt", T_WORD, minishell));
+	add_token(&tokens, create_token("||", T_LOGIC, minishell));
+	add_token(&tokens, create_token("grep", T_WORD, minishell));
+	add_token(&tokens, create_token("test", T_WORD, minishell));
+	add_token(&tokens, create_token(">>", T_REDIR, minishell));
+	add_token(&tokens, create_token("log.txt", T_WORD, minishell));
+
+	result = parsing(tokens, minishell);
+	if (result)
+	{
+		current = result;
+		cmd_num = 1;
+		while (current)
+		{
+			printf("Commande %d:\n", cmd_num++);
+			print_cmd_simple(current);
+			current = current->next;
+		}
+	}
 	else
 		printf("Le parsing a retourné NULL (erreur détectée)\n");
 }
