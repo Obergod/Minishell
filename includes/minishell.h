@@ -15,6 +15,20 @@
 
 #include "../full_libft/include/libft.h"
 
+enum e_pipe
+{
+	START,
+	MIDLE,
+	END
+};
+
+enum e_state
+{
+    NORMAL,
+    IN_SQUOTE,
+    IN_DQUOTE
+};
+
 typedef struct s_minishell
 {
 	struct s_env *env;
