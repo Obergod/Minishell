@@ -1,0 +1,42 @@
+# Makefile pour test_simple
+
+CC = cc
+CFLAGS = -Wall -Wextra -I../../includes -I../../full_libft/include
+LDFLAGS = -lreadline
+
+NAME = test_simple
+SRC = test_simple.c \
+	../../src/parsing/parsing.c \
+	../../src/garbage_collector/garbage_collector.c \
+	../../src/garbage_collector/garbage_collector_2.c \
+	../../src/garbage_collector/utils/gc_strdup.c \
+	../../src/garbage_collector/utils/gc_split.c \
+	../../src/garbage_collector/utils/gc_strjoin.c \
+	../../src/garbage_collector/utils/gc_strjoin_three.c \
+	../../src/garbage_collector/utils/gc_strndup.c \
+	../../src/garbage_collector/utils/gc_strndup_array.c \
+	../../src/garbage_collector/utils/gc_calloc.c \
+	../../src/garbage_collector/utils/gc_substr.c
+
+OBJ = $(SRC:.c=.o)
+
+# Libft
+LIBFT = ../../full_libft/libftfull.a
+
+all: $(NAME)
+
+$(NAME): $(OBJ)
+	$(CC) $(OBJ) $(LIBFT) $(LDFLAGS) -o $(NAME)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJ)
+
+fclean: clean
+	rm -f $(NAME)
+
+re: fclean all
+
+.PHONY: all clean fclean re
