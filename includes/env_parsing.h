@@ -1,30 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.h                                          :+:      :+:    :+:   */
+/*   env_parsing.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 15:44:33 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/05 15:44:34 by mafioron         ###   ########.fr       */
+/*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
+/*   Updated: 2025/03/21 15:25:55 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSING_H
-# define PARSING_H
+#define PARSING_H
 
-# include "libft.h"
+#include "garbage_collector.h"
+#include "minishell.h"
+#include <stdio.h>
+#include <complex.h>
+#include <stdlib.h>
 
-enum		e_pipe
+typedef struct s_env
 {
-	START,
-	MIDLE,
-	END
-}
-
-/*****		A trier		******/
-
-
-
+	char *key;
+	char *value;
+	char *raw;
+	struct s_env *next;
+} t_env;
 
 #endif
