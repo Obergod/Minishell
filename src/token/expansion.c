@@ -99,7 +99,6 @@ char	*get_vars(char *str, int *i, t_minishell *minishell)
 	var_name = ft_substr(str, start, *i - start);
 	if (!var_name)
 		return(NULL);
-	//check what get_env returns to know if its a malloc_failure or an unsets var
 	res = find_in_env(var_name, minishell);
 	free(var_name);
 	if (!res)

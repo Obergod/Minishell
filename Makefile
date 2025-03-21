@@ -107,25 +107,28 @@ re: fclean all
 # Usage: make test_X où X est le nom du fichier dans test_dir sans l'extension .c
 test_%: $(LIBFT)
 	@echo "$(BOLD)$(YELLOW)👾 Compilation du test $(GREEN)$*$(YELLOW) en cours...$(RESET)"
-	@mkdir -p $(OBJ_DIR)
-	@$(CC) -o test_dir/$* test_dir/$*.c \
+	@mkdir -p test_dir/bin
+	@$(CC) -o test_dir/bin/$* test_dir/$*.c \
 		$(shell find $(SRC_DIR)/token -name "*.c") \
 		$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \
 		$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
+		$(shell find $(SRC_DIR)/parsing -name "*.c") \
 		$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull
 	@echo "$(BOLD)$(GREEN)✅ Test $(CYAN)$*$(GREEN) compilé avec succès !$(RESET)"
-	@echo "$(BOLD)$(PURPLE)🚀 Exécutez avec: ./test_dir/$* <arguments>$(RESET)"
+	@echo "$(BOLD)$(PURPLE)🚀 Exécutez avec: ./test_dir/bin/$* <arguments>$(RESET)"
 
 # Compile tous les tests disponibles
 test: $(LIBFT)
 	@echo "$(BOLD)$(YELLOW)🧪 Compilation de tous les tests disponibles...$(RESET)"
+	@mkdir -p test_dir/bin
 	@for test in $(wildcard test_dir/*.c); do \
 		test_name=$$(basename $$test .c); \
 		echo "$(BOLD)$(CYAN)📝 Compilation de $$test_name...$(RESET)"; \
-		$(CC) -o test_dir/$$test_name $$test \
+		$(CC) -o test_dir/bin/$$test_name $$test \
 			$(shell find $(SRC_DIR)/token -name "*.c") \
 			$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \
 			$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
+			$(shell find $(SRC_DIR)/parsing -name "*.c") \
 			$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
 	done
 	@echo "$(BOLD)$(GREEN)✅ Tous les tests ont été compilés avec succès !$(RESET)"

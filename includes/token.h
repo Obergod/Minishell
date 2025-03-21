@@ -46,7 +46,7 @@ typedef struct	s_token
 }	t_token;
 
 /*****		A trier			*****/
-t_token	*tokenize(const char *input);
+t_token	*tokenize(const char *input, t_minishell *minishell);
 
 
 
@@ -54,7 +54,7 @@ t_token	*tokenize(const char *input);
 int					is_operator(char c);
 void				operator_str(const char *input, char *buff, int i);
 enum e_token_type	handle_operator(const char *input, int *i);
-void				add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state);
+void	add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state, t_minishell *minishell);
 int					quotes_verif(const char *input);
 
 #endif

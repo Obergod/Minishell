@@ -12,7 +12,7 @@
 
 #include "token.h"
 
-t_token	*tokenize(const char *input)
+t_token	*tokenize(const char *input, t_minishell *minishell)
 {
 	int					i;
 	t_token				*token;
@@ -26,7 +26,7 @@ t_token	*tokenize(const char *input)
 		return (NULL);
 	i = -1;
 	nb_tok = 0;
-	buff = malloc(sizeof(char) * ft_strlen(input) + 1);
+	buff = gc_malloc((sizeof(char) * ft_strlen(input) + 1), minishell->gc);
 	token = NULL;
 	state = NORMAL;
 	token_state = NORMAL;
@@ -39,7 +39,7 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(&token, buff, T_WORD, token_state);
+					add_token(&token, buff, T_WORD, token_state, minishell);
 					nb_tok = 0;
 					token_state = state;
 				}
@@ -61,13 +61,13 @@ t_token	*tokenize(const char *input)
 				if (nb_tok > 0)
 				{
 					buff[nb_tok] = '\0';
-					add_token(&token, buff, T_WORD, token_state);
+					add_token(&token, buff, T_WORD, token_state, minishell);
 					nb_tok = 0;
 					token_state = state;
 				}
 				operator_str(input, buff, i);
 				type = handle_operator(input, &i);
-				add_token(&token, buff, type, NORMAL);
+				add_token(&token, buff, type, NORMAL, minishell);
 			}
 			else
 			{
@@ -102,9 +102,9 @@ t_token	*tokenize(const char *input)
 	if (nb_tok > 0)
 	{
 		buff[nb_tok] = '\0';
-		add_token(&token, buff, T_WORD, token_state);
+		add_token(&token, buff, T_WORD, token_state, minishell);
 	}
-	free(buff);
+	gc_free(buff, minishell->gc);
 	return (token);
 }
 
@@ -166,18 +166,18 @@ enum e_token_type	handle_operator(const char *input, int *i)
 	return (-1);
 }
 
-void	add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state)
+void	add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state, t_minishell *minishell)
 {
 	t_token	*new_token;
 	t_token	*tmp;
 
-	new_token = malloc(sizeof(t_token));
+	new_token = gc_malloc((sizeof(t_token)), minishell->gc);
 //	if (!new_token)
 //		clean_up_and_exit();
 	new_token->type = type;
 	new_token->state = state;
 	new_token->next = NULL;
-	new_token->str = ft_strdup(buff);
+	new_token->str = gc_strdup((buff), minishell->gc);
 //		if (!new_token->str)
 //			clean_up_and_exit;
 	if (*token == NULL)

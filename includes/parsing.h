@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include "token.h"
 
-typedef struct s_cmd //
+typedef struct s_cmd
 {
     char *command_raw; //grep -e "salut"
     char **command; //["grep"] ["-e"] ["salut"] [NULL]

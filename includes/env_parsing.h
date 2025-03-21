@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSING_H
-#define PARSING_H
+#ifndef ENV_PARSING_H
+#define ENV_PARSING_H
 
 #include "garbage_collector.h"
 #include "minishell.h"
