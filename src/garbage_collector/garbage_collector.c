@@ -6,11 +6,11 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:52:33 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/09 20:48:34 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 16:12:37 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "garbage_collector.h"
+#include "../../includes/garbage_collector.h"
 
 /**
  * @brief Initialise un nouveau collecteur de mémoire
@@ -37,18 +37,18 @@ t_gc_head	*gc_init(void)
  */
 int	gc_alloc(void *data, t_gc_head *head)
 {
-	t_gc	*new;
+	t_gc	*node;
 
 	if (!head || !data)
 		return (1);
 	if (gc_contains(data, head) == 1)
 		return (1);
-	new = malloc(sizeof(t_gc));
-	if (!new)
+	node = malloc(sizeof(t_gc));
+	if (!node)
 		return (1);
-	new->data = data;
-	new->next = head->head;
-	head->head = new;
+	node->data = data;
+	node->next = head->head;
+	head->head = node;
 	return (0);
 }
 

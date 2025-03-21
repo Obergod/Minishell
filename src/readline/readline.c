@@ -6,16 +6,11 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:05 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/20 15:23:20 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 15:27:38 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <readline/history.h>
-#include <readline/readline.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#define PROMPT "Entrer votre commande: "
+#include "../../includes/readline.h"
 
 static char	*ft_add_readline(const char *prompt, char **stock)
 {
@@ -66,8 +61,8 @@ int	ft_readline(void)
 	return (0);
 }
 
-int main(void)
-{
-	ft_readline();
-	return (0);
-}
+// int main(void)
+// {
+// 	ft_readline();
+// 	return (0);
+// }

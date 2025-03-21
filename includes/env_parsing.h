@@ -1,21 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   readline.h                                         :+:      :+:    :+:   */
+/*   env_parsing.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/07 15:50:37 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/07 15:50:47 by ufalzone         ###   ########.fr       */
+/*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
+/*   Updated: 2025/03/21 15:25:55 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef READLINE_H
-#define READLINE_H
+#ifndef PARSING_H
+#define PARSING_H
 
-#include <readline/readline.h>
-#include <readline/history.h>
+#include "garbage_collector.h"
+#include "minishell.h"
+#include <stdio.h>
+#include <complex.h>
+#include <stdlib.h>
 
-int	ft_readline(void);
+typedef struct s_env
+{
+	char *key;
+	char *value;
+	char *raw;
+	struct s_env *next;
+} t_env;
 
 #endif

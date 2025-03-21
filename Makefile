@@ -3,80 +3,104 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mafioron <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/11/05 15:31:44 by mafioron          #+#    #+#              #
-#    Updated: 2024/11/14 20:05:25 by mafioron         ###   ########.fr        #
+#    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
+#    Updated: 2025/03/21 16:16:33 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-# names
-NAME = Minishell
-#BONUS_NAME = checker
-LIBFT = full_libft/libftfull.a
-
-# Compilation
-CC = gcc
-#MAKEFLAGS += --silent
-WFLAGS = -Wall -Werror -Wextra
-CFLAGS += -I$(INCS_DIR) -I$(LIBFT_INC) $(WFLAGS)
-
-
-#printing
+# Couleurs
+RED = \033[31m
 GREEN = \033[32m
 YELLOW = \033[33m
+BLUE = \033[34m
+CYAN = \033[36m
+PURPLE = \033[35m
+BOLD = \033[1m
 RESET = \033[0m
-CLEAR = \033[2K\r
 
-# source and include directories
-SRCS_DIR = src/
-#SRCS_BONUS_DIR = src/checker_bonus/
-INCS_DIR = include/
-LIBFT_INC = full_libft/include/
+# Nom de l'exécutable
+NAME = minishell
 
-#sources
-COMMON_SRC = 
+# Répertoires
+SRC_DIR = src
+INCLUDE_DIR = includes
+OBJ_DIR = obj
+DEPFLAGS = -MMD -MP
 
-#MAIN_SRC =
+# Libft
+LIBFT_DIR = full_libft
+LIBFT = $(LIBFT_DIR)/libftfull.a
 
-#SRC_BONUS = 
+# Fichiers sources et objets
+SRC_FILES = $(shell find $(SRC_DIR) -type f -name "*.c")
+OBJ_FILES = $(SRC_FILES:%.c=$(OBJ_DIR)/%.o)
+DEP_FILES = $(OBJ_FILES:.o=.d) $(OBJ_FILES_BONUS:.o=.d)
 
-# full src with prefix
-COMMON_SRCS = $(addprefix $(SRCS_DIR), $(COMMON_SRC))
-#MAIN_SRCS = $(addprefix $(SRCS_DIR), $(MAIN_SRC))
-#SRCS_BONUS = $(addprefix $(SRCS_BONUS_DIR), $(SRC_BONUS))
+# Flags de compilation
+CC = cc
+CFLAGS = -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -Wall -Wextra -Werror -O3
+LDFLAGS = -lreadline
 
-# src to obj convertion
-COMMON_OBJ = $(COMMON_SRCS:.c=.o)
-#MAIN_OBJ = $(MAIN_SRCS:.c=.o)
-#OBJ_BONUS = $(SRCS_BONUS:.c=.o)
+# Règles
+.PHONY: all clean fclean re libft
 
-all: $(NAME)
+# Compilation principale
+all: banner $(OBJ_DIR) libft $(NAME)
+	@echo "$(BOLD)$(YELLOW)✨ $(GREEN)MINISHELL $(CYAN)PRÊT À L'EMPLOI ! $(YELLOW)PROFITEZ DE CETTE MERVEILLE TECHNOLOGIQUE ! ✨$(RESET)"
 
-$(LIBFT):
-	$(MAKE) -C full_libft re
+# Bannière stylée
+banner:
+	@echo "\n$(BOLD)$(CYAN)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)"
+	@echo "$(BOLD)$(PURPLE)                         ✧ MINISHELL EXTRAORDINAIRE ✧                         $(RESET)"
+	@echo "$(BOLD)$(BLUE)                 LE SHELL ULTIME QUI REDÉFINIT L'EXCELLENCE                     $(RESET)"
+	@echo "$(BOLD)$(CYAN)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)\n"
 
+# Compilation de la libft
+libft:
+	@echo "$(BOLD)$(YELLOW)🔮 Compilation de la libft légendaire...$(RESET)"
+	@$(MAKE) -C $(LIBFT_DIR) >/dev/null 2>&1
+	@echo "$(BOLD)$(GREEN)💎 Libft compilée avec brio ! Une merveille d'ingénierie !$(RESET)"
 
-$(NAME): $(LIBFT) $(COMMON_OBJ)
-	@printf "$(CLEAR)$(YELLOW)Creating $(NAME)..."
-	@$(CC) $(COMMON_OBJ) $(LIBFT) -o $(NAME)
-	@printf "$(CLEAR)$(GREEN)✓ $(NAME) successfully created!\n"
+# Création du dossier obj et ses sous-dossiers
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(dir $(OBJ_FILES))
+	@echo "$(BOLD)$(BLUE)🏗️  Création des structures de dossiers ultra-optimisées...$(RESET)"
 
-#bonus: $(LIBFT) $(COMMON_OBJ) $(OBJ_BONUS)
-#	$(CC) -o $(BONUS_NAME) $(COMMON_OBJ) $(OBJ_BONUS) $(LIBFT)
+# Compile le projet minishell
+$(NAME): $(OBJ_FILES) $(LIBFT)
+	@printf "$(BOLD)$(GREEN)⚡ Compilation du légendaire MINISHELL en cours...$(RESET)                       \r"
+	@sleep 0.5
+	@printf "$(BOLD)$(CYAN)⚡ Optimisation du code à la perfection...$(RESET)                               \r"
+	@sleep 0.5
+	@printf "$(BOLD)$(PURPLE)⚡ Intégration des technologies de pointe...$(RESET)                           \r"
+	@sleep 0.5
+	@$(CC) $(OBJ_FILES) $(LIBFT) $(CFLAGS) $(LDFLAGS) -o $(NAME)
+	@printf "\n$(BOLD)$(YELLOW)🚀 COMPILATION RÉUSSIE AVEC BRIO ! $(GREEN)$(NAME) $(YELLOW)EST MAINTENANT PRÊT À RÉVOLUTIONNER VOTRE MONDE !$(RESET)\n"
+	@echo "$(BOLD)$(CYAN)🌟 Une expérience utilisateur inégalée vous attend...$(RESET)"
 
+# Règle de compilation des fichiers objets
+$(OBJ_DIR)/%.o: %.c
+	@printf "$(BOLD)$(CYAN)🔧 Transformation magique de $<...$(RESET)\r"
+	@$(CC) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
+
+# Nettoyage des fichiers objets
 clean:
-	@printf "$(CLEAR)$(YELLOW)Cleaning object files..."
-	@$(MAKE) -C full_libft clean
-	@rm -f $(COMMON_OBJ)
-	@printf "$(CLEAR)$(GREEN)✓ Object files cleaned!\n"
+	@echo "$(BOLD)$(RED)🧹 Nettoyage cosmique des fichiers temporaires...$(RESET)"
+	@rm -rf $(OBJ_DIR)
+	@$(MAKE) -C $(LIBFT_DIR) clean
+	@echo "$(BOLD)$(GREEN)✨ Espace nettoyé avec une précision chirurgicale !$(RESET)"
 
+# Nettoyage complet
 fclean: clean
-	@printf "$(CLEAR)$(YELLOW)Removing executables..."
-	@$(MAKE) -C full_libft fclean
+	@echo "$(BOLD)$(RED)🗑️ Suppression stratégique de $(NAME) pour préparer une nouvelle ère...$(RESET)"
 	@rm -f $(NAME)
-	@printf "$(CLEAR)$(GREEN)✓ Executables removed!\n"
+	@$(MAKE) -C $(LIBFT_DIR) fclean
+	@echo "$(BOLD)$(GREEN)🌈 Tout est prêt pour une renaissance éclatante !$(RESET)"
 
+# Recompile tout
 re: fclean all
 
-.PHONY: all clean fclean re bonus
+-include $(DEP_FILES)

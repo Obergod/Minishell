@@ -1,17 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   garbage_collector2.c                               :+:      :+:    :+:   */
+/*   garbage_collector_2.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:49:10 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/20 15:24:08 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 15:23:10 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "garbage_collector.h"
-#include <stdio.h>
+#include "../../includes/garbage_collector.h"
 
 /**
  * @brief Alloue de la mémoire et l'enregistre dans le collecteur
