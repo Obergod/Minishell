@@ -22,6 +22,8 @@ t_token	*tokenize(const char *input)
 	int					nb_tok;
 	char				*buff;
 
+	if (quotes_verif(input) == 1)
+		return (NULL);
 	i = -1;
 	nb_tok = 0;
 	buff = malloc(sizeof(char) * ft_strlen(input) + 1);
@@ -150,6 +152,8 @@ enum e_token_type	handle_operator(const char *input, int *i)
 		}
 		return (T_PIPE);
 	}
+	else if (op == '(' || op == ')')
+		return (T_LOGIC);
 	else if (op == '&')
 	{
 		if (next_char == '&')

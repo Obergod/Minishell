@@ -13,7 +13,7 @@
 #include "token.h"
 #include "expand.h"
 
-t_token	*expand_vars(t_token *token)
+t_token	*expand_vars(t_token *token, t_minishell *minishell)
 {
 	char	*new_str;
 	t_token	*head;
@@ -26,7 +26,7 @@ t_token	*expand_vars(t_token *token)
 			token = token->next;
 		else
 		{
-			new_str = expand_str(token->str);
+			new_str = expand_str(token->str, minishell);
 			if (!new_str)
 			//	cleanup_and_exit();
 			free(token->str);
@@ -71,7 +71,7 @@ char	*expand_str(char *str)
 	return (new_str);
 }
 
-char	*get_vars(char *str, int *i)
+char	*get_vars(char *str, int *i, t_minishell *minishell)
 {
 	char	*res;
 	int		start;
@@ -96,10 +96,10 @@ char	*get_vars(char *str, int *i)
 	if (!var_name)
 		return(NULL);
 	//check what get_env returns to know if its a malloc_failure or an unsets var
-	res = get_env(var_name);
+	res = get_env(var_name, minishell);
 	free(var_name);
 	if (!res)
-		return (NULL);
+		return (ft_strdup(""));
 	return (res);
 }
 

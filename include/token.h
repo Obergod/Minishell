@@ -53,5 +53,6 @@ int					is_operator(char c);
 void				operator_str(const char *input, char *buff, int i);
 enum e_token_type	handle_operator(const char *input, int *i);
 void				add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state);
+int					quotes_verif(const char *input);
 
 #endif
