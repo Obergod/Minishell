@@ -34,6 +34,7 @@ enum		e_token_type
 	T_PIPE,
 	T_REDIR,
 	T_LOGIC,
+	T_PARANTHESES,
 	T_EOF
 };
 
