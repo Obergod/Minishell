@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 17:29:24 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 18:02:18 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ t_cmd	*new_cmd(t_minishell *minishell)
 	new->infile = NULL;
 	new->outfile = NULL;
 	new->append = -1;
+	new->logic_operator_type = NONE;
 	new->heredoc = NULL;
 	new->next = NULL;
 	return (new);
@@ -126,6 +127,7 @@ void add_cmd_to_list(t_cmd **cmd_list, t_cmd *current)
 		tmp = tmp->next;
 	tmp->next = current;
 }
+
 void print_error(enum error_parsing error)
 {
     switch (error)
@@ -148,6 +150,39 @@ void print_error(enum error_parsing error)
     }
 }
 
+static void t_redir_parsing(t_token *token, t_cmd **current_cmd, t_minishell *minishell)
+{
+	if (ft_strcmp(token->str, "<") == 0)
+		(*current_cmd)->infile = gc_strdup(token->next->str, minishell->gc);
+	else if(ft_strcmp(token->str, ">") == 0)
+	{
+		(*current_cmd)->outfile = gc_strdup(token->next->str, minishell->gc);
+		(*current_cmd)->append = 0;
+	}
+	else if(ft_strcmp(token->str, ">>") == 0)
+	{
+		(*current_cmd)->outfile = gc_strdup(token->next->str, minishell->gc);
+		(*current_cmd)->append = 1;
+	}
+	else if (ft_strcmp(token->str, "<<") == 0)
+	{
+		(*current_cmd)->heredoc = gc_strdup(token->next->str, minishell->gc);
+		(*current_cmd)->infile = NULL;
+	}
+}
+
+static void t_logic_parsing(t_token *token, t_cmd **current_cmd, t_minishell *minishell)
+{
+	if (ft_strcmp(token->str, "&&") == 0)
+		(*current_cmd)->logic_operator_type = AND;
+	else if (ft_strcmp(token->str, "||") == 0)
+		(*current_cmd)->logic_operator_type = OR;
+	else if (ft_strcmp(token->str, "(") == 0)
+		(*current_cmd)->logic_operator_type = OPEN_PARENTHESIS;
+	else if (ft_strcmp(token->str, ")") == 0)
+		(*current_cmd)->logic_operator_type = CLOSE_PARENTHESIS;
+}
+
 t_cmd *parsing(t_token *token, t_minishell *minishell)
 {
 	t_cmd *cmd_list;
@@ -166,26 +201,8 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 			add_arg_to_cmd(current_cmd, token->str, minishell->gc);
 		else if (token->type == T_REDIR)
 		{
-				if (ft_strcmp(token->str, "<") == 0)
-				{
-					current_cmd->infile = gc_strdup(token->next->str, minishell->gc);
-				}
-				else if(ft_strcmp(token->str, ">") == 0)
-				{
-					current_cmd->outfile = gc_strdup(token->next->str, minishell->gc);
-					current_cmd->append = 0;
-				}
-				else if(ft_strcmp(token->str, ">>") == 0)
-				{
-					current_cmd->outfile = gc_strdup(token->next->str, minishell->gc);
-					current_cmd->append = 1;
-				}
-				else if (ft_strcmp(token->str, "<<") == 0)
-				{
-					current_cmd->heredoc = gc_strdup(token->next->str, minishell->gc);
-					current_cmd->infile = NULL;
-				}
-			token=token->next;
+			t_redir_parsing(token, &current_cmd, minishell);
+			token = token->next;
 		}
 		else if(token->type == T_PIPE)
 		{
@@ -194,6 +211,9 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 		}
 		else if (token->type == T_LOGIC)
 		{
+			add_cmd_to_list(&cmd_list, current_cmd);
+			current_cmd = new_cmd(minishell);
+			t_logic_parsing(token, &current_cmd, minishell);
 			add_cmd_to_list(&cmd_list, current_cmd);
 			current_cmd = new_cmd(minishell);
 		}
