@@ -13,8 +13,8 @@
 #include "../../includes/token.h"
 #include "../../includes/expand.h"
 
-/* Global variable definition for the exit status */
-int g_exit_status = 0;
+/* Use the global variable declared in token.h and defined in the test file */
+/* int g_exit_status = 0; */
 
 t_token	*expand_vars(t_token *token, t_minishell *minishell)
 {

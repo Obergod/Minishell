@@ -40,11 +40,11 @@ DEP_FILES = $(OBJ_FILES:.o=.d) $(OBJ_FILES_BONUS:.o=.d)
 
 # Flags de compilation
 CC = cc
-CFLAGS = -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -Wall -Wextra -Werror -O3
+CFLAGS = -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -Wall -Wextra -Werror -O3 -g3
 LDFLAGS = -lreadline
 
 # Règles
-.PHONY: all clean fclean re libft
+.PHONY: all clean fclean re libft test
 
 # Compilation principale
 all: banner $(OBJ_DIR) libft $(NAME)
@@ -102,5 +102,32 @@ fclean: clean
 
 # Recompile tout
 re: fclean all
+
+# Règle de test dynamique
+# Usage: make test_X où X est le nom du fichier dans test_dir sans l'extension .c
+test_%: $(LIBFT)
+	@echo "$(BOLD)$(YELLOW)👾 Compilation du test $(GREEN)$*$(YELLOW) en cours...$(RESET)"
+	@mkdir -p $(OBJ_DIR)
+	@$(CC) -o test_dir/$* test_dir/$*.c \
+		$(shell find $(SRC_DIR)/token -name "*.c") \
+		$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \
+		$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
+		$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull
+	@echo "$(BOLD)$(GREEN)✅ Test $(CYAN)$*$(GREEN) compilé avec succès !$(RESET)"
+	@echo "$(BOLD)$(PURPLE)🚀 Exécutez avec: ./test_dir/$* <arguments>$(RESET)"
+
+# Compile tous les tests disponibles
+test: $(LIBFT)
+	@echo "$(BOLD)$(YELLOW)🧪 Compilation de tous les tests disponibles...$(RESET)"
+	@for test in $(wildcard test_dir/*.c); do \
+		test_name=$$(basename $$test .c); \
+		echo "$(BOLD)$(CYAN)📝 Compilation de $$test_name...$(RESET)"; \
+		$(CC) -o test_dir/$$test_name $$test \
+			$(shell find $(SRC_DIR)/token -name "*.c") \
+			$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \
+			$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
+			$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
+	done
+	@echo "$(BOLD)$(GREEN)✅ Tous les tests ont été compilés avec succès !$(RESET)"
 
 -include $(DEP_FILES)

@@ -29,5 +29,6 @@ typedef struct s_env
 
 /****		A trier		****/
 char *find_in_env(char *key, t_minishell *minishell);
+t_env *env_parsing(char **envp, t_minishell *minishell);
 
 #endif

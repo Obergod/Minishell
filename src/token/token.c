@@ -6,14 +6,11 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:17:02 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/21 17:25:33 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:42:26 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/token.h"
-
-/* Global variable is defined in test_dir/test_tok.c */
-// int g_exit_status = 0;
+#include "token.h"
 
 t_token	*tokenize(const char *input)
 {
@@ -29,7 +26,7 @@ t_token	*tokenize(const char *input)
 		return (NULL);
 	i = -1;
 	nb_tok = 0;
-	buff = gc_malloc(sizeof(char) * ft_strlen(input) + 1, minishell->gc);
+	buff = malloc(sizeof(char) * ft_strlen(input) + 1);
 	token = NULL;
 	state = NORMAL;
 	token_state = NORMAL;
@@ -174,13 +171,13 @@ void	add_token(t_token **token, char *buff, enum e_token_type type, enum e_state
 	t_token	*new_token;
 	t_token	*tmp;
 
-	new_token = gc_malloc(sizeof(t_token), minishell->gc);
+	new_token = malloc(sizeof(t_token));
 //	if (!new_token)
 //		clean_up_and_exit();
 	new_token->type = type;
 	new_token->state = state;
 	new_token->next = NULL;
-	new_token->str = gc_strdup(buff, minishell->gc);
+	new_token->str = ft_strdup(buff);
 //		if (!new_token->str)
 //			clean_up_and_exit;
 	if (*token == NULL)
