@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 16:17:03 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 16:55:58 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,32 +203,3 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 	return(cmd_list);
 }
 
-// Fonction pour créer un token et l'ajouter à la liste
-t_token *create_token(char *str, enum e_token_type type, t_minishell *minishell)
-{
-	t_token *token;
-
-	token = gc_malloc(sizeof(t_token), minishell->gc);
-	if (!token)
-		return (NULL);
-	token->str = gc_strdup(str, minishell->gc);
-	token->type = type;
-	token->next = NULL;
-	return (token);
-}
-
-// Fonction pour ajouter un token à la fin de la liste
-void add_token(t_token **head, t_token *new_token)
-{
-	t_token *current;
-
-	if (*head == NULL)
-	{
-		*head = new_token;
-		return;
-	}
-	current = *head;
-	while (current->next)
-		current = current->next;
-	current->next = new_token;
-}

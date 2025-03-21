@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   token.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:16:52 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/05 18:16:54 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/03/21 16:55:41 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TOKEN_H
 # define TOKEN_H
 
-# include "../../full_libft/include/libft.h"
 #include <string.h>
 
 extern int g_exit_status;

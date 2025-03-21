@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 16:48:21 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 16:14:47 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 16:56:11 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,20 +77,20 @@ char *find_in_env(char *key, t_minishell *minishell)
 	return (NULL);
 }
 
-int main(int ac, char **av, char **envp)
-{
-	t_minishell minishell;
-	t_gc_head *gc_head;
-	char *result;
+// int main(int ac, char **av, char **envp)
+// {
+// 	t_minishell minishell;
+// 	t_gc_head *gc_head;
+// 	char *result;
 
-	(void)ac; // Pour éviter l'avertissement de paramètre non utilisé
-	gc_head = gc_init();
-	minishell.gc = gc_head;
-	minishell.env = env_parsing(envp, &minishell);
-	// aff_env(minishell.env);
-	if ((result = find_in_env(av[1], &minishell)) != NULL)
-			printf("%s\n", result);
+// 	(void)ac; // Pour éviter l'avertissement de paramètre non utilisé
+// 	gc_head = gc_init();
+// 	minishell.gc = gc_head;
+// 	minishell.env = env_parsing(envp, &minishell);
+// 	// aff_env(minishell.env);
+// 	if ((result = find_in_env(av[1], &minishell)) != NULL)
+// 			printf("%s\n", result);
 
-	gc_print(gc_head);
-	gc_destroy(gc_head);
-}
+// 	gc_print(gc_head);
+// 	gc_destroy(gc_head);
+// }
