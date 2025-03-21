@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 15:16:27 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/21 17:21:28 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 17:24:10 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ char	*expand_str(char *str, t_minishell *minishell)
 	full_len = get_full_len(str, minishell);
 	if (full_len < 0)
 		return (NULL);
-	new_str = ft_calloc(full_len + 1, sizeof(char));
+	new_str = gc_calloc(full_len + 1, sizeof(char), minishell->gc);
 	if (!new_str)
 		return (NULL);
 	while (str[i])
@@ -85,7 +85,7 @@ char	*get_vars(char *str, int *i, t_minishell *minishell)
 	var_name = NULL;
 	res = NULL;
 	if (str[*i] != '?' && !ft_isalpha(str[*i]))
-		return (ft_strdup(""));
+		return (gc_strdup("", minishell->gc));
 	if (str[*i] == '?')
 	{
 		(*i)++;
@@ -103,7 +103,7 @@ char	*get_vars(char *str, int *i, t_minishell *minishell)
 	res = find_in_env(var_name, minishell);
 	free(var_name);
 	if (!res)
-		return (ft_strdup(""));
+		return (gc_strdup("", minishell->gc));
 	return (res);
 }
 

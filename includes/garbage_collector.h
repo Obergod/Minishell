@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 17:52:45 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 16:07:58 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 17:23:48 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,4 +67,5 @@ char			**gc_split(const char *str, char c, t_gc_head *gc);
 char			**gc_split_first_word(const char *str, char c, t_gc_head *gc);
 char			*gc_substr(char const *s, unsigned int start, size_t len, t_gc_head *gc);
 char			**gc_strndup_array(char **s1, size_t size, t_gc_head *gc);
+void			*gc_calloc(size_t count, size_t size, t_gc_head *gc);
 #endif
