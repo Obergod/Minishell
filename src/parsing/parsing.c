@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 17:21:50 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 17:29:24 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,7 +196,6 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 		{
 			add_cmd_to_list(&cmd_list, current_cmd);
 			current_cmd = new_cmd(minishell);
-
 		}
 		token = token->next;
 	}
