@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 15:16:27 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/19 15:16:27 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/03/21 17:21:28 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "token.h"
-#include "expand.h"
+#include "../../includes/token.h"
+#include "../../includes/expand.h"
 
 /* Global variable definition for the exit status */
 int g_exit_status = 0;
@@ -31,6 +31,7 @@ t_token	*expand_vars(t_token *token, t_minishell *minishell)
 		{
 			new_str = expand_str(token->str, minishell);
 			if (!new_str)
+				return (NULL); //temporaire pour pas d'erreur
 			//	cleanup_and_exit();
 			free(token->str);
 			token->str = new_str;

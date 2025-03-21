@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 16:11:54 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 17:21:00 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,34 +16,7 @@
 #include "minishell.h"
 #include "garbage_collector.h"
 #include <stdlib.h>
-
-
-enum    e_type
-{
-    COMMAND,
-    PIPE,
-    OPERATOR,
-};
-
-enum    e_pipe
-{
-    START,
-    MID,
-    END,
-};
-
-enum	e_logic
-{
-	AND,
-	OR
-};
-
-enum    e_state
-{
-    NORMAL,
-    IN_QUOTES,
-    IN_DQUOTES
-};
+#include "token.h"
 
 typedef struct s_cmd //
 {
@@ -58,13 +31,12 @@ typedef struct s_cmd //
 	struct s_cmd *next; //des que ya un pipe on passe au prochain
 } t_cmd;
 
-enum	e_token_type
+enum	e_logic_operator_type
 {
-	T_WORD,
-	T_PIPE,
-	T_REDIR,
-	T_LOGIC,
-	T_OTHER
+	AND,
+	OR,
+	OPEN_PARENTHESIS,
+	CLOSE_PARENTHESIS
 };
 
 enum	error_parsing
@@ -76,17 +48,7 @@ enum	error_parsing
 	ERR_SYNTAX_TOKEN // Toutes autres erreurs
 };
 
-typedef struct s_token
-{
-	char *str;
-	enum e_token_type type;
-	struct s_token *next;
-} t_token;
-
 // Déclarations des fonctions
-t_token *create_token(char *str, enum e_token_type type, t_minishell *minishell);
-void add_token(t_token **head, t_token *new_token);
-void print_cmd(t_cmd *cmd, int test_type);
 t_cmd *parsing(t_token *token, t_minishell *minishell);
 
 #endif

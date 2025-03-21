@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 17:33:03 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/06 17:33:04 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/03/21 17:18:13 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "token.h"
+#include "../../includes/token.h"
 
 int	is_operator(char c)
 {

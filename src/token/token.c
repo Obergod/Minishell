@@ -6,11 +6,11 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:17:02 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/11 15:42:26 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 17:18:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "token.h"
+#include "../../includes/token.h"
 
 /* Global variable is defined in test_dir/test_tok.c */
 // int g_exit_status = 0;

@@ -6,11 +6,12 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 16:55:58 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 17:21:50 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/parsing.h"
+#include "../../includes/token.h"
 
 //<< en position 0
 //EOF sera en position 1
