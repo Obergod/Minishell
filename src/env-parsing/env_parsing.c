@@ -69,7 +69,6 @@ char *find_in_env(char *key, t_minishell *minishell)
 	{
 		if (ft_strcmp(current->key, key) == 0)
 		{
-			printf("%s\n", current->raw);
 			return (current->value);
 		}
 		current = current->next;

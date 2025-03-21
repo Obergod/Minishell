@@ -60,7 +60,7 @@ banner:
 # Compilation de la libft
 libft:
 	@echo "$(BOLD)$(YELLOW)🔮 Compilation de la libft légendaire...$(RESET)"
-	@$(MAKE) -C $(LIBFT_DIR) >/dev/null 2>&1
+	@$(MAKE) -C $(LIBFT_DIR)
 	@echo "$(BOLD)$(GREEN)💎 Libft compilée avec brio ! Une merveille d'ingénierie !$(RESET)"
 
 # Création du dossier obj et ses sous-dossiers

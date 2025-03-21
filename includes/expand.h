@@ -18,9 +18,9 @@
 #include <string.h>
 
 /****		A trier		****/
-t_token	*expand_vars(t_token *token);
-char	*expand_str(char *str);
-char	*get_vars(char *str, int *i);
-int	get_full_len(char *str);
+t_token	*expand_vars(t_token *token, t_minishell *minishell);
+char	*expand_str(char *str, t_minishell *minishell);
+char	*get_vars(char *str, int *i, t_minishell *minishell);
+int		get_full_len(char *str, t_minishell *minishell);
 
 #endif

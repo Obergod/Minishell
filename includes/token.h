@@ -13,7 +13,10 @@
 #ifndef TOKEN_H
 # define TOKEN_H
 
-#include <string.h>
+# include <string.h>
+# include "minishell.h"
+# include "env_parsing.h"
+# include "garbage_collector.h"
 
 extern int g_exit_status;
 

@@ -27,4 +27,7 @@ typedef struct s_env
 	struct s_env *next;
 } t_env;
 
+/****		A trier		****/
+char *find_in_env(char *key, t_minishell *minishell);
+
 #endif

@@ -13,6 +13,9 @@
 #include "token.h"
 #include "expand.h"
 
+/* Global variable definition for the exit status */
+int g_exit_status = 0;
+
 t_token	*expand_vars(t_token *token, t_minishell *minishell)
 {
 	char	*new_str;
@@ -37,7 +40,7 @@ t_token	*expand_vars(t_token *token, t_minishell *minishell)
 	return (head);
 }
 
-char	*expand_str(char *str)
+char	*expand_str(char *str, t_minishell *minishell)
 {
 	char	*full_var;
 	int		full_len;
@@ -47,7 +50,7 @@ char	*expand_str(char *str)
 
 	i = 0;
 	j = 0;
-	full_len = get_full_len(str);
+	full_len = get_full_len(str, minishell);
 	if (full_len < 0)
 		return (NULL);
 	new_str = ft_calloc(full_len + 1, sizeof(char));
@@ -58,7 +61,7 @@ char	*expand_str(char *str)
 		if (str[i] == '$' && str[i + 1])
 		{
 			i++;
-			full_var = get_vars(str, &i);
+			full_var = get_vars(str, &i, minishell);
 			if (!full_var)
 				return (NULL);
 			ft_strlcpy(new_str + j, full_var, ft_strlen(full_var));
@@ -96,14 +99,14 @@ char	*get_vars(char *str, int *i, t_minishell *minishell)
 	if (!var_name)
 		return(NULL);
 	//check what get_env returns to know if its a malloc_failure or an unsets var
-	res = get_env(var_name, minishell);
+	res = find_in_env(var_name, minishell);
 	free(var_name);
 	if (!res)
 		return (ft_strdup(""));
 	return (res);
 }
 
-int	get_full_len(char *str)
+int	get_full_len(char *str, t_minishell *minishell)
 {
 	int		i;
 	int		full_len;
@@ -116,7 +119,7 @@ int	get_full_len(char *str)
 		if (str[i] == '$' && str[i + 1])
 		{
 			i++;
-			full_var = get_vars(str, &i);
+			full_var = get_vars(str, &i, minishell);
 			if (!full_var)
 				return (0);
 			full_len += ft_strlen(full_var);

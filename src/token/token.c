@@ -12,6 +12,9 @@
 
 #include "token.h"
 
+/* Global variable is defined in test_dir/test_tok.c */
+// int g_exit_status = 0;
+
 t_token	*tokenize(const char *input)
 {
 	int					i;
@@ -170,7 +173,6 @@ void	add_token(t_token **token, char *buff, enum e_token_type type, enum e_state
 {
 	t_token	*new_token;
 	t_token	*tmp;
-	char	op[2];
 
 	new_token = malloc(sizeof(t_token));
 //	if (!new_token)
