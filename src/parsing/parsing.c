@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 18:02:18 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/21 18:57:20 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,7 +171,7 @@ static void t_redir_parsing(t_token *token, t_cmd **current_cmd, t_minishell *mi
 	}
 }
 
-static void t_logic_parsing(t_token *token, t_cmd **current_cmd, t_minishell *minishell)
+static void t_logic_parsing(t_token *token, t_cmd **current_cmd)
 {
 	if (ft_strcmp(token->str, "&&") == 0)
 		(*current_cmd)->logic_operator_type = AND;
@@ -213,7 +213,7 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 		{
 			add_cmd_to_list(&cmd_list, current_cmd);
 			current_cmd = new_cmd(minishell);
-			t_logic_parsing(token, &current_cmd, minishell);
+			t_logic_parsing(token, &current_cmd);
 			add_cmd_to_list(&cmd_list, current_cmd);
 			current_cmd = new_cmd(minishell);
 		}
