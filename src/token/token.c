@@ -153,7 +153,7 @@ enum e_token_type	handle_operator(const char *input, int *i)
 		return (T_PIPE);
 	}
 	else if (op == '(' || op == ')')
-		return (T_LOGIC);
+		return (T_PARANTHESES);
 	else if (op == '&')
 	{
 		if (next_char == '&')
