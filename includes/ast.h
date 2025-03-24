@@ -1,33 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   gc_strndup_array.c                                 :+:      :+:    :+:   */
+/*   ast.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/21 16:07:24 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/24 16:17:40 by ufalzone         ###   ########.fr       */
+/*   Created: 2025/03/22 15:47:55 by ufalzone          #+#    #+#             */
+/*   Updated: 2025/03/24 18:23:03 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../../includes/garbage_collector.h"
+#ifndef AST_H
+#define AST_H
 
-char	**gc_strndup_array(char **s1, size_t size, t_gc_head *gc)
+#include "minishell.h"
+#include "parsing.h"
+
+enum node_type
 {
-	int		j;
-	char	**new_array;
+	NODE_NONE,
+	NODE_CMD,
+	NODE_PIPE,
+	NODE_AND,
+	NODE_OR,
+	NODE_OPEN_PARENTHESIS,
+	NODE_CLOSE_PARENTHESIS
+};
 
-	j = 0;
-	new_array = gc_malloc((sizeof(char *) * size) + 1, gc);
-	if (!new_array)
-		return (NULL);
-	while (s1[j])
-	{
-		new_array[j] = gc_strdup(s1[j], gc);
-		if (!new_array[j])
-			return (NULL);
-		j++;
-	}
-	new_array[j] = NULL;
-	return (new_array);
-}
+typedef struct s_ast_node
+{
+    enum node_type type;
+	t_cmd *cmd;
+	int subshell;
+	struct s_ast_node *left;
+    struct s_ast_node *right;
+
+} t_ast_node;
+
+#endif

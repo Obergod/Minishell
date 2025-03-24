@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/03/21 16:56:51 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/03/24 18:15:16 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -112,7 +112,9 @@ test_%: $(LIBFT)
 		$(shell find $(SRC_DIR)/token -name "*.c") \
 		$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \
 		$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
-		$(shell find $(SRC_DIR)/parsing -name "*.c") \
+		$(shell find $(SRC_DIR)/parsing -name "*.c" | grep -v "ast/") \
+		$(shell find $(SRC_DIR)/parsing/ast -name "*.c") \
+		$(shell find $(SRC_DIR)/ast_visualizer -name "*.c") \
 		$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull
 	@echo "$(BOLD)$(GREEN)✅ Test $(CYAN)$*$(GREEN) compilé avec succès !$(RESET)"
 	@echo "$(BOLD)$(PURPLE)🚀 Exécutez avec: ./test_dir/bin/$* <arguments>$(RESET)"
@@ -128,7 +130,9 @@ test: $(LIBFT)
 			$(shell find $(SRC_DIR)/token -name "*.c") \
 			$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \
 			$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
-			$(shell find $(SRC_DIR)/parsing -name "*.c") \
+			$(shell find $(SRC_DIR)/parsing -name "*.c" | grep -v "ast/") \
+			$(shell find $(SRC_DIR)/parsing/ast -name "*.c") \
+			$(shell find $(SRC_DIR)/ast_visualizer -name "*.c") \
 			$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
 	done
 	@echo "$(BOLD)$(GREEN)✅ Tous les tests ont été compilés avec succès !$(RESET)"
