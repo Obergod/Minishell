@@ -61,8 +61,8 @@ int	ft_readline(void)
 	return (0);
 }
 
-// int main(void)
-// {
-// 	ft_readline();
-// 	return (0);
-// }
+ int main(void)
+ {
+ 	ft_readline();
+ 	return (0);
+ }

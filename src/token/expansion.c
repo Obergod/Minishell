@@ -13,9 +13,7 @@
 #include "../../includes/token.h"
 #include "../../includes/expand.h"
 
-/* Use the global variable declared in token.h and defined in the test file */
-/* int g_exit_status = 0; */
-
+//gerer l'export
 t_token	*expand_vars(t_token *token, t_minishell *minishell)
 {
 	char	*new_str;
@@ -24,10 +22,8 @@ t_token	*expand_vars(t_token *token, t_minishell *minishell)
 	head = token;
 	while (token)
 	{
-		if (token->type != T_WORD || token->state == IN_SQUOTE
-				|| !ft_strchr(token->str, '$'))
-			token = token->next;
-		else
+		if (token->type == T_WORD && token->state != IN_SQUOTE
+				&& ft_strchr(token->str, '$'))
 		{
 			new_str = expand_str(token->str, minishell);
 			if (!new_str)
@@ -37,6 +33,10 @@ t_token	*expand_vars(t_token *token, t_minishell *minishell)
 			token->str = new_str;
 			token = token->next;
 		}
+//		if (ft_strchr(token->str, '*'))
+//			expand_wildcards()
+		else
+			token = token->next;
 	}
 	return (head);
 }
