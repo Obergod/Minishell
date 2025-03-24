@@ -23,7 +23,7 @@ int	main(int ac, char **av, char **envp)
 
 	gc_head = gc_init();
 	minishell.gc = gc_head;
-	
+
 	// Initialize environment
 	minishell.env = env_parsing(envp, &minishell);
 	if (!minishell.env) {
@@ -31,12 +31,12 @@ int	main(int ac, char **av, char **envp)
 		gc_destroy(gc_head);
 		return (1);
 	}
-	
+
 	token = tokenize(av[1], &minishell);
-	if (token) 
+	if (token)
 	{
 		token = expand_vars(token, &minishell);
-		
+
 		// Print token information
 		t_token *current = token;
 		printf("******/		tokenization		******/\n\n");
@@ -58,12 +58,40 @@ int	main(int ac, char **av, char **envp)
 	while (cmd_head)
 	{
 		printf("Command_raw :%s\n", cmd_head->command_raw);
-		for (int i=0;cmd_head->command[i];i++)
+		for (int i=0; cmd_head->command[i]; i++)
 			printf("[%d] Command: %s\n", i, cmd_head->command[i]);
-		printf("Infile: %s\n", cmd_head->infile);
-		printf("Outfile: %s\n", cmd_head->outfile);
-		printf("Append: %d\n", cmd_head->append);
-		printf("Heredoc: %s\n", cmd_head->heredoc);
+
+		// Afficher les redirections
+		printf("Redirections:\n");
+		t_redir *current_redir = cmd_head->redirs;
+		int redir_count = 0;
+		while (current_redir)
+		{
+			printf("  [%d] ", redir_count++);
+			switch (current_redir->type)
+			{
+				case REDIR_IN:
+					printf("Type: < (REDIR_IN)");
+					break;
+				case REDIR_OUT:
+					printf("Type: > (REDIR_OUT)");
+					break;
+				case REDIR_APPEND:
+					printf("Type: >> (REDIR_APPEND)");
+					break;
+				case REDIR_HEREDOC:
+					printf("Type: << (REDIR_HEREDOC)");
+					break;
+				default:
+					printf("Type: UNKNOWN");
+			}
+			printf(", File/Delimiter: %s\n", current_redir->file_or_delimiter);
+			current_redir = current_redir->next;
+		}
+		if (redir_count == 0)
+			printf("  Aucune redirection\n");
+
+		printf("Logic operator type: %d\n", cmd_head->logic_operator_type);
 		printf("\n");
 		cmd_head = cmd_head->next;
 	}

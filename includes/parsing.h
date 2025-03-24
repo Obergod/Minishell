@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 19:10:08 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/24 14:38:07 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,29 @@ enum	e_logic_operator_type
 	CLOSE_PARENTHESIS
 };
 
+enum	e_redir_type
+{
+	REDIR_IN,   // <
+	REDIR_OUT,  // >
+	REDIR_APPEND, // >>
+	REDIR_HEREDOC // <<
+};
+
+typedef struct s_redir
+{
+	enum e_redir_type type;
+	char *file_or_delimiter;
+	struct s_redir *next;
+} t_redir;
+
 typedef struct s_cmd
 {
     char *command_raw; //grep -e "salut"
     char **command; //["grep"] ["-e"] ["salut"] [NULL]
 	size_t _arg_count;
 	size_t _arg_capacity;
-    char *infile; //file d'entree
-	char *outfile; //file de sortie
-	int append; //>> ou pas
 	enum e_logic_operator_type logic_operator_type; //&& || ( )
-	char *heredoc; //delimiteur
+	struct s_redir *redirs; // Liste des redirections
 	struct s_cmd *next; //des que ya un pipe on passe au prochain
 } t_cmd;
 
@@ -53,5 +65,7 @@ enum	error_parsing
 
 // Déclarations des fonctions
 t_cmd *parsing(t_token *token, t_minishell *minishell);
+t_redir *new_redir(enum e_redir_type type, char *file_or_delimiter, t_gc_head *gc);
+void add_redir_to_cmd(t_cmd *cmd, t_redir *redir);
 
 #endif
