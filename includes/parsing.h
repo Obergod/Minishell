@@ -13,10 +13,12 @@
 #ifndef PARSING_H
 #define PARSING_H
 
-#include "minishell.h"
-#include "garbage_collector.h"
 #include <stdlib.h>
+#include "garbage_collector.h"
 #include "token.h"
+
+// Forward declaration of t_minishell to prevent circular dependency
+typedef struct s_minishell t_minishell;
 
 enum	e_logic_operator_type
 {
@@ -53,5 +55,6 @@ enum	error_parsing
 
 // Déclarations des fonctions
 t_cmd *parsing(t_token *token, t_minishell *minishell);
+void print_parsing(t_cmd *cmd_head);
 
 #endif

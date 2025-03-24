@@ -13,14 +13,14 @@
 #ifndef MAIN_H
 # define MAIN_H
 
+# include "minishell.h"
+# include "garbage_collector.h"
+# include "token.h"
 # include "env_parsing.h"
 # include "expand.h"
-# include "garbage_collector.h"
-# include "minishell.h"
-# include "parsing.h"
 # include "readline.h"
-# include "token.h"
+# include "parsing.h"
 
-
+/* Function declarations for main */
 
 #endif

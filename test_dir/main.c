@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../includes/parsing.h"
 #include "../includes/main.h"
 
 int	g_exit_status = 0;

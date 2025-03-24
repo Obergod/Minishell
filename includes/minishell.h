@@ -15,6 +15,11 @@
 
 #include "../full_libft/include/libft.h"
 
+// Forward declarations
+struct s_env;
+struct s_cmd;
+struct s_gc_head;
+
 typedef struct s_minishell
 {
 	struct s_env *env;
