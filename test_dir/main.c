@@ -45,25 +45,6 @@ static void	handle_signal(int sig)
 	}
 }
 
-int	ft_readline(void)
-{
-	char	*input;
-
-	rl_catch_signals = 0; // Desactive la gestion auto des signaux de readline
-	signal(SIGINT, handle_signal);
-	signal(SIGQUIT, SIG_IGN);
-	while (ft_add_readline(PROMPT, &input) != NULL)
-	{
-		if (*input)
-			add_history(input);
-		printf("Commande entrée: %s\n", input);
-		free(input);
-	}
-	rl_clear_history();
-	handle_signal(SIGTERM);
-	return (0);
-}
-
 int	init_minishell(t_minishell *minishell, char **envp)
 {
 	t_gc_head	*gc_head;
@@ -132,7 +113,10 @@ int	main(int ac, char **av, char **envp)
 	{
 		token = tokenize(input, &minishell);
 		if (token)
+		{
+			token = expand_vars(token, &minishell);
 			print_token(token);
+		}
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);	
