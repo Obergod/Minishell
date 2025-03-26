@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 15:47:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/24 18:23:03 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/25 16:24:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,5 +36,9 @@ typedef struct s_ast_node
     struct s_ast_node *right;
 
 } t_ast_node;
+
+t_ast_node	*create_node(enum node_type type, t_minishell *minishell);
+t_ast_node	*create_command_node(t_cmd *cmd, t_minishell *minishell);
+t_ast_node	*build_ast(t_cmd *cmd_list, t_minishell *minishell);
 
 #endif

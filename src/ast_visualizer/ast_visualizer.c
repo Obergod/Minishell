@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 00:00:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/24 18:49:32 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/25 13:32:44 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,28 +24,18 @@ void    visualize_ast(t_ast_node *ast, const char *output_filename)
     char    dot_filename[256];
     char    img_filename[256];
 
-    printf("DEBUG: Entrée dans visualize_ast, ast=%p, output=%s\n",
-           (void*)ast, output_filename ? output_filename : "NULL");
-
     if (!ast || !output_filename)
-    {
-        printf("DEBUG: Sortie de visualize_ast - paramètres invalides\n");
         return;
-    }
 
     // Créer les noms de fichiers
     snprintf(dot_filename, sizeof(dot_filename), "/tmp/%s.dot", output_filename);
     snprintf(img_filename, sizeof(img_filename), "%s.png", output_filename);
-
-    printf("DEBUG: Fichiers temporaires: dot=%s, img=%s\n", dot_filename, img_filename);
 
     // Génère le fichier DOT
     generate_dot_file(ast, dot_filename);
 
     // Génère l'image
     render_ast_image(dot_filename, img_filename);
-
-    printf("DEBUG: Sortie de visualize_ast\n");
 }
 
 /**
@@ -59,20 +49,13 @@ void    generate_dot_file(t_ast_node *ast, const char *filename)
     FILE    *dot_file;
     int     node_counter = 0;
 
-    printf("DEBUG: Entrée dans generate_dot_file, ast=%p, filename=%s\n",
-           (void*)ast, filename ? filename : "NULL");
-
     if (!ast || !filename)
-    {
-        printf("DEBUG: Sortie de generate_dot_file - paramètres invalides\n");
         return;
-    }
 
     dot_file = fopen(filename, "w");
     if (!dot_file)
     {
         perror("Error opening dot file");
-        printf("DEBUG: Sortie de generate_dot_file - échec ouverture fichier\n");
         return;
     }
 
@@ -80,15 +63,12 @@ void    generate_dot_file(t_ast_node *ast, const char *filename)
     write_dot_header(dot_file);
 
     // Écrire récursivement les nœuds de l'AST
-    printf("DEBUG: Avant write_ast_recursive\n");
     write_ast_recursive(dot_file, ast, -1, 0, &node_counter);
-    printf("DEBUG: Après write_ast_recursive\n");
 
     // Écrire le pied de page du fichier DOT
     write_dot_footer(dot_file);
 
     fclose(dot_file);
-    printf("DEBUG: Sortie de generate_dot_file\n");
 }
 
 /**
@@ -101,28 +81,17 @@ void    render_ast_image(const char *dot_filename, const char *output_filename)
 {
     char    command[512];
 
-    printf("DEBUG: Entrée dans render_ast_image, dot=%s, output=%s\n",
-           dot_filename ? dot_filename : "NULL",
-           output_filename ? output_filename : "NULL");
-
     if (!dot_filename || !output_filename)
-    {
-        printf("DEBUG: Sortie de render_ast_image - paramètres invalides\n");
         return;
-    }
 
     // Construire la commande pour générer l'image avec une meilleure qualité
     snprintf(command, sizeof(command),
              "dot -Tpng -Gdpi=300 -o%s %s && echo \"AST visualisé dans %s\"",
              output_filename, dot_filename, output_filename);
 
-    printf("DEBUG: Commande à exécuter: %s\n", command);
-
     // Exécuter la commande
     if (system(command) != 0)
         perror("Error generating AST image");
-
-    printf("DEBUG: Sortie de render_ast_image\n");
 }
 
 /**
@@ -160,19 +129,11 @@ void    write_dot_footer(FILE *dot_file)
 void    write_ast_recursive(FILE *dot_file, t_ast_node *node,
                        int parent_id, int current_id, int *node_counter)
 {
-    printf("DEBUG: write_ast_recursive node=%p, type=%d\n",
-           (void*)node, node ? node->type : -1);
-
     if (!node || !dot_file || !node_counter)
-    {
-        printf("DEBUG: Sortie de write_ast_recursive - paramètres invalides\n");
         return;
-    }
 
     // Écrire le nœud actuel
-    printf("DEBUG: Avant write_node\n");
     write_node(dot_file, node, node_counter);
-    printf("DEBUG: Après write_node\n");
 
     // Connexion au parent
     if (parent_id >= 0)
@@ -184,7 +145,6 @@ void    write_ast_recursive(FILE *dot_file, t_ast_node *node,
     // Fils gauche
     if (node->left)
     {
-        printf("DEBUG: Traitement du fils gauche\n");
         (*node_counter)++;
         write_ast_recursive(dot_file, node->left, current_id, *node_counter, node_counter);
     }
@@ -192,12 +152,9 @@ void    write_ast_recursive(FILE *dot_file, t_ast_node *node,
     // Fils droit
     if (node->right)
     {
-        printf("DEBUG: Traitement du fils droit\n");
         (*node_counter)++;
         write_ast_recursive(dot_file, node->right, current_id, *node_counter, node_counter);
     }
-
-    printf("DEBUG: Sortie de write_ast_recursive\n");
 }
 
 /**
@@ -209,24 +166,17 @@ void    write_ast_recursive(FILE *dot_file, t_ast_node *node,
  */
 void    write_node(FILE *dot_file, t_ast_node *node, int *node_counter)
 {
-    printf("DEBUG: Entrée dans write_node, node=%p\n", (void*)node);
-
     if (!node || !dot_file || !node_counter)
-    {
-        printf("DEBUG: Sortie de write_node - paramètres invalides\n");
         return;
-    }
 
     // Vérifier que le type de nœud est valide
     if (node->type < NODE_NONE || node->type > NODE_CLOSE_PARENTHESIS)
     {
-        printf("DEBUG: ERREUR - Type de nœud invalide: %d\n", node->type);
         fprintf(dot_file, "  node%d [label=\"INVALID TYPE %d\", fillcolor=\"#FF0000\"];\n",
             *node_counter, node->type);
         return;
     }
 
-    printf("DEBUG: Obtention du label et de la couleur\n");
     char *label = get_node_label(node);
     char *color = get_node_color(node->type);
 
@@ -289,16 +239,11 @@ void    write_node(FILE *dot_file, t_ast_node *node, int *node_counter)
             sprintf(extra_attrs, ", penwidth=2.5, style=\"filled,rounded\", color=\"%s\"", border_color);
     }
 
-    printf("DEBUG: Label=%s, Color=%s\n",
-           label ? label : "NULL",
-           final_color);
-
     // Écrire le nœud avec tous ses attributs
     fprintf(dot_file, "  node%d [label=\"%s\", fillcolor=\"%s\"%s];\n",
             *node_counter, label ? label : "ERROR", final_color, extra_attrs);
 
     free(label); // Libérer la mémoire allouée par get_node_label
-    printf("DEBUG: Sortie de write_node\n");
 }
 
 /**
