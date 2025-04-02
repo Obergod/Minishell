@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 00:00:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/02 17:15:23 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/02 22:50:23 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ void    render_ast_image(const char *dot_filename, const char *output_filename)
 
     // Construire la commande pour générer l'image avec une meilleure qualité
     snprintf(command, sizeof(command),
-             "dot -Tpng -Gdpi=300 -o%s %s && echo \"AST visualisé dans %s\"",
+             "dot -Tpng -Gdpi=400 -Gsize=10,10 -Gratio=fill -o%s %s && echo \"AST visualisé dans %s\"",
              output_filename, dot_filename, output_filename);
 
     // Exécuter la commande
@@ -136,9 +136,9 @@ void    render_ast_image(const char *dot_filename, const char *output_filename)
 void    write_dot_header(FILE *dot_file)
 {
     fprintf(dot_file, "digraph AST {\n");
-    fprintf(dot_file, "  graph [rankdir=TB, fontname=\"Arial\", bgcolor=\"#F8F8F8\", nodesep=0.8, ranksep=0.8];\n");
-    fprintf(dot_file, "  node [shape=box, style=\"filled,rounded\", fontname=\"Arial\", fontsize=11, margin=\"0.4,0.3\"];\n");
-    fprintf(dot_file, "  edge [fontname=\"Arial\", color=\"#555555\", penwidth=1.2];\n\n");
+    fprintf(dot_file, "  graph [rankdir=TB, fontname=\"Arial\", bgcolor=\"#F8F8F8\", nodesep=1.0, ranksep=1.0, splines=ortho];\n");
+    fprintf(dot_file, "  node [shape=box, style=\"filled,rounded\", fontname=\"Arial\", fontsize=12, margin=\"0.4,0.3\"];\n");
+    fprintf(dot_file, "  edge [fontname=\"Arial\", color=\"#555555\", penwidth=1.5, arrowsize=1.2];\n\n");
 }
 
 /**
@@ -249,28 +249,45 @@ void    write_node(FILE *dot_file, t_ast_node *node, int *node_counter)
     if (node->type == NODE_CMD && node->cmd && node->cmd->redirs)
     {
         t_redir *redir = node->cmd->redirs;
-        char border_color[8] = "#3366ff"; // Bleu par défaut
+        char border_color[8];
 
-        // Couleur différente selon le type de la première redirection
-        switch (redir->type)
-        {
-            case REDIR_IN:
-                strcpy(border_color, "#009900"); // Vert foncé pour l'entrée
-                break;
-            case REDIR_OUT:
-            case REDIR_APPEND:
-                strcpy(border_color, "#cc3300"); // Rouge pour la sortie
-                break;
-            case REDIR_HEREDOC:
-                strcpy(border_color, "#9900cc"); // Violet pour heredoc
-                break;
+        // Compter les différents types de redirections
+        int in_count = 0, out_count = 0, append_count = 0, heredoc_count = 0;
+        t_redir *temp_redir = redir;
+
+        while (temp_redir) {
+            switch (temp_redir->type) {
+                case REDIR_IN: in_count++; break;
+                case REDIR_OUT: out_count++; break;
+                case REDIR_APPEND: append_count++; break;
+                case REDIR_HEREDOC: heredoc_count++; break;
+            }
+            temp_redir = temp_redir->next;
         }
+
+        // Déterminer la couleur de bordure en fonction des redirections présentes
+        if (heredoc_count > 0)
+            strcpy(border_color, "#9900cc"); // Violet pour heredoc (priorité la plus haute)
+        else if (in_count > 0 && (out_count > 0 || append_count > 0))
+            strcpy(border_color, "#ff6600"); // Orange pour entrée+sortie
+        else if (in_count > 0)
+            strcpy(border_color, "#009900"); // Vert foncé pour l'entrée uniquement
+        else if (out_count > 0 || append_count > 0)
+            strcpy(border_color, "#cc3300"); // Rouge pour la sortie uniquement
+        else
+            strcpy(border_color, "#3366ff"); // Bleu par défaut (ne devrait pas arriver)
+
+        // Définir l'épaisseur de la bordure en fonction du nombre total de redirections
+        int total_redirs = in_count + out_count + append_count + heredoc_count;
+        float border_width = 2.0 + (total_redirs > 3 ? 1.5 : total_redirs * 0.5);
 
         // Si le nœud a déjà des attributs pour sous-shell, ajouter à ceux-ci
         if (node->subshell)
-            sprintf(extra_attrs, ", penwidth=3, style=\"filled,rounded,dashed\", color=\"%s\"", border_color);
+            sprintf(extra_attrs, ", penwidth=%.1f, style=\"filled,rounded,dashed\", color=\"%s\"",
+                    border_width, border_color);
         else
-            sprintf(extra_attrs, ", penwidth=2.5, style=\"filled,rounded\", color=\"%s\"", border_color);
+            sprintf(extra_attrs, ", penwidth=%.1f, style=\"filled,rounded\", color=\"%s\"",
+                    border_width, border_color);
     }
 
     // Écrire le nœud avec tous ses attributs
@@ -315,7 +332,7 @@ char    *get_node_color(enum node_type type)
 char    *get_node_label(t_ast_node *node)
 {
     char *label;
-    char redir_part[256] = ""; // Augmenté la taille pour plus de détails
+    char redir_part[512] = ""; // Augmenté la taille pour plus de détails
     int has_redirs = 0;
 
     if (!node)
@@ -336,51 +353,64 @@ char    *get_node_label(t_ast_node *node)
                 {
                     has_redirs = 1;
                     t_redir *redir = node->cmd->redirs;
-                    char temp_redir[128];
+                    char temp_redir[256];
 
-                    // En-tête des redirections
-                    strcpy(redir_part, "\\n-- Redirections: --");
+                    // En-tête des redirections avec séparateur visuel
+                    strcpy(redir_part, "\\n\\n━━━━ REDIRECTIONS ━━━━");
 
                     // Parcourir toutes les redirections
+                    int redir_count = 0;
                     while (redir)
                     {
                         char redir_symbol[5] = "";
-                        char redir_type[15] = "";
+                        char redir_type[20] = "";
+                        char redir_color[20] = "";
 
-                        // Obtenir le symbole et le type de redirection
+                        // Obtenir le symbole, le type et la couleur de redirection
                         switch (redir->type)
                         {
                             case REDIR_IN:
                                 strcpy(redir_symbol, "<");
-                                strcpy(redir_type, "INPUT");
+                                strcpy(redir_type, "ENTRÉE");
+                                strcpy(redir_color, "green");
                                 break;
                             case REDIR_OUT:
                                 strcpy(redir_symbol, ">");
-                                strcpy(redir_type, "OUTPUT");
+                                strcpy(redir_type, "SORTIE");
+                                strcpy(redir_color, "red");
                                 break;
                             case REDIR_APPEND:
                                 strcpy(redir_symbol, ">>");
                                 strcpy(redir_type, "APPEND");
+                                strcpy(redir_color, "orange");
                                 break;
                             case REDIR_HEREDOC:
                                 strcpy(redir_symbol, "<<");
                                 strcpy(redir_type, "HEREDOC");
+                                strcpy(redir_color, "purple");
                                 break;
                             default:
                                 strcpy(redir_symbol, "?");
-                                strcpy(redir_type, "UNKNOWN");
+                                strcpy(redir_type, "INCONNU");
+                                strcpy(redir_color, "gray");
                                 break;
                         }
 
-                        // Formater cette redirection
-                        snprintf(temp_redir, sizeof(temp_redir), "\\n%s [%s]: %s",
-                                redir_symbol, redir_type,
+                        // Formater cette redirection avec des séparateurs
+                        if (redir_count > 0)
+                            strcat(redir_part, "\\n──────────────────");
+
+                        // Formater cette redirection avec un format plus détaillé
+                        snprintf(temp_redir, sizeof(temp_redir),
+                                "\\n• Type: %s (%s)\\n• Fichier: %s",
+                                redir_type, redir_symbol,
                                 redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
 
                         // Ajouter à la chaîne des redirections
                         strcat(redir_part, temp_redir);
 
                         redir = redir->next;
+                        redir_count++;
                     }
                 }
 
@@ -396,26 +426,25 @@ char    *get_node_label(t_ast_node *node)
                         args_count++;
 
                     // Afficher tous les arguments
-                    if (args_count > 0)
+                    if (args_count > 1) // Si plus d'un argument (pas juste la commande)
                     {
-                        strcat(args_str, "\\n-- Arguments: --");
-                        for (int i = 0; i < args_count; i++)
+                        strcat(args_str, "\\n\\n━━━━ ARGUMENTS ━━━━");
+                        for (int i = 1; i < args_count; i++) // Commence à 1 pour sauter la commande
                         {
-                            char arg_temp[128];
+                            char arg_temp[256];
                             snprintf(arg_temp, sizeof(arg_temp), "\\n[%d]: %s",
                                     i, node->cmd->command[i]);
                             strcat(args_str, arg_temp);
                         }
                     }
 
-                    // Le titre affiche le nom de la commande principale
-                    // Formater avec subshell et redirections si nécessaire
+                    // Le titre affiche le nom de la commande principale avec un style distinctif
                     char title[256];
                     if (node->subshell)
-                        snprintf(title, sizeof(title), "CMD (subshell)\\n%s",
+                        snprintf(title, sizeof(title), "COMMANDE (subshell)\\n≻ %s ≺",
                                 node->cmd->command[0]);
                     else
-                        snprintf(title, sizeof(title), "CMD\\n%s",
+                        snprintf(title, sizeof(title), "COMMANDE\\n≻ %s ≺",
                                 node->cmd->command[0]);
 
                     // Mettre tout ensemble
@@ -428,17 +457,17 @@ char    *get_node_label(t_ast_node *node)
                 {
                     // Commande vide ou opérateur
                     if (node->subshell)
-                        snprintf(label, 1024, "CMD (subshell)\\n(Empty)%s",
+                        snprintf(label, 1024, "COMMANDE (subshell)\\n(Vide)%s",
                                 has_redirs ? redir_part : "");
                     else
-                        snprintf(label, 1024, "CMD\\n(Empty)%s",
+                        snprintf(label, 1024, "COMMANDE\\n(Vide)%s",
                                 has_redirs ? redir_part : "");
                 }
             }
             else
             {
                 // Nœud sans commande
-                snprintf(label, 1024, "CMD\\n(No cmd)");
+                snprintf(label, 1024, "COMMANDE\\n(Aucune cmd)");
             }
             break;
         case NODE_PIPE:
@@ -460,13 +489,13 @@ char    *get_node_label(t_ast_node *node)
                 snprintf(label, 1024, "OR ||");
             break;
         case NODE_OPEN_PARENTHESIS:
-            snprintf(label, 1024, "OPEN (");
+            snprintf(label, 1024, "PARENTHÈSE (");
             break;
         case NODE_CLOSE_PARENTHESIS:
-            snprintf(label, 1024, "CLOSE )");
+            snprintf(label, 1024, "PARENTHÈSE )");
             break;
         default:
-            snprintf(label, 1024, "UNKNOWN (%d)", node->type);
+            snprintf(label, 1024, "INCONNU (%d)", node->type);
     }
 
     return label;

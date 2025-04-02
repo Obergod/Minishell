@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/24 19:04:57 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/02 22:27:39 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 enum	e_logic_operator_type
 {
 	NONE,
+	PIPE,   // Ajout explicite du type PIPE
 	AND,
 	OR,
 	OPEN_PARENTHESIS,

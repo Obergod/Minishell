@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/02 17:19:25 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/02 23:00:41 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,10 @@ void print_error(enum error_parsing error)
     }
 }
 
+// Déclarations de fonctions
+void fix_redirections_for_subshells(t_cmd *cmd_list);
+t_cmd *find_last_command_before(t_cmd *list, t_cmd *before);
+
 static void t_redir_parsing(t_token *token, t_cmd **current_cmd, t_minishell *minishell)
 {
 	t_redir *redir;
@@ -222,10 +226,14 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 	t_cmd *cmd_list;
 	t_cmd *current_cmd;
 	int position;
+	int parenthesis_level;
+	t_token *prev_token = NULL; // Pour garder une trace du token précédent
 
 	cmd_list = NULL;
 	current_cmd = new_cmd(minishell);
 	position = 0;
+	parenthesis_level = 0;
+
 	if (check_parsing(token) != SUCCESS)
 	{
 		print_error(check_parsing(token));
@@ -237,34 +245,90 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 			add_arg_to_cmd(current_cmd, token->str, minishell->gc);
 		else if (token->type == T_REDIR)
 		{
-			t_redir_parsing(token, &current_cmd, minishell);
+			// Si on est après une parenthèse fermante et que parenthesis_level == 0,
+			// alors les redirections s'appliquent à toute la sous-commande précédente
+			if (position > 0 && parenthesis_level == 0 &&
+				prev_token && prev_token->type == T_PARANTHESES &&
+				ft_strcmp(prev_token->str, ")") == 0)
+			{
+				// Trouver la commande précédente qui a reçu la parenthèse fermante
+				t_cmd *prev_cmd = cmd_list;
+				while (prev_cmd && prev_cmd->next)
+					prev_cmd = prev_cmd->next;
+
+				// Appliquer la redirection à cette commande
+				if (prev_cmd)
+				{
+					// Stocker la redirection dans la commande précédente
+					t_redir_parsing(token, &prev_cmd, minishell);
+				}
+				else
+				{
+					// Si pas de commande précédente (ne devrait pas arriver),
+					// le traiter normalement
+					t_redir_parsing(token, &current_cmd, minishell);
+				}
+			}
+			else
+			{
+				// Comportement normal pour les redirections
+				t_redir_parsing(token, &current_cmd, minishell);
+			}
+			prev_token = token; // Mémoriser le token actuel
 			token = token->next;
 		}
-		else if (token->type == T_PIPE)
+		else if (token->type == T_PIPE || token->type == T_LOGIC || token->type == T_PARANTHESES)
 		{
-			add_cmd_to_list(&cmd_list, current_cmd);
-			current_cmd = new_cmd(minishell);
-			position++;
-		}
-		else if (token->type == T_LOGIC || token->type == T_PARANTHESES)
-		{
+			// Gérer le niveau de parenthèses
+			if (token->type == T_PARANTHESES)
+			{
+				if (ft_strcmp(token->str, "(") == 0)
+					parenthesis_level++;
+				else if (ft_strcmp(token->str, ")") == 0)
+					parenthesis_level--;
+			}
+
+			// Ajouter la commande courante à la liste seulement si elle contient quelque chose
 			if (current_cmd->command[0] != NULL || current_cmd->redirs != NULL)
 			{
 				add_cmd_to_list(&cmd_list, current_cmd);
 				current_cmd = new_cmd(minishell);
 			}
-			t_logic_parsing(token, &current_cmd);
+
+			// Créer un nœud spécifique pour l'opérateur
+			if (token->type == T_PIPE)
+			{
+				current_cmd->logic_operator_type = PIPE;
+			}
+			else // T_LOGIC ou T_PARANTHESES
+			{
+				t_logic_parsing(token, &current_cmd);
+			}
+
+			// Ajouter l'opérateur à la liste
 			add_cmd_to_list(&cmd_list, current_cmd);
+
+			// Créer une nouvelle commande pour la suite
 			if (token->next != NULL)
 				current_cmd = new_cmd(minishell);
 			else
 				current_cmd = NULL;
+
 			position++;
+			prev_token = token; // Mémoriser le token actuel
+		}
+		else
+		{
+			prev_token = token; // Mémoriser le token actuel
 		}
 		token = token->next;
 	}
-	if (current_cmd != NULL)
+	if (current_cmd != NULL && (current_cmd->command[0] != NULL || current_cmd->redirs != NULL))
 		add_cmd_to_list(&cmd_list, current_cmd);
+
+	// Traiter les redirections pour les sous-commandes entre parenthèses
+	fix_redirections_for_subshells(cmd_list);
+
 	return (cmd_list);
 }
 
