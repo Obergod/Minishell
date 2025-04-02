@@ -6,15 +6,15 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 15:47:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/02 16:58:27 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/02 18:04:18 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef AST_H
 #define AST_H
 
-#include "minishell.h"
-#include "parsing.h"
+#include "../../../includes/main.h"
+#include <stdio.h>
 
 enum node_type
 {
@@ -48,5 +48,6 @@ void print_ast_compact(t_ast_node *node);
 void print_ast_with_commands(t_ast_node *node, int depth);
 void print_ast_execution_order(t_ast_node *node);
 void visualize_ast(t_ast_node *root, int mode);
+void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, int current_id);
 
 #endif

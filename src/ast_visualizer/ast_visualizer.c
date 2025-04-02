@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 00:00:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/25 13:32:44 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/02 17:15:23 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,49 @@
  * Fonction principale pour visualiser un AST
  *
  * @param ast Pointeur vers l'arbre à visualiser
- * @param output_filename Nom du fichier image de sortie (sans extension)
+ * @param mode Mode de visualisation: 0=compact, 1=arborescent, 2=ordre d'exécution, 3=graphviz
  */
-void    visualize_ast(t_ast_node *ast, const char *output_filename)
+void    visualize_ast(t_ast_node *ast, int mode)
 {
     char    dot_filename[256];
     char    img_filename[256];
 
-    if (!ast || !output_filename)
+    if (!ast)
+    {
+        printf("AST is empty (NULL)\n");
         return;
+    }
+
+    // Mode 0-2: utiliser les fonctions de visualisation textuelles
+    if (mode >= 0 && mode <= 2)
+    {
+        printf("\n=== AST Visualization ===\n");
+
+        switch (mode)
+        {
+            case 0: // Mode compact
+                printf("Compact representation:\n");
+                print_ast_compact(ast);
+                printf("\n");
+                break;
+            case 1: // Mode arborescent
+                printf("Tree representation:\n");
+                print_ast_with_commands(ast, 0);
+                break;
+            case 2: // Mode ordre d'exécution
+                printf("Execution order:\n");
+                print_ast_execution_order(ast);
+                break;
+            default:
+                printf("Invalid visualization mode.\n");
+        }
+
+        printf("===========================\n\n");
+        return;
+    }
+
+    // Mode 3: génération d'image avec Graphviz
+    const char *output_filename = "ast_output";
 
     // Créer les noms de fichiers
     snprintf(dot_filename, sizeof(dot_filename), "/tmp/%s.dot", output_filename);

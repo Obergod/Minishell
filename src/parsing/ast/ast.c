@@ -5,766 +5,413 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/25 15:11:42 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/25 16:43:29 by ufalzone         ###   ########.fr       */
+/*   Created: 2025/04/02 15:20:50 by ufalzone          #+#    #+#             */
+/*   Updated: 2025/04/02 18:02:20 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/ast.h"
-#include <string.h>
 
-/**
- * Convertit un type d'opérateur logique en type de noeud correspondant
- */
-static enum node_type	convert_operator_type(enum e_logic_operator_type type)
+t_ast_node *init_ast_node(enum node_type type, t_cmd *cmd, t_minishell *minishell)
 {
-	if (type == AND)
-		return (NODE_AND);
-	else if (type == OR)
-		return (NODE_OR);
-	else if (type == OPEN_PARENTHESIS)
-		return (NODE_OPEN_PARENTHESIS);
-	else if (type == CLOSE_PARENTHESIS)
-		return (NODE_CLOSE_PARENTHESIS);
-	return (NODE_NONE);
-}
-
-/**
- * Crée un nouveau noeud dans l'AST
- */
-t_ast_node	*create_node(enum node_type type, t_minishell *minishell)
-{
-	t_ast_node	*node;
+	t_ast_node *node;
 
 	node = gc_malloc(sizeof(t_ast_node), minishell->gc);
 	if (!node)
+	{
+		printf("[DEBUG-AST] Échec d'allocation pour init_ast_node\n");
 		return (NULL);
+	}
 	node->type = type;
-	node->cmd = NULL;
+	node->cmd = cmd;
 	node->subshell = 0;
 	node->left = NULL;
 	node->right = NULL;
+	printf("[DEBUG-AST] Création nœud type=%d, cmd=%s\n",
+		type, (cmd && cmd->command_raw) ? cmd->command_raw : "NULL");
 	return (node);
 }
 
-/**
- * Crée un noeud de commande dans l'AST
- */
-t_ast_node	*create_command_node(t_cmd *cmd, t_minishell *minishell)
+static int is_logic_op(enum e_logic_operator_type op)
 {
-	t_ast_node	*node;
-
-	node = create_node(NODE_CMD, minishell);
-	if (!node)
-		return (NULL);
-	node->cmd = cmd;
-	return (node);
+	return (op == AND || op == OR || op == OPEN_PARENTHESIS
+			|| op == CLOSE_PARENTHESIS);
 }
 
-/**
- * Duplique une liste de commandes
- */
-static t_cmd	*duplicate_cmd_list(t_cmd *cmd, t_minishell *minishell)
-{
-	t_cmd	*new_head;
-	t_cmd	*current;
-	t_cmd	*tmp;
-	t_cmd	*to_copy;
+// Déclaration préalable de build_ast_recursive pour éviter l'erreur de compilation
+t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
+								int *parenthesis_count);
 
-	if (!cmd)
-		return (NULL);
-	new_head = NULL;
-	to_copy = cmd;
-	while (to_copy)
+static int handle_parenthesis(t_cmd **cmd_list, t_ast_node **ast,
+							t_minishell *minishell, int *parenthesis_count)
+{
+	t_ast_node *subshell_node;
+	t_cmd *tmp;
+
+	printf("[DEBUG-AST] handle_parenthesis: type=%d, count=%d\n",
+		(*cmd_list)->logic_operator_type, *parenthesis_count);
+
+	if ((*cmd_list)->logic_operator_type == OPEN_PARENTHESIS)
 	{
-		current = new_cmd(minishell);
-		if (!current)
-			return (new_head);
-		if (to_copy->command_raw)
-			current->command_raw = gc_strdup(to_copy->command_raw, minishell->gc);
-		if (to_copy->command)
-			current->command = gc_strdup_array(to_copy->command, minishell->gc);
-		current->_arg_capacity = to_copy->_arg_capacity;
-		current->_arg_count = to_copy->_arg_count;
-		current->logic_operator_type = to_copy->logic_operator_type;
-		current->redirs = to_copy->redirs;
-		if (!new_head)
-			new_head = current;
-		else
+		(*parenthesis_count)++;
+		printf("[DEBUG-AST] Parenthèse ouvrante trouvée, nouveau count=%d\n", *parenthesis_count);
+
+		// Passer au prochain élément et construire le sous-arbre
+		tmp = *cmd_list;
+		*cmd_list = (*cmd_list)->next;
+		if (!*cmd_list)
 		{
-			tmp = new_head;
-			while (tmp->next)
-				tmp = tmp->next;
-			tmp->next = current;
+			printf("[DEBUG-AST] ERREUR: Parenthèse ouvrante sans contenu\n");
+			return (0); // Erreur: parenthèse ouvrante sans contenu
 		}
-		to_copy = to_copy->next;
-	}
-	return (new_head);
-}
 
-/**
- * Recherche le premier opérateur logique (AND, OR) en dehors des parenthèses
- * Cette fonction est conservée pour compatibilité avec d'autres parties du code
- */
-static int	find_highest_logic_operator(t_cmd *cmd, enum node_type *operator_type)
-{
-	int		in_parenthesis;
-	t_cmd	*current;
-	int		position;
-
-	in_parenthesis = 0;
-	*operator_type = NODE_NONE;
-	current = cmd;
-	position = 0;
-	while (current)
-	{
-		if (current->logic_operator_type == OPEN_PARENTHESIS)
-			in_parenthesis++;
-		else if (current->logic_operator_type == CLOSE_PARENTHESIS)
-			in_parenthesis--;
-		else if (in_parenthesis == 0 && (current->logic_operator_type == AND
-				|| current->logic_operator_type == OR))
+		printf("[DEBUG-AST] Construction du sous-arbre après parenthèse ouvrante\n");
+		// Créer un nouveau nœud pour la sous-expression
+		subshell_node = build_ast_recursive(cmd_list, minishell, parenthesis_count);
+		if (!subshell_node)
 		{
-			*operator_type = convert_operator_type(current->logic_operator_type);
-			return (position);
+			printf("[DEBUG-AST] ERREUR: Échec de construction du sous-arbre\n");
+			return (0);
 		}
-		current = current->next;
-		position++;
-	}
-	return (position);
-}
 
-/**
- * Vérifie si la commande est une commande nulle avec un type d'opérateur
- */
-static int	is_empty_operator_cmd(t_cmd *cmd)
-{
-	return (cmd && (!cmd->command_raw || !cmd->command[0]) && cmd->redirs == NULL);
-}
+		subshell_node->subshell = 1;
+		*ast = subshell_node;
+		printf("[DEBUG-AST] Sous-arbre construit avec succès, subshell=1\n");
 
-/**
- * Reconstruit la liste de commandes en ignorant les commandes vides intermédiaires
- * qui ne contiennent que des opérateurs
- */
-static t_cmd	*clean_cmd_list(t_cmd *cmd_list, t_minishell *minishell)
-{
-	t_cmd	*result;
-	t_cmd	*current;
-	t_cmd	*new_cmd;
-	t_cmd	*last;
+		// Vérifier si on a géré la parenthèse fermante correctement
+		// Il n'est pas nécessaire d'avoir *parenthesis_count < 0 comme condition d'erreur,
+		// car ce cas est déjà géré dans la partie CLOSE_PARENTHESIS
 
-	if (!cmd_list)
-		return (NULL);
-
-	result = NULL;
-	last = NULL;
-	current = cmd_list;
-
-	while (current)
-	{
-		// On ne garde que les commandes non vides ou les opérateurs importants
-		if (!is_empty_operator_cmd(current) ||
-			current->logic_operator_type == OPEN_PARENTHESIS ||
-			current->logic_operator_type == CLOSE_PARENTHESIS ||
-			current->logic_operator_type == AND ||
-			current->logic_operator_type == OR)
-		{
-			new_cmd = duplicate_cmd_list(current, minishell);
-			if (new_cmd)
-			{
-				new_cmd->next = NULL;
-				if (!result)
-					result = new_cmd;
-				else
-					last->next = new_cmd;
-				last = new_cmd;
-			}
-		}
-		current = current->next;
-	}
-
-	printf("DEBUG: Liste nettoyée:\n");
-	current = result;
-	while (current)
-	{
-		printf("DEBUG:   Cmd: %s (Op: %d)\n",
-			current->command_raw ? current->command_raw : "(null)",
-			current->logic_operator_type);
-		current = current->next;
-	}
-
-	return (result);
-}
-
-/**
- * Récupère les commandes avant l'opérateur spécifié
- */
-static t_cmd	*get_commands_before_operator(t_cmd *cmd, int position,
-					t_minishell *minishell)
-{
-	t_cmd	*new;
-	t_cmd	*current;
-	int		i;
-
-	if (!cmd || position <= 0)
-		return (NULL);
-	new = duplicate_cmd_list(cmd, minishell);
-	if (!new)
-		return (NULL);
-	if (position == 1)
-	{
-		t_cmd *single_cmd = duplicate_cmd_list(new, minishell);
-		if (single_cmd)
-			single_cmd->next = NULL;
-		return (single_cmd);
-	}
-	current = new;
-	i = 1;
-	while (current && i < position)
-	{
-		if (i == position - 1)
-		{
-			if (current->next)
-				current->next = NULL;
-			break ;
-		}
-		i++;
-		current = current->next;
-	}
-	return (new);
-}
-
-/**
- * Récupère les commandes après l'opérateur spécifié
- */
-static t_cmd	*get_commands_after_operator(t_cmd *cmd, int position,
-					t_minishell *minishell)
-{
-	t_cmd	*new;
-	t_cmd	*current;
-	int		i;
-
-	if (!cmd)
-		return (NULL);
-	new = duplicate_cmd_list(cmd, minishell);
-	if (!new)
-		return (NULL);
-	current = new;
-	i = 0;
-	while (current && i < position)
-	{
-		current = current->next;
-		i++;
-	}
-	if (!current || !current->next)
-		return (NULL);
-	return (duplicate_cmd_list(current->next, minishell));
-}
-
-/**
- * Extrait la sous-liste de commandes à partir d'une position jusqu'à la fin
- * Cette fonction est conservée pour compatibilité avec d'autres parties du code
- */
-static t_cmd	*get_commands_from_position(t_cmd *cmd, int position, t_minishell *minishell)
-{
-	t_cmd	*current;
-	int		i;
-
-	if (!cmd || position < 0)
-		return (NULL);
-
-	current = cmd;
-	i = 0;
-
-	while (current && i < position)
-	{
-		current = current->next;
-		i++;
-	}
-
-	if (!current)
-		return (NULL);
-
-	return (duplicate_cmd_list(current, minishell));
-}
-
-/**
- * Vérifie si c'est un bloc qui démarre par une parenthèse
- */
-static int is_parenthesis_block(t_cmd *cmd_list)
-{
-	if (!cmd_list)
-		return (0);
-
-	// On vérifie simplement si le premier élément significatif est une parenthèse ouvrante
-	t_cmd *current = cmd_list;
-
-	// Ignorer les commandes vides au début
-	while (current && (!current->command_raw || !current->command_raw[0]) &&
-		current->logic_operator_type != OPEN_PARENTHESIS)
-		current = current->next;
-
-	if (current && current->logic_operator_type == OPEN_PARENTHESIS)
 		return (1);
-
-	return (0);
-}
-
-/**
- * Vérifie si le nœud est entouré de parenthèses complètes
- */
-static int is_complete_parenthesis_block(t_cmd *cmd_list)
-{
-	int depth = 0;
-	int has_opening = 0;
-	t_cmd *current = cmd_list;
-
-	// Vérifier si la première commande est une parenthèse ouvrante
-	if (!cmd_list || cmd_list->logic_operator_type != OPEN_PARENTHESIS)
-		return (0);
-
-	has_opening = 1;
-	depth = 1;
-	current = current->next;
-
-	// Parcourir la liste pour trouver la parenthèse fermante correspondante
-	while (current)
+	}
+	else if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
 	{
-		if (current->logic_operator_type == OPEN_PARENTHESIS)
-			depth++;
-		else if (current->logic_operator_type == CLOSE_PARENTHESIS)
+		(*parenthesis_count)--;
+		printf("[DEBUG-AST] Parenthèse fermante trouvée, nouveau count=%d\n", *parenthesis_count);
+
+		if (*parenthesis_count < 0)
 		{
-			depth--;
-			if (depth == 0)
-				break; // On a trouvé la parenthèse fermante correspondante
+			printf("[DEBUG-AST] ERREUR: Parenthèse fermante sans ouvrante correspondante\n");
+			return (0); // Erreur: parenthèse fermante sans ouvrante correspondante
 		}
-		current = current->next;
+
+		// Avancer au-delà de la parenthèse fermante
+		*cmd_list = (*cmd_list)->next;
+		return (2); // Code spécial pour indiquer qu'on a trouvé une parenthèse fermante
 	}
 
-	// Si on a trouvé une parenthèse fermante correspondante à la fin
-	return (has_opening && depth == 0 && current && !current->next);
+	return (1);
 }
 
-/**
- * Extrait le contenu entre les parenthèses d'un bloc complet
- */
-static t_cmd *extract_parenthesis_content(t_cmd *cmd_list, t_minishell *minishell)
-{
-	t_cmd *content = NULL;
-	int depth = 0;
-
-	if (!cmd_list || cmd_list->logic_operator_type != OPEN_PARENTHESIS)
-		return (NULL);
-
-	// Commencer après la parenthèse ouvrante
-	t_cmd *current = cmd_list->next;
-	while (current)
-	{
-		if (current->logic_operator_type == OPEN_PARENTHESIS)
-			depth++;
-		else if (current->logic_operator_type == CLOSE_PARENTHESIS)
-		{
-			if (depth == 0)
-				break; // On a atteint la parenthèse fermante qui correspond à l'ouvrante initiale
-			depth--;
-		}
-
-		// On ajoute cette commande à notre liste de contenu
-		t_cmd *new_cmd = duplicate_cmd_list(current, minishell);
-		if (new_cmd)
-		{
-			new_cmd->next = NULL;
-
-			// Ajouter à la fin de la liste de contenu
-			if (!content)
-				content = new_cmd;
-			else
-			{
-				t_cmd *last = content;
-				while (last->next)
-					last = last->next;
-				last->next = new_cmd;
-			}
-		}
-
-		current = current->next;
-	}
-
-	return (content);
-}
-
-/**
- * Vérifie si la commande actuelle est liée à la suivante par un pipe implicite
- */
-static int	is_implicit_pipe(t_cmd *cmd)
-{
-	return (cmd && cmd->next && cmd->logic_operator_type == NONE
-		&& cmd->next->logic_operator_type != AND
-		&& cmd->next->logic_operator_type != OR
-		&& cmd->next->logic_operator_type != CLOSE_PARENTHESIS);
-}
-
-/**
- * Applique un traitement de debug aux commandes pour montrer comment elles sont traitées
- */
-static void debug_cmd_list(t_cmd *cmd_list, const char *message)
-{
-	printf("DEBUG: %s:\n", message);
-	int i = 0;
-	t_cmd *current = cmd_list;
-
-	while (current)
-	{
-		printf("DEBUG:   [%d] Cmd: %s (Op: %d)\n", i++,
-			current->command_raw ? current->command_raw : "(null)",
-			current->logic_operator_type);
-		current = current->next;
-	}
-}
-
-/**
- * Vérifie si la liste de commandes contient au moins une commande de pipe implicite
- * Un pipe implicite est une commande suivie d'une autre sans opérateur
- */
-static int has_implicit_pipe(t_cmd *cmd_list)
-{
-	t_cmd *current = cmd_list;
-	int paren_level = 0;
-
-	while (current && current->next)
-	{
-		// Ne pas compter les pipes à l'intérieur des parenthèses
-		if (current->logic_operator_type == OPEN_PARENTHESIS)
-			paren_level++;
-		else if (current->logic_operator_type == CLOSE_PARENTHESIS)
-		{
-			if (paren_level > 0)
-				paren_level--;
-		}
-		// Vérifier s'il y a un pipe implicite à ce niveau
-		else if (paren_level == 0 &&
-				current->logic_operator_type == NONE &&
-				current->next->logic_operator_type == NONE)
-		{
-			return (1);
-		}
-
-		current = current->next;
-	}
-
-	return (0);
-}
-
-/**
- * Extrait la première paire de commandes liées par un pipe implicite
- */
-static t_cmd *extract_first_pipe(t_cmd *cmd_list, t_cmd **right_part, t_minishell *minishell)
-{
-	t_cmd *current = cmd_list;
-	t_cmd *left_part = NULL;
-	int pipe_found = 0;
-	int paren_level = 0;
-
-	// Trouver le premier pipe implicite
-	while (current && current->next)
-	{
-		if (current->logic_operator_type == OPEN_PARENTHESIS)
-			paren_level++;
-		else if (current->logic_operator_type == CLOSE_PARENTHESIS)
-		{
-			if (paren_level > 0)
-				paren_level--;
-		}
-		else if (paren_level == 0 &&
-				current->logic_operator_type == NONE &&
-				current->next->logic_operator_type == NONE)
-		{
-			pipe_found = 1;
-			break;
-		}
-
-		current = current->next;
-	}
-
-	if (!pipe_found || !current || !current->next)
-	{
-		*right_part = NULL;
-		return NULL;
-	}
-
-	// Créer la partie gauche (un seul élément)
-	left_part = duplicate_cmd_list(current, minishell);
-	if (left_part)
-		left_part->next = NULL;
-
-	// Créer la partie droite (tout ce qui suit)
-	*right_part = duplicate_cmd_list(current->next, minishell);
-
-	return left_part;
-}
-
-/**
- * Crée un noeud pour un pipe implicite entre commandes
- */
-static t_ast_node *create_pipe_node(t_cmd *cmd_list, t_minishell *minishell)
+static t_ast_node *build_expr(t_cmd **cmd_list, t_minishell *minishell,
+							int *parenthesis_count)
 {
 	t_ast_node *node;
-	t_cmd *right_part = NULL;
-	t_cmd *left_part = NULL;
+	int result;
 
-	// Extraire les deux parties du pipe
-	left_part = extract_first_pipe(cmd_list, &right_part, minishell);
-	if (!left_part || !right_part)
-		return NULL;
+	if (!cmd_list || !*cmd_list)
+	{
+		printf("[DEBUG-AST] build_expr: cmd_list est NULL\n");
+		return (NULL);
+	}
 
-	// Débugger les parties extraites
-	debug_cmd_list(left_part, "Partie gauche du pipe");
-	debug_cmd_list(right_part, "Partie droite du pipe");
+	printf("[DEBUG-AST] build_expr: cmd=%s, op_type=%d\n",
+		((*cmd_list)->command_raw) ? (*cmd_list)->command_raw : "NULL",
+		(*cmd_list)->logic_operator_type);
 
-	// Créer le noeud pipe
-	node = create_node(NODE_PIPE, minishell);
+	// Gérer explicitement les parenthèses
+	if ((*cmd_list)->logic_operator_type == OPEN_PARENTHESIS ||
+		(*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
+	{
+		printf("[DEBUG-AST] Traitement d'une parenthèse\n");
+		result = handle_parenthesis(cmd_list, &node, minishell, parenthesis_count);
+		if (result == 0)
+		{
+			printf("[DEBUG-AST] ERREUR dans le traitement des parenthèses\n");
+			return (NULL); // Erreur dans les parenthèses
+		}
+		else if (result == 2)
+		{
+			printf("[DEBUG-AST] Parenthèse fermante trouvée, fin de sous-expression\n");
+			return (NULL); // Parenthèse fermante - signal spécial
+		}
+		printf("[DEBUG-AST] Parenthèse traitée avec succès\n");
+		return (node);
+	}
+
+	// Créer un nœud pour une commande simple
+	printf("[DEBUG-AST] Création d'un nœud pour commande simple\n");
+	node = init_ast_node(NODE_CMD, *cmd_list, minishell);
 	if (!node)
-		return NULL;
+	{
+		printf("[DEBUG-AST] ERREUR: Échec de création du nœud commande\n");
+		return (NULL);
+	}
 
-	// Partie gauche est une commande simple
-	node->left = create_command_node(left_part, minishell);
+	// Avancer à la commande suivante
+	*cmd_list = (*cmd_list)->next;
 
-	// Partie droite peut être récursivement traitée
-	node->right = build_ast(right_part, minishell);
-
-	return node;
+	return (node);
 }
 
-/**
- * Construit l'arbre syntaxique abstrait (AST) récursivement
- */
-t_ast_node	*build_ast(t_cmd *cmd_list, t_minishell *minishell)
+t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
+								int *parenthesis_count)
 {
-	t_ast_node	*node;
-	t_cmd		*block_cmd;
-	t_cmd		*left_cmd;
-	t_cmd		*right_cmd;
-	t_cmd		*current;
-	t_cmd		*cleaned_list;
-	int			i;
+	t_ast_node *left;
+	t_ast_node *root;
+	enum node_type op_type;
+	t_cmd *op_cmd;
+
+	if (!*cmd_list)
+	{
+		printf("[DEBUG-AST] build_ast_recursive: cmd_list est NULL\n");
+		return (NULL);
+	}
+
+	printf("[DEBUG-AST] build_ast_recursive: cmd=%s, op_type=%d, count=%d\n",
+		((*cmd_list)->command_raw) ? (*cmd_list)->command_raw : "NULL",
+		(*cmd_list)->logic_operator_type, *parenthesis_count);
+
+	// Traiter immédiatement le cas d'une parenthèse fermante
+	if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
+	{
+		printf("[DEBUG-AST] Détection directe d'une parenthèse fermante\n");
+		(*parenthesis_count)--;
+		printf("[DEBUG-AST] Parenthèse fermante trouvée (directe), nouveau count=%d\n", *parenthesis_count);
+		if (*parenthesis_count < 0)
+		{
+			printf("[DEBUG-AST] ERREUR: Parenthèse fermante sans ouvrante correspondante\n");
+			return (NULL);
+		}
+		*cmd_list = (*cmd_list)->next;
+		return (NULL); // Signal pour remonter d'un niveau de récursion
+	}
+
+	// Construire d'abord le côté gauche de l'expression
+	left = build_expr(cmd_list, minishell, parenthesis_count);
+	if (!left)
+	{
+		// Vérifier si c'est à cause d'une parenthèse fermante
+		if (*parenthesis_count >= 0)
+		{
+			printf("[DEBUG-AST] ERREUR: Échec de construction du côté gauche\n");
+		}
+		return (NULL);
+	}
+
+	// Si plus de commandes
+	if (!*cmd_list)
+	{
+		printf("[DEBUG-AST] Fin de construction (plus de commandes)\n");
+		return (left);
+	}
+
+	// Si on a trouvé une parenthèse fermante, vérifions-la explicitement
+	if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
+	{
+		printf("[DEBUG-AST] Détection d'une parenthèse fermante après construction gauche\n");
+		(*parenthesis_count)--;
+		printf("[DEBUG-AST] Parenthèse fermante trouvée, nouveau count=%d\n", *parenthesis_count);
+		if (*parenthesis_count < 0)
+		{
+			printf("[DEBUG-AST] ERREUR: Parenthèse fermante sans ouvrante correspondante\n");
+			return (NULL);
+		}
+		*cmd_list = (*cmd_list)->next;
+		return (left);
+	}
+
+	printf("[DEBUG-AST] Prochain élément: cmd=%s, op_type=%d\n",
+		(*cmd_list && (*cmd_list)->command_raw) ? (*cmd_list)->command_raw : "NULL",
+		(*cmd_list) ? (*cmd_list)->logic_operator_type : -1);
+
+	// Si l'opérateur est AND ou OR, c'est un nœud binaire
+	if ((*cmd_list)->logic_operator_type == AND || (*cmd_list)->logic_operator_type == OR)
+	{
+		op_type = ((*cmd_list)->logic_operator_type == AND) ? NODE_AND : NODE_OR;
+		op_cmd = *cmd_list;
+
+		printf("[DEBUG-AST] Opérateur %s trouvé\n", (op_type == NODE_AND) ? "AND" : "OR");
+
+		// Avancer à la commande suivante après l'opérateur
+		*cmd_list = (*cmd_list)->next;
+		if (!*cmd_list)
+		{
+			printf("[DEBUG-AST] ERREUR: Opérateur sans opérande droite\n");
+			return (NULL); // Erreur: opérateur sans opérande droite
+		}
+
+		// Créer le nœud racine avec l'opérateur
+		root = init_ast_node(op_type, op_cmd, minishell);
+		if (!root)
+		{
+			printf("[DEBUG-AST] ERREUR: Échec de création du nœud opérateur\n");
+			return (NULL);
+		}
+
+		root->left = left;
+		printf("[DEBUG-AST] Construction récursive du côté droit de l'opérateur\n");
+		// Construire récursivement le côté droit
+		root->right = build_ast_recursive(cmd_list, minishell, parenthesis_count);
+		if (!root->right)
+		{
+			printf("[DEBUG-AST] ERREUR: Échec de construction du côté droit\n");
+			// Nettoyage si nécessaire (géré par le garbage collector)
+			return (NULL);
+		}
+
+		printf("[DEBUG-AST] Nœud opérateur %s construit avec succès\n",
+			(op_type == NODE_AND) ? "AND" : "OR");
+		return (root);
+	}
+
+	// Si c'est un pipe implicite
+	if (!is_logic_op((*cmd_list)->logic_operator_type))
+	{
+		printf("[DEBUG-AST] Pipe implicite détecté\n");
+		root = init_ast_node(NODE_PIPE, NULL, minishell);
+		if (!root)
+		{
+			printf("[DEBUG-AST] ERREUR: Échec de création du nœud pipe\n");
+			return (NULL);
+		}
+
+		root->left = left;
+		printf("[DEBUG-AST] Construction récursive du côté droit du pipe\n");
+		// Construire récursivement le côté droit (pipe implicite)
+		root->right = build_ast_recursive(cmd_list, minishell, parenthesis_count);
+		if (!root->right)
+		{
+			printf("[DEBUG-AST] ERREUR: Échec de construction du côté droit du pipe\n");
+			// Nettoyage si nécessaire (géré par le garbage collector)
+			return (NULL);
+		}
+
+		printf("[DEBUG-AST] Nœud pipe construit avec succès\n");
+		return (root);
+	}
+
+	printf("[DEBUG-AST] Retour du côté gauche uniquement (opérateur non géré: %d)\n",
+		(*cmd_list)->logic_operator_type);
+	return (left);
+}
+
+t_ast_node *build_ast(t_cmd *cmd_list, t_minishell *minishell)
+{
+	int parenthesis_count;
+	t_ast_node *root;
+
+	printf("\n[DEBUG-AST] ===== DÉBUT DE CONSTRUCTION AST =====\n");
 
 	if (!cmd_list)
+	{
+		printf("[DEBUG-AST] Liste de commandes vide\n");
 		return (NULL);
+	}
 
-	// On nettoie la liste des commandes avant de la traiter
-	cleaned_list = clean_cmd_list(cmd_list, minishell);
-	if (!cleaned_list)
+	// Afficher la liste des commandes pour débogage
+	t_cmd *debug_cmd = cmd_list;
+	int cmd_idx = 0;
+	printf("[DEBUG-AST] Liste des commandes à traiter:\n");
+	while (debug_cmd)
+	{
+		printf("[DEBUG-AST]   Cmd %d: '%s', op=%d\n",
+			cmd_idx++,
+			debug_cmd->command_raw ? debug_cmd->command_raw : "NULL",
+			debug_cmd->logic_operator_type);
+		debug_cmd = debug_cmd->next;
+	}
+
+	// Vérifier si la première commande est une parenthèse ouvrante
+	// Cas spécial: si la première commande est une parenthèse ouvrante mais n'a pas de contenu
+	if (cmd_list->logic_operator_type == OPEN_PARENTHESIS && !cmd_list->command_raw && !cmd_list->next)
+	{
+		printf("[DEBUG-AST] ERREUR: Parenthèse ouvrante sans contenu\n");
 		return (NULL);
-
-	// Affichage de debug pour voir la liste de commandes en entrée
-	printf("\nDEBUG: ========= NOUVELLE ANALYSE AST =========\n");
-	debug_cmd_list(cleaned_list, "Commandes en entrée");
-
-	// PRIORITÉ #0: Traiter les blocs entourés de parenthèses complètes
-	if (is_complete_parenthesis_block(cleaned_list))
-	{
-		printf("DEBUG: Traitement d'un bloc entouré de parenthèses complètes\n");
-		block_cmd = extract_parenthesis_content(cleaned_list, minishell);
-
-		if (block_cmd)
-		{
-			debug_cmd_list(block_cmd, "Contenu extrait des parenthèses");
-
-			node = build_ast(block_cmd, minishell);
-			if (node)
-				node->subshell = 1;
-			return (node);
-		}
 	}
 
-	// 1. PRIORITÉ #1: Rechercher d'abord les OR au niveau le plus externe
-	current = cleaned_list;
-	int or_pos = -1;
-	int in_paren = 0;
-	int temp_pos = 0;
+	parenthesis_count = 0;
+	printf("[DEBUG-AST] Appel à build_ast_recursive\n");
+	root = build_ast_recursive(&cmd_list, minishell, &parenthesis_count);
 
-	printf("DEBUG: Recherche des opérateurs OR au premier niveau\n");
-	while (current)
+	// Vérification finale des parenthèses équilibrées
+	printf("[DEBUG-AST] Vérification finale: parenthesis_count=%d\n", parenthesis_count);
+	if (parenthesis_count != 0)
 	{
-		if (current->logic_operator_type == OPEN_PARENTHESIS)
-			in_paren++;
-		else if (current->logic_operator_type == CLOSE_PARENTHESIS)
-		{
-			in_paren--;
-			if (in_paren < 0) // Correction pour les parenthèses non équilibrées
-				in_paren = 0;
-		}
-		else if (in_paren == 0 && current->logic_operator_type == OR)
-		{
-			or_pos = temp_pos;
-			printf("DEBUG: Opérateur OR trouvé à la position %d (en dehors des parenthèses)\n", or_pos);
-			break;
-		}
-		temp_pos++;
-		current = current->next;
+		// Si nous avons un déséquilibre positif, il manque des parenthèses fermantes
+		if (parenthesis_count > 0)
+			printf("[DEBUG-AST] ERREUR: Parenthèses non équilibrées - il manque %d parenthèse(s) fermante(s)\n",
+				parenthesis_count);
+		else
+			printf("[DEBUG-AST] ERREUR: Parenthèses non équilibrées - il y a %d parenthèse(s) fermante(s) en trop\n",
+				-parenthesis_count);
+
+		// Dans un shell interactif, nous pourrions demander plus d'input, mais ici nous échouons simplement
+		return (NULL);
 	}
 
-	// Si on a trouvé un OR, on le traite en priorité
-	if (or_pos >= 0)
+	// Si nous sommes arrivés à la fin de la liste, mais qu'il reste encore des tokens
+	// C'est qu'il y a une erreur de syntaxe
+	if (cmd_list != NULL)
 	{
-		printf("DEBUG: Construction d'un noeud OR\n");
-		node = create_node(NODE_OR, minishell);
-		if (!node)
-			return (NULL);
-
-		t_cmd *left_cmds = get_commands_before_operator(cleaned_list, or_pos, minishell);
-		t_cmd *right_cmds = get_commands_after_operator(cleaned_list, or_pos, minishell);
-
-		debug_cmd_list(left_cmds, "Partie gauche de OR");
-		debug_cmd_list(right_cmds, "Partie droite de OR");
-
-		node->left = build_ast(left_cmds, minishell);
-		node->right = build_ast(right_cmds, minishell);
-		return (node);
-	}
-
-	// 2. PRIORITÉ #2: Rechercher les AND au niveau le plus externe
-	current = cleaned_list;
-	int and_pos = -1;
-	in_paren = 0;
-	temp_pos = 0;
-
-	printf("DEBUG: Recherche des opérateurs AND au premier niveau\n");
-	while (current)
-	{
-		if (current->logic_operator_type == OPEN_PARENTHESIS)
-			in_paren++;
-		else if (current->logic_operator_type == CLOSE_PARENTHESIS)
+		printf("[DEBUG-AST] ERREUR: Tokens supplémentaires après la construction de l'AST\n");
+		// Afficher les tokens restants
+		cmd_idx = 0;
+		while (cmd_list)
 		{
-			in_paren--;
-			if (in_paren < 0)
-				in_paren = 0;
+			printf("[DEBUG-AST]   Token restant %d: '%s', op=%d\n",
+				cmd_idx++,
+				cmd_list->command_raw ? cmd_list->command_raw : "NULL",
+				cmd_list->logic_operator_type);
+			cmd_list = cmd_list->next;
 		}
-		else if (in_paren == 0 && current->logic_operator_type == AND)
-		{
-			and_pos = temp_pos;
-			printf("DEBUG: Opérateur AND trouvé à la position %d (en dehors des parenthèses)\n", and_pos);
-			break;
-		}
-		temp_pos++;
-		current = current->next;
+		// On permet de continuer car c'est peut-être juste un problème de parsing
 	}
 
-	// Si on a trouvé un AND, on le traite
-	if (and_pos >= 0)
-	{
-		printf("DEBUG: Construction d'un noeud AND\n");
-		node = create_node(NODE_AND, minishell);
-		if (!node)
-			return (NULL);
+	if (root)
+		printf("[DEBUG-AST] AST construit avec succès\n");
+	else
+		printf("[DEBUG-AST] ÉCHEC de construction de l'AST\n");
 
-		t_cmd *left_cmds = get_commands_before_operator(cleaned_list, and_pos, minishell);
-		t_cmd *right_cmds = get_commands_after_operator(cleaned_list, and_pos, minishell);
-
-		debug_cmd_list(left_cmds, "Partie gauche de AND");
-		debug_cmd_list(right_cmds, "Partie droite de AND");
-
-		node->left = build_ast(left_cmds, minishell);
-		node->right = build_ast(right_cmds, minishell);
-		return (node);
-	}
-
-	// 3. PRIORITÉ #3: Traiter les blocs de parenthèses avec un opérateur
-	current = cleaned_list;
-	if (current && current->logic_operator_type == OPEN_PARENTHESIS)
-	{
-		printf("DEBUG: Détection d'un bloc de parenthèses avec potentiel opérateur\n");
-
-		// Trouver la parenthèse fermante correspondante et ce qui suit
-		int depth = 1;
-		t_cmd *closing_paren = NULL;
-		t_cmd *after_paren = NULL;
-
-		t_cmd *search = current->next;
-		while (search)
-		{
-			if (search->logic_operator_type == OPEN_PARENTHESIS)
-				depth++;
-			else if (search->logic_operator_type == CLOSE_PARENTHESIS)
-			{
-				depth--;
-				if (depth == 0)
-				{
-					closing_paren = search;
-					after_paren = search->next;
-					break;
-				}
-			}
-			search = search->next;
-		}
-
-		// Si on a trouvé une parenthèse fermante et qu'elle est suivie d'un opérateur
-		if (closing_paren && after_paren &&
-			(after_paren->logic_operator_type == AND || after_paren->logic_operator_type == OR))
-		{
-			printf("DEBUG: Parenthèse suivie d'un opérateur %d\n", after_paren->logic_operator_type);
-
-			// Extraire le contenu entre parenthèses
-			t_cmd *content = NULL;
-			t_cmd *last_content = NULL;
-			t_cmd *current_cmd = current->next;
-
-			while (current_cmd != closing_paren)
-			{
-				t_cmd *cmd_copy = duplicate_cmd_list(current_cmd, minishell);
-				if (cmd_copy)
-				{
-					cmd_copy->next = NULL;
-					if (!content)
-						content = cmd_copy;
-					else
-					{
-						last_content->next = cmd_copy;
-						last_content = cmd_copy;
-					}
-				}
-				current_cmd = current_cmd->next;
-			}
-
-			// Créer le nœud pour l'opérateur
-			node = create_node(
-				after_paren->logic_operator_type == AND ? NODE_AND : NODE_OR,
-				minishell);
-
-			if (!node)
-				return (NULL);
-
-			// Partie gauche : sous-arbre du contenu des parenthèses
-			debug_cmd_list(content, "Contenu des parenthèses");
-			node->left = build_ast(content, minishell);
-			if (node->left)
-				node->left->subshell = 1;
-
-			// Partie droite : ce qui suit après l'opérateur
-			if (after_paren->next)
-			{
-				t_cmd *right_part = duplicate_cmd_list(after_paren->next, minishell);
-				debug_cmd_list(right_part, "Partie droite après parenthèse+opérateur");
-
-				node->right = build_ast(right_part, minishell);
-			}
-
-			return (node);
-		}
-	}
-
-	// 4. PRIORITÉ #4: Traiter les pipes implicites
-	if (has_implicit_pipe(cleaned_list))
-	{
-		printf("DEBUG: Traitement d'un groupe de pipes implicites\n");
-		node = create_pipe_node(cleaned_list, minishell);
-		if (node)
-			return (node);
-	}
-
-	// 5. Cas de base : commande simple
-	printf("DEBUG: Création d'un noeud commande simple: %s\n",
-		cleaned_list && cleaned_list->command_raw ? cleaned_list->command_raw : "(null)");
-	return (create_command_node(cleaned_list, minishell));
+	printf("[DEBUG-AST] ===== FIN DE CONSTRUCTION AST =====\n\n");
+	return (root);
 }
 
+void print_ast(t_ast_node *node, int depth)
+{
+	int i;
+
+	if (!node)
+		return;
+
+	for (i = 0; i < depth; i++)
+		printf("  ");
+
+	switch (node->type)
+	{
+		case NODE_CMD:
+			printf("CMD: %s\n", node->cmd->command_raw);
+			break;
+		case NODE_PIPE:
+			printf("PIPE\n");
+			break;
+		case NODE_AND:
+			printf("AND\n");
+			break;
+		case NODE_OR:
+			printf("OR\n");
+			break;
+		default:
+			printf("UNKNOWN NODE TYPE\n");
+	}
+
+	if (node->subshell)
+	{
+		for (i = 0; i < depth; i++)
+			printf("  ");
+		printf("(SUBSHELL)\n");
+	}
+
+	print_ast(node->left, depth + 1);
+	print_ast(node->right, depth + 1);
+}

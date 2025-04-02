@@ -211,7 +211,7 @@ int	main(int ac, char **av, char **envp)
 		debug_print_ast(ast);
 
 		printf("Génération de la visualisation de l'AST...\n");
-		visualize_ast(ast, "ast_output");
+		visualize_ast(ast, 3);  // Mode 3 pour génération Graphviz
 		printf("Visualisation terminée. Vérifiez ast_output.png\n");
 	}
 	else
