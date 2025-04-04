@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/04/02 17:05:45 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/04/04 17:35:56 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -97,27 +97,14 @@ clean:
 fclean: clean
 	@echo "$(BOLD)$(RED)🗑️ Suppression stratégique de $(NAME) pour préparer une nouvelle ère...$(RESET)"
 	@rm -f $(NAME)
+	@rm -f builtin_test
 	@$(MAKE) -C $(LIBFT_DIR) fclean
 	@echo "$(BOLD)$(GREEN)🌈 Tout est prêt pour une renaissance éclatante !$(RESET)"
 
 # Recompile tout
 re: fclean all
 
-# Règle de test dynamique
-# Usage: make test_X où X est le nom du fichier dans test_dir sans l'extension .c
-test_%: $(LIBFT)
-	@echo "$(BOLD)$(YELLOW)👾 Compilation du test $(GREEN)$*$(YELLOW) en cours...$(RESET)"
-	@mkdir -p test_dir/bin
-	@$(CC) -o test_dir/bin/$* test_dir/$*.c \
-		$(shell find $(SRC_DIR)/token -name "*.c") \
-		$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \
-		$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
-		$(shell find $(SRC_DIR)/parsing -name "*.c") \
-		$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull
-	@echo "$(BOLD)$(GREEN)✅ Test $(CYAN)$*$(GREEN) compilé avec succès !$(RESET)"
-	@echo "$(BOLD)$(PURPLE)🚀 Exécutez avec: ./test_dir/bin/$* <arguments>$(RESET)"
-
-# Compile tous les tests disponibles
+#Compile tous les tests disponibles
 test: $(LIBFT)
 	@echo "$(BOLD)$(YELLOW)🧪 Compilation de tous les tests disponibles...$(RESET)"
 	@mkdir -p test_dir/bin
@@ -133,6 +120,26 @@ test: $(LIBFT)
 	done
 	@echo "$(BOLD)$(GREEN)✅ Tous les tests ont été compilés avec succès !$(RESET)"
 
+# Teste les commandes builtin
+test_builtin: $(LIBFT)
+	@echo "$(BOLD)$(YELLOW)🧪 Test des commandes builtin en cours...$(RESET)"
+	@if [ -f $(SRC_DIR)/builtin/main.c ]; then \
+		echo "$(BOLD)$(CYAN)📝 Compilation des tests builtin...$(RESET)"; \
+		$(CC) -o builtin_test $(SRC_DIR)/builtin/main.c \
+			$(shell find $(SRC_DIR)/builtin -type f -name "*.c" ! -name "main.c") \
+			$(shell find $(SRC_DIR)/garbage_collector -maxdepth 1 -name "*.c") \
+			$(shell find $(SRC_DIR)/garbage_collector/utils -name "*.c") \
+			$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
+			-g3\
+			$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
+		echo "$(BOLD)$(GREEN)✅ Tests builtin compilés avec succès !$(RESET)"; \
+		echo "$(BOLD)$(PURPLE)🚀 Exécution des tests builtin...$(RESET)"; \
+		./builtin_test; \
+		echo "$(BOLD)$(GREEN)✅ Tests builtin exécutés avec succès !$(RESET)"; \
+	else \
+		echo "$(BOLD)$(RED)❌ Fichier main.c introuvable dans $(SRC_DIR)/builtin/ !$(RESET)"; \
+		echo "$(BOLD)$(YELLOW)ℹ️ Veuillez créer un fichier main.c dans le dossier builtin pour tester les commandes.$(RESET)"; \
+	fi
 
 # Compile le test AST
 ast_test:

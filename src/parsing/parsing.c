@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/02 23:00:41 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/04 16:28:32 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,10 +179,6 @@ void print_error(enum error_parsing error)
     }
 }
 
-// Déclarations de fonctions
-void fix_redirections_for_subshells(t_cmd *cmd_list);
-t_cmd *find_last_command_before(t_cmd *list, t_cmd *before);
-
 static void t_redir_parsing(t_token *token, t_cmd **current_cmd, t_minishell *minishell)
 {
 	t_redir *redir;
@@ -219,6 +215,8 @@ static void t_logic_parsing(t_token *token, t_cmd **current_cmd)
 		(*current_cmd)->logic_operator_type = OPEN_PARENTHESIS;
 	else if (ft_strcmp(token->str, ")") == 0)
 		(*current_cmd)->logic_operator_type = CLOSE_PARENTHESIS;
+	else if (ft_strcmp(token->str, "|") == 0)
+		(*current_cmd)->logic_operator_type = PIPE;
 }
 
 t_cmd *parsing(t_token *token, t_minishell *minishell)
@@ -245,8 +243,8 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 			add_arg_to_cmd(current_cmd, token->str, minishell->gc);
 		else if (token->type == T_REDIR)
 		{
-			// Si on est après une parenthèse fermante et que parenthesis_level == 0,
-			// alors les redirections s'appliquent à toute la sous-commande précédente
+			// di on est apres une parenthese fermante et que parenthesis_level == 0,
+			// alors les redirections s'appliquent a toute la sous-commande precedente
 			if (position > 0 && parenthesis_level == 0 &&
 				prev_token && prev_token->type == T_PARANTHESES &&
 				ft_strcmp(prev_token->str, ")") == 0)
@@ -296,19 +294,10 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 			}
 
 			// Créer un nœud spécifique pour l'opérateur
-			if (token->type == T_PIPE)
-			{
-				current_cmd->logic_operator_type = PIPE;
-			}
-			else // T_LOGIC ou T_PARANTHESES
-			{
+			if (token->type == T_PIPE || token->type == T_PARANTHESES || token->type == T_LOGIC)
 				t_logic_parsing(token, &current_cmd);
-			}
-
-			// Ajouter l'opérateur à la liste
 			add_cmd_to_list(&cmd_list, current_cmd);
 
-			// Créer une nouvelle commande pour la suite
 			if (token->next != NULL)
 				current_cmd = new_cmd(minishell);
 			else
@@ -325,10 +314,6 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 	}
 	if (current_cmd != NULL && (current_cmd->command[0] != NULL || current_cmd->redirs != NULL))
 		add_cmd_to_list(&cmd_list, current_cmd);
-
-	// Traiter les redirections pour les sous-commandes entre parenthèses
-	fix_redirections_for_subshells(cmd_list);
-
 	return (cmd_list);
 }
 

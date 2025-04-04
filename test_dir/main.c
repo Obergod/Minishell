@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/02 18:02:31 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/04 16:49:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,10 @@ int	init_minishell(t_minishell *minishell, char **envp)
 	// Initialize environment
 	minishell->env = env_parsing(envp, minishell);
 	if (!minishell->env) {
-		printf("Error: Failed to parse environment\n");
+		printf("Error: Failed to parse environment\n"); //creer un environnement
+															//PWD=/home/ufalzone/42cursus/Cercle-3/Minishell/off-minishell-github/test_dir/bin
+															// SHLVL=1
+															// _=/usr/bin/env
 		gc_destroy(gc_head);
 		return (1);
 	}
