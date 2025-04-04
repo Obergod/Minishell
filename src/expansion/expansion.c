@@ -13,6 +13,7 @@
 #include "../../includes/token.h"
 #include "../../includes/expand.h"
 
+int	g_exit_status = 0;
 //gerer l'export
 t_token	*expand_vars(t_token *token, t_minishell *minishell)
 {
@@ -22,19 +23,21 @@ t_token	*expand_vars(t_token *token, t_minishell *minishell)
 	head = token;
 	while (token)
 	{
-		if (token->type == T_WORD && token->state != IN_SQUOTE
-				&& ft_strchr(token->str, '$'))
+		if (token->type == T_WORD && token->state != IN_SQUOTE)
 		{
-			new_str = expand_str(token->str, minishell);
-			if (!new_str)
-				return (NULL); //temporaire pour pas d'erreur
-			//	cleanup_and_exit();
-			free(token->str);
-			token->str = new_str;
+			if (ft_strchr(token->str, '$'))
+			{
+				new_str = expand_str(token->str, minishell);
+				if (!new_str)
+					return (NULL); //temporaire pour pas d'erreur
+				//	cleanup_and_exit();
+				free(token->str);
+				token->str = new_str;
+			}
+//			if (ft_strchr(token->str, '*'))
+//				expand_wildcards()
 			token = token->next;
 		}
-//		if (ft_strchr(token->str, '*'))
-//			expand_wildcards()
 		else
 			token = token->next;
 	}
@@ -67,7 +70,6 @@ char	*expand_str(char *str, t_minishell *minishell)
 				return (NULL);
 			ft_strlcpy(new_str + j, full_var, ft_strlen(full_var));
 			j += ft_strlen(full_var);
-			free(full_var);
 		}
 		else
 			new_str[j++] = str[i++];

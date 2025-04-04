@@ -34,22 +34,6 @@ void	process_space(t_tokenizer *tok, t_minishell *minishell)
 	}
 }
 
-void	process_operator(const char *input, t_tokenizer *tok, t_minishell *minishell)
-{
-	enum e_token_type	type;
-
-	if (tok->nb_tok > 0)
-	{
-		tok->buff[tok->nb_tok] = '\0';
-		add_token(&tok->token_list, tok->buff, T_WORD, tok->token_state, minishell);
-		tok->nb_tok = 0;
-		tok->token_state = tok->state;
-	}
-	operator_str(input, tok->buff, tok->i);
-	type = handle_operator(input, &tok->i);
-	add_token(&tok->token_list, tok->buff, type, NORMAL, minishell);
-}
-
 void	handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minishell)
 {
 	if (input[tok->i] == ' ' || input[tok->i] == '\t')
@@ -89,15 +73,6 @@ void	handle_quotes(const char *input, t_tokenizer *tok, char quote)
 	}
 }
 
-void	finalize_token(t_tokenizer *tok, t_minishell *minishell)
-{
-	if (tok->nb_tok > 0)
-	{
-		tok->buff[tok->nb_tok] = '\0';
-		add_token(&tok->token_list, tok->buff, T_WORD, tok->token_state, minishell);
-	}
-}
-
 t_token	*tokenize(const char *input, t_minishell *minishell)
 {
 	t_tokenizer	tok;
@@ -119,63 +94,6 @@ t_token	*tokenize(const char *input, t_minishell *minishell)
 	result = tok.token_list;
 	//gc_free(tok.buff, minishell->gc);
 	return (result);
-}
-
-void	operator_str(const char *input, char *buff, int i)
-{
-	if (is_operator(input[i + 1]))
-	{
-		buff[0] = input[i];
-		buff[1] = input[i + 1];
-		buff[2] = '\0';
-	}
-	else
-	{
-		buff[0] = input[i];
-		buff[1] = '\0';
-	}
-}
-
-enum e_token_type	handle_operator(const char *input, int *i)
-{
-	char	op;
-	char	next_char;
-
-	op = input[*i];
-	next_char = input[*i + 1];
-	if (op == '<')
-	{
-		if (next_char == '<')
-			(*i)++;
-		return (T_REDIR);
-	}
-	else if (op == '>')
-	{
-		if (next_char == '>')
-			(*i)++;
-		return (T_REDIR);
-	}
-	else if (op == '|')
-	{
-		if (next_char == '|')
-		{
-			(*i)++;
-			return (T_LOGIC);
-		}
-		return (T_PIPE);
-	}
-	else if (op == '(' || op == ')')
-		return (T_PARANTHESIS);
-	else if (op == '&')
-	{
-		if (next_char == '&')
-		{
-			(*i)++;
-			return (T_LOGIC);
-		}
-//		exit_and_cleanup;
-	}
-	return (-1);
 }
 
 void	add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state, t_minishell *minishell)

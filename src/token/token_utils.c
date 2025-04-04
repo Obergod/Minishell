@@ -40,3 +40,12 @@ int	quotes_verif(const char *input)
 		return (1);
 	return (0);
 }
+
+void	finalize_token(t_tokenizer *tok, t_minishell *minishell)
+{
+	if (tok->nb_tok > 0)
+	{
+		tok->buff[tok->nb_tok] = '\0';
+		add_token(&tok->token_list, tok->buff, T_WORD, tok->token_state, minishell);
+	}
+}

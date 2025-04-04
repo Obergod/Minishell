@@ -13,7 +13,6 @@
 #include "../includes/parsing.h"
 #include "../includes/main.h"
 
-int	g_exit_status = 0;
 
 static char	*ft_add_readline(const char *prompt, char **stock)
 {
