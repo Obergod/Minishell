@@ -6,14 +6,13 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 15:16:27 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/21 17:24:10 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/05 19:57:37 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/token.h"
 #include "../../includes/expand.h"
 
-int	g_exit_status = 0;
 //gerer l'export
 t_token	*expand_vars(t_token *token, t_minishell *minishell)
 {

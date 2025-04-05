@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   wildcards.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:58:21 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/04 16:58:23 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/04/05 19:57:01 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/token.h"
 #include "../../includes/expand.h"
 #include <dirent.h>
+#include <string.h>
 
 int	count_slash(char *str)
 {
@@ -58,7 +59,7 @@ const char *find_path(char *str, t_minishell *minishell)
 	return (path);
 }
 
-t_token	expand_wildcards(t_token *token, t_minishell *minishell)
+t_token	*expand_wildcards(t_token *token, t_minishell *minishell)
 {
 	const char		*path;
 	DIR				*dir;
@@ -79,4 +80,5 @@ t_token	expand_wildcards(t_token *token, t_minishell *minishell)
 		printf("Dir/file : %s\n", entry->d_name);
 	}
 	closedir(dir);
+	return NULL;
 }

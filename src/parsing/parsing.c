@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/04 16:28:32 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/05 19:53:32 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,7 +246,7 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 			// di on est apres une parenthese fermante et que parenthesis_level == 0,
 			// alors les redirections s'appliquent a toute la sous-commande precedente
 			if (position > 0 && parenthesis_level == 0 &&
-				prev_token && prev_token->type == T_PARANTHESES &&
+				prev_token && prev_token->type == T_PARANTHESIS &&
 				ft_strcmp(prev_token->str, ")") == 0)
 			{
 				// Trouver la commande précédente qui a reçu la parenthèse fermante
@@ -275,10 +275,10 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 			prev_token = token; // Mémoriser le token actuel
 			token = token->next;
 		}
-		else if (token->type == T_PIPE || token->type == T_LOGIC || token->type == T_PARANTHESES)
+		else if (token->type == T_PIPE || token->type == T_LOGIC || token->type == T_PARANTHESIS)
 		{
 			// Gérer le niveau de parenthèses
-			if (token->type == T_PARANTHESES)
+			if (token->type == T_PARANTHESIS)
 			{
 				if (ft_strcmp(token->str, "(") == 0)
 					parenthesis_level++;
@@ -294,7 +294,7 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 			}
 
 			// Créer un nœud spécifique pour l'opérateur
-			if (token->type == T_PIPE || token->type == T_PARANTHESES || token->type == T_LOGIC)
+			if (token->type == T_PIPE || token->type == T_PARANTHESIS || token->type == T_LOGIC)
 				t_logic_parsing(token, &current_cmd);
 			add_cmd_to_list(&cmd_list, current_cmd);
 
