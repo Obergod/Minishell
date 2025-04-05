@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/05 19:46:50 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/05 19:51:15 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include "garbage_collector.h"
 #include "token.h"
-
 // Forward declaration of t_minishell to prevent circular dependency
 typedef struct s_minishell t_minishell;
 

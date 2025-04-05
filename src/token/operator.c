@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   operator.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:43:18 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/04 12:43:21 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/04/05 19:50:37 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "token.h"
+#include "../../includes/token.h"
 
 void	process_operator(const char *input, t_tokenizer *tok, t_minishell *minishell)
 {

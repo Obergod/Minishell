@@ -6,12 +6,11 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:17:02 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/11 15:42:26 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/05 19:50:54 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "token.h"
-#include "expand.h"
+#include "../../includes/token.h"
 
 void	init_tokenizer(t_tokenizer *tok, const char *input, t_minishell *minishell)
 {
