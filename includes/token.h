@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:16:52 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/21 16:55:41 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/03/22 17:42:11 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,10 @@ enum		e_state
 	IN_DQUOTE
 };
 
+<<<<<<< HEAD
 // Gerer Wildcards
+=======
+>>>>>>> ufalzone
 enum		e_token_type
 {
 	T_WORD,

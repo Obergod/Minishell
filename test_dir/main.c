@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/24 13:59:24 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/04/04 16:49:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/parsing.h"
 #include "../includes/main.h"
 
+int	g_exit_status = 0;
 
 static char	*ft_add_readline(const char *prompt, char **stock)
 {
@@ -50,11 +50,14 @@ int	init_minishell(t_minishell *minishell, char **envp)
 
 	gc_head = gc_init();
 	minishell->gc = gc_head;
-	
+
 	// Initialize environment
 	minishell->env = env_parsing(envp, minishell);
 	if (!minishell->env) {
-		printf("Error: Failed to parse environment\n");
+		printf("Error: Failed to parse environment\n"); //creer un environnement
+															//PWD=/home/ufalzone/42cursus/Cercle-3/Minishell/off-minishell-github/test_dir/bin
+															// SHLVL=1
+															// _=/usr/bin/env
 		gc_destroy(gc_head);
 		return (1);
 	}
@@ -76,28 +79,13 @@ void	print_token(t_token *token)
 
 }
 
-void	print_parsing(t_cmd *cmd_head)
-{
-	while (cmd_head)
-	{
-		printf("Command_raw :%s\n", cmd_head->command_raw);
-		for (int i=0;cmd_head->command[i];i++)
-			printf("[%d] Command: %s\n", i, cmd_head->command[i]);
-		printf("Infile: %s\n", cmd_head->infile);
-		printf("Outfile: %s\n", cmd_head->outfile);
-		printf("Append: %d\n", cmd_head->append);
-		printf("Heredoc: %s\n", cmd_head->heredoc);
-		printf("\n");
-		cmd_head = cmd_head->next;
-	}
-}
-
 int	main(int ac, char **av, char **envp)
 {
 	char		*input;
 	t_token 	*token;
 	t_minishell	minishell;
 	t_cmd		*cmd_head;
+	t_ast_node *ast;
 
 	if (ac < 1)
 		return (1);
@@ -118,11 +106,9 @@ int	main(int ac, char **av, char **envp)
 		}
 		else
 			printf("Error: Failed to tokenize input\n");
-		cmd_head = parsing(token, &minishell);	
-		if (cmd_head)
-			print_parsing(cmd_head);
-		else
-			printf("Error : parsing failed\n");
+		cmd_head = parsing(token, &minishell);
+		ast = build_ast(cmd_head, &minishell);
+		visualize_ast(ast, 3);
 		if (*input)
 			add_history(input);
 		free(input);

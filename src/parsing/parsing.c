@@ -6,12 +6,13 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 18:57:20 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/04 16:28:32 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/parsing.h"
 #include "../../includes/token.h"
+#include <string.h>
 
 //<< en position 0
 //EOF sera en position 1
@@ -86,14 +87,42 @@ t_cmd	*new_cmd(t_minishell *minishell)
 		new->command[i] = NULL;
 	new->_arg_capacity = 4;
 	new->_arg_count = 0;
-	new->infile = NULL;
-	new->outfile = NULL;
-	new->append = -1;
 	new->logic_operator_type = NONE;
-	new->heredoc = NULL;
+	new->redirs = NULL;
 	new->next = NULL;
 	return (new);
 }
+
+t_redir *new_redir(enum e_redir_type type, char *file_or_delimiter, t_gc_head *gc)
+{
+	t_redir *redir;
+
+	redir = gc_malloc(sizeof(t_redir), gc);
+	redir->type = type;
+	redir->file_or_delimiter = gc_strdup(file_or_delimiter, gc);
+	redir->next = NULL;
+	return (redir);
+}
+
+void add_redir_to_cmd(t_cmd *cmd, t_redir *redir)
+{
+	t_redir *tmp;
+
+	if (cmd->redirs == NULL)
+	{
+		cmd->redirs = redir;
+		return;
+	}
+	tmp = cmd->redirs;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = redir;
+}
+
+//creer command->size = 4
+//si jai mit 3 arg dans command => arg_count = 3
+//
+
 
 void add_arg_to_cmd(t_cmd *cmd, char *str, t_gc_head *gc)
 {
@@ -152,22 +181,27 @@ void print_error(enum error_parsing error)
 
 static void t_redir_parsing(t_token *token, t_cmd **current_cmd, t_minishell *minishell)
 {
+	t_redir *redir;
+
 	if (ft_strcmp(token->str, "<") == 0)
-		(*current_cmd)->infile = gc_strdup(token->next->str, minishell->gc);
+	{
+		redir = new_redir(REDIR_IN, token->next->str, minishell->gc);
+		add_redir_to_cmd(*current_cmd, redir);
+	}
 	else if(ft_strcmp(token->str, ">") == 0)
 	{
-		(*current_cmd)->outfile = gc_strdup(token->next->str, minishell->gc);
-		(*current_cmd)->append = 0;
+		redir = new_redir(REDIR_OUT, token->next->str, minishell->gc);
+		add_redir_to_cmd(*current_cmd, redir);
 	}
 	else if(ft_strcmp(token->str, ">>") == 0)
 	{
-		(*current_cmd)->outfile = gc_strdup(token->next->str, minishell->gc);
-		(*current_cmd)->append = 1;
+		redir = new_redir(REDIR_APPEND, token->next->str, minishell->gc);
+		add_redir_to_cmd(*current_cmd, redir);
 	}
 	else if (ft_strcmp(token->str, "<<") == 0)
 	{
-		(*current_cmd)->heredoc = gc_strdup(token->next->str, minishell->gc);
-		(*current_cmd)->infile = NULL;
+		redir = new_redir(REDIR_HEREDOC, token->next->str, minishell->gc);
+		add_redir_to_cmd(*current_cmd, redir);
 	}
 }
 
@@ -181,15 +215,23 @@ static void t_logic_parsing(t_token *token, t_cmd **current_cmd)
 		(*current_cmd)->logic_operator_type = OPEN_PARENTHESIS;
 	else if (ft_strcmp(token->str, ")") == 0)
 		(*current_cmd)->logic_operator_type = CLOSE_PARENTHESIS;
+	else if (ft_strcmp(token->str, "|") == 0)
+		(*current_cmd)->logic_operator_type = PIPE;
 }
 
 t_cmd *parsing(t_token *token, t_minishell *minishell)
 {
 	t_cmd *cmd_list;
 	t_cmd *current_cmd;
+	int position;
+	int parenthesis_level;
+	t_token *prev_token = NULL; // Pour garder une trace du token précédent
 
 	cmd_list = NULL;
 	current_cmd = new_cmd(minishell);
+	position = 0;
+	parenthesis_level = 0;
+
 	if (check_parsing(token) != SUCCESS)
 	{
 		print_error(check_parsing(token));
@@ -201,25 +243,77 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 			add_arg_to_cmd(current_cmd, token->str, minishell->gc);
 		else if (token->type == T_REDIR)
 		{
-			t_redir_parsing(token, &current_cmd, minishell);
+			// di on est apres une parenthese fermante et que parenthesis_level == 0,
+			// alors les redirections s'appliquent a toute la sous-commande precedente
+			if (position > 0 && parenthesis_level == 0 &&
+				prev_token && prev_token->type == T_PARANTHESES &&
+				ft_strcmp(prev_token->str, ")") == 0)
+			{
+				// Trouver la commande précédente qui a reçu la parenthèse fermante
+				t_cmd *prev_cmd = cmd_list;
+				while (prev_cmd && prev_cmd->next)
+					prev_cmd = prev_cmd->next;
+
+				// Appliquer la redirection à cette commande
+				if (prev_cmd)
+				{
+					// Stocker la redirection dans la commande précédente
+					t_redir_parsing(token, &prev_cmd, minishell);
+				}
+				else
+				{
+					// Si pas de commande précédente (ne devrait pas arriver),
+					// le traiter normalement
+					t_redir_parsing(token, &current_cmd, minishell);
+				}
+			}
+			else
+			{
+				// Comportement normal pour les redirections
+				t_redir_parsing(token, &current_cmd, minishell);
+			}
+			prev_token = token; // Mémoriser le token actuel
 			token = token->next;
 		}
-		else if(token->type == T_PIPE)
+		else if (token->type == T_PIPE || token->type == T_LOGIC || token->type == T_PARANTHESES)
 		{
+			// Gérer le niveau de parenthèses
+			if (token->type == T_PARANTHESES)
+			{
+				if (ft_strcmp(token->str, "(") == 0)
+					parenthesis_level++;
+				else if (ft_strcmp(token->str, ")") == 0)
+					parenthesis_level--;
+			}
+
+			// Ajouter la commande courante à la liste seulement si elle contient quelque chose
+			if (current_cmd->command[0] != NULL || current_cmd->redirs != NULL)
+			{
+				add_cmd_to_list(&cmd_list, current_cmd);
+				current_cmd = new_cmd(minishell);
+			}
+
+			// Créer un nœud spécifique pour l'opérateur
+			if (token->type == T_PIPE || token->type == T_PARANTHESES || token->type == T_LOGIC)
+				t_logic_parsing(token, &current_cmd);
 			add_cmd_to_list(&cmd_list, current_cmd);
-			current_cmd = new_cmd(minishell);
+
+			if (token->next != NULL)
+				current_cmd = new_cmd(minishell);
+			else
+				current_cmd = NULL;
+
+			position++;
+			prev_token = token; // Mémoriser le token actuel
 		}
-		else if (token->type == T_LOGIC)
+		else
 		{
-			add_cmd_to_list(&cmd_list, current_cmd);
-			current_cmd = new_cmd(minishell);
-			t_logic_parsing(token, &current_cmd);
-			add_cmd_to_list(&cmd_list, current_cmd);
-			current_cmd = new_cmd(minishell);
+			prev_token = token; // Mémoriser le token actuel
 		}
 		token = token->next;
 	}
-	add_cmd_to_list(&cmd_list, current_cmd);
-	return(cmd_list);
+	if (current_cmd != NULL && (current_cmd->command[0] != NULL || current_cmd->redirs != NULL))
+		add_cmd_to_list(&cmd_list, current_cmd);
+	return (cmd_list);
 }
 
