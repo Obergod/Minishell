@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 16:48:21 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/04 19:33:17 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/05 18:10:09 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ static t_env *create_value_env(char *key, char *value, t_minishell *minishell)
 	tmp->key = key;
 	tmp->value = value;
 	tmp->raw = gc_strjoin_three(tmp->key, "=", tmp->value ? tmp->value : "", minishell->gc);
+	tmp->next = NULL;
 	return (tmp);
 }
 
@@ -70,6 +71,7 @@ t_env *init_env(t_minishell *minishell)
 	t_env *head;
 	t_env *current;
 
+	head = NULL;
 	current = create_value_env("PWD", getcwd(NULL, 0), minishell);
 	add_to_env(&head, current);
 	current = create_value_env("SHLVL", "1", minishell);
@@ -144,6 +146,27 @@ t_env *env_parsing(char **envp, t_minishell *minishell)
 	}
 	check_env(head, minishell);
 	return (head);
+}
+
+int edit_in_env(char *key, char *new_value, t_minishell *minishell)
+{
+	t_env *current;
+	if (!key || !minishell || !minishell->env)
+		return (1);
+	current = minishell->env;
+	while (current)
+	{
+		if (ft_strcmp(current->key, key) == 0)
+		{
+			current->value = gc_strdup(new_value, minishell->gc);
+			current->raw = gc_strjoin_three(current->key, "=", new_value, minishell->gc);
+			return (0);
+		}
+		current = current->next;
+	}
+	//ca n'a pas ete trouvee
+	add_to_env(&minishell->env, create_value_env(key, new_value, minishell));
+	return (2);
 }
 
 char *find_in_env(char *key, t_minishell *minishell)

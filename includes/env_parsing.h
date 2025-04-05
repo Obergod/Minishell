@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 16:53:54 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/04 17:33:25 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/05 17:09:07 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,4 +31,5 @@ typedef struct s_env
 char *find_in_env(char *key, t_minishell *minishell);
 t_env *env_parsing(char **envp, t_minishell *minishell);
 t_env *init_env(t_minishell *minishell);
+int edit_in_env(char *key, char *new_value, t_minishell *minishell);
 #endif
