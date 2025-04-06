@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/05 19:53:32 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/06 19:14:22 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ t_cmd	*new_cmd(t_minishell *minishell)
 	new = gc_malloc(sizeof(t_cmd), minishell->gc);
 	new->command_raw = NULL;
 	new->command = gc_malloc(sizeof(char *) * 4, minishell->gc);
+	new->cmd_path = NULL;
 	i = -1;
 	while (++i < 4)
 		new->command[i] = NULL;
@@ -225,9 +226,11 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 	t_cmd *current_cmd;
 	int position;
 	int parenthesis_level;
-	t_token *prev_token = NULL; // Pour garder une trace du token précédent
+	t_token *prev_token;
+	t_cmd *prev_cmd; // Pour garder une trace du token précédent
 
 	cmd_list = NULL;
+	prev_token = NULL;
 	current_cmd = new_cmd(minishell);
 	position = 0;
 	parenthesis_level = 0;
@@ -250,7 +253,7 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 				ft_strcmp(prev_token->str, ")") == 0)
 			{
 				// Trouver la commande précédente qui a reçu la parenthèse fermante
-				t_cmd *prev_cmd = cmd_list;
+				prev_cmd = cmd_list;
 				while (prev_cmd && prev_cmd->next)
 					prev_cmd = prev_cmd->next;
 
