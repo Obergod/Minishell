@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 15:20:50 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/02 23:00:52 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/06 17:38:54 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,44 @@ static t_ast_node *build_expr(t_cmd **cmd_list, t_minishell *minishell,
 	return (node);
 }
 
+// Gestion des pipes (priorité plus élevée que AND/OR)
+static t_ast_node *handle_pipes(t_cmd **cmd_list, t_minishell *minishell, int *parenthesis_count)
+{
+	t_ast_node *left;
+	t_ast_node *root;
+	t_cmd *op_cmd;
+
+	// Construction du nœud de gauche
+	left = build_expr(cmd_list, minishell, parenthesis_count);
+	if (!left)
+		return (NULL);
+
+	// Si on trouve un pipe, on le traite en priorité
+	while (*cmd_list && (*cmd_list)->logic_operator_type == PIPE)
+	{
+		op_cmd = *cmd_list;
+		*cmd_list = (*cmd_list)->next;
+		if (!*cmd_list)
+			return (NULL);
+
+		root = init_ast_node(NODE_PIPE, op_cmd, minishell);
+		if (!root)
+			return (NULL);
+
+		root->left = left;
+
+		// Construction du nœud de droite (récursivement pour gérer des pipes en chaîne)
+		root->right = build_expr(cmd_list, minishell, parenthesis_count);
+		if (!root->right)
+			return (NULL);
+
+		// Mise à jour du nœud gauche pour le prochain pipe éventuel
+		left = root;
+	}
+
+	return (left);
+}
+
 t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
 								int *parenthesis_count)
 {
@@ -159,8 +197,8 @@ t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
 		return (NULL);
 	}
 
-	// Construction du nœud de gauche
-	left = build_expr(cmd_list, minishell, parenthesis_count);
+	// Construction du nœud de gauche en gérant les pipes (priorité supérieure)
+	left = handle_pipes(cmd_list, minishell, parenthesis_count);
 	if (!left)
 		return (NULL);
 
@@ -178,17 +216,14 @@ t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
 		return (left);
 	}
 
-	// Gestion des opérateurs logiques AND/OR/PIPE
+	// Gestion des opérateurs logiques AND/OR (priorité inférieure aux pipes)
 	if ((*cmd_list)->logic_operator_type == AND ||
-		(*cmd_list)->logic_operator_type == OR ||
-		(*cmd_list)->logic_operator_type == PIPE)
+		(*cmd_list)->logic_operator_type == OR)
 	{
 		if ((*cmd_list)->logic_operator_type == AND)
 			op_type = NODE_AND;
-		else if ((*cmd_list)->logic_operator_type == OR)
-			op_type = NODE_OR;
 		else
-			op_type = NODE_PIPE;
+			op_type = NODE_OR;
 
 		op_cmd = *cmd_list;
 

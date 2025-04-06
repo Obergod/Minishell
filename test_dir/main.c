@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/04 16:49:06 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/06 17:20:39 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,175 @@ void	print_token(t_token *token)
 
 }
 
+void test_ast(t_ast_node *ast)
+{
+	t_ast_node *tmp;
+	char *temp;
+
+	tmp = ast;
+	while (tmp)
+	{
+		if (tmp->type == NODE_CMD)
+			printf("left cmd :%s\n", tmp->cmd->command_raw);
+		else
+			printf("left operator: %i\n", tmp->type);
+		if (tmp->right)
+			temp = tmp->right->cmd->command_raw;
+		tmp = tmp->left;
+	}
+	printf("%s\n", temp);
+	// tmp = ast;
+	// while (tmp)
+	// {
+	// 	if (tmp->type == NODE_CMD)
+	// 		printf("right cmd :%s\n", tmp->cmd->command_raw);
+	// 	else
+	// 		printf("right operator: %i\n", tmp->type);
+	// 	tmp = tmp->right;
+
+	// }
+}
+
+void	print_cmd_list(t_cmd *cmd_head)
+{
+	t_cmd *current;
+	t_redir *redir;
+	int i;
+	int cmd_num;
+
+	current = cmd_head;
+	cmd_num = 1;
+	printf("******/		cmd_list		******/\n\n");
+	while (current)
+	{
+		printf("Commande %d:\n", cmd_num);
+		printf("  command_raw: %s\n", current->command_raw);
+		printf("  arguments: ");
+		i = 0;
+		while (current->command && current->command[i])
+		{
+			printf("[%s] ", current->command[i]);
+			i++;
+		}
+		printf("\n");
+		printf("  arg_count: %zu\n", current->_arg_count);
+
+		// Afficher le type d'opérateur logique
+		printf("  operateur: ");
+		if (current->logic_operator_type == NONE)
+			printf("NONE");
+		else if (current->logic_operator_type == PIPE)
+			printf("PIPE |");
+		else if (current->logic_operator_type == AND)
+			printf("AND &&");
+		else if (current->logic_operator_type == OR)
+			printf("OR ||");
+		else if (current->logic_operator_type == OPEN_PARENTHESIS)
+			printf("OPEN_PARENTHESIS (");
+		else if (current->logic_operator_type == CLOSE_PARENTHESIS)
+			printf("CLOSE_PARENTHESIS )");
+		printf("\n");
+
+		// Afficher les redirections
+		printf("  redirections: ");
+		redir = current->redirs;
+		if (!redir)
+			printf("aucune\n");
+		else
+		{
+			printf("\n");
+			while (redir)
+			{
+				printf("    type: ");
+				if (redir->type == REDIR_IN)
+					printf("<");
+				else if (redir->type == REDIR_OUT)
+					printf(">");
+				else if (redir->type == REDIR_APPEND)
+					printf(">>");
+				else if (redir->type == REDIR_HEREDOC)
+					printf("<<");
+				printf(", fichier/délimiteur: %s\n", redir->file_or_delimiter);
+				redir = redir->next;
+			}
+		}
+
+		printf("\n");
+		current = current->next;
+		cmd_num++;
+	}
+	printf("\n\n");
+}
+
+// Parcours préfixe (racine, gauche, droite)
+void parcours_prefixe(t_ast_node *node)
+{
+	if (!node)
+		return;
+
+	// Visite de la racine
+	if (node->type == NODE_CMD)
+		printf("Préfixe CMD: %s\n", node->cmd->command_raw);
+	else if (node->type == NODE_PIPE)
+		printf("Préfixe PIPE\n");
+	else if (node->type == NODE_AND)
+		printf("Préfixe AND\n");
+	else if (node->type == NODE_OR)
+		printf("Préfixe OR\n");
+
+	// Visite du sous-arbre gauche
+	parcours_prefixe(node->left);
+
+	// Visite du sous-arbre droit
+	parcours_prefixe(node->right);
+}
+
+// Parcours infixe (gauche, racine, droite)
+void parcours_infixe(t_ast_node *node)
+{
+	if (!node)
+		return;
+
+	// Visite du sous-arbre gauche
+	parcours_infixe(node->left);
+
+	// Visite de la racine
+	if (node->type == NODE_CMD)
+		printf("Infixe CMD: %s\n", node->cmd->command_raw);
+	else if (node->type == NODE_PIPE)
+		printf("Infixe PIPE\n");
+	else if (node->type == NODE_AND)
+		printf("Infixe AND\n");
+	else if (node->type == NODE_OR)
+		printf("Infixe OR\n");
+
+	// Visite du sous-arbre droit
+	parcours_infixe(node->right);
+}
+
+// Parcours suffixe/postfixe (gauche, droite, racine)
+void parcours_suffixe(t_ast_node *node)
+{
+	if (!node)
+		return;
+
+	// Visite du sous-arbre gauche
+	parcours_suffixe(node->left);
+
+	// Visite du sous-arbre droit
+	parcours_suffixe(node->right);
+
+	// Visite de la racine
+	if (node->type == NODE_CMD)
+		printf("Suffixe CMD: %s\n", node->cmd->command_raw);
+	else if (node->type == NODE_PIPE)
+		printf("Suffixe PIPE\n");
+	else if (node->type == NODE_AND)
+		printf("Suffixe AND\n");
+	else if (node->type == NODE_OR)
+		printf("Suffixe OR\n");
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	char		*input;
@@ -107,8 +276,32 @@ int	main(int ac, char **av, char **envp)
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
+
+		// Appel de la fonction pour imprimer la liste de commandes
+		if (cmd_head)
+			print_cmd_list(cmd_head);
+		else
+			printf("Aucune commande valide n'a été trouvée.\n");
+
 		ast = build_ast(cmd_head, &minishell);
+		// test_ast(ast);
+
 		visualize_ast(ast, 3);
+
+		// Effectuer les trois types de parcours
+		if (ast)
+		{
+			printf("\n--- Parcours Préfixe ---\n");
+			parcours_prefixe(ast);
+
+			printf("\n--- Parcours Infixe ---\n");
+			parcours_infixe(ast);
+
+			printf("\n--- Parcours Suffixe ---\n");
+			parcours_suffixe(ast);
+			printf("\n");
+		}
+
 		if (*input)
 			add_history(input);
 		free(input);
