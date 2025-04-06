@@ -22,6 +22,7 @@
 # include "readline.h"
 # include "parsing.h"
 # include "builtin.h"
+# include "exec.h"
 
 /* Function declarations for main */
 
