@@ -35,26 +35,26 @@ int	exec_pipes(t_ast_node *node, t_minishell *minishell)
 	t_pipe	pipes;
 
 	if (pipe(pipes.pipes) == -1)
-		exit(EXIT_FAILURE);
+		return (-1);
 	pipes.pid_l = fork();
 	if (pipes.pid_l < 0)
 	{
 		perror("Fork failed");
-		exit(EXIT_FAILURE);
+		return (-1);
 	}	
 	else if (pipes.pid_l == 0)
 	{
 		close(pipes.pipes[0]);
 		dup2(pipes.pipes[1], STDOUT_FILENO);
 		close(pipes.pipes[1]);
-prefix_exec(node->left, minishell);
-		exit(EXIT_SUCCESS);
+		prefix_exec(node->left, minishell);
+		return (-1);
 	}
 	pipes.pid_r = fork();
 	if (pipes.pid_r < 0)
 	{
 		perror("Fork failed");
-		exit(EXIT_FAILURE);
+		return (-1);
 	}	
 	else if (pipes.pid_r == 0)
 	{
@@ -62,7 +62,7 @@ prefix_exec(node->left, minishell);
 		dup2(pipes.pipes[0], STDIN_FILENO);
 		close(pipes.pipes[0]);
 		prefix_exec(node->right, minishell);
-		exit(EXIT_SUCCESS);
+		return (-1);
 	}
 	close(pipes.pipes[0]);
 	close(pipes.pipes[1]);

@@ -18,7 +18,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define PROMPT "Entrer votre commande: "
+#define PROMPT "🍕 pizzshell : "
 
 int	ft_readline(void);
 

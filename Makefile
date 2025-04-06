@@ -115,6 +115,7 @@ test: $(LIBFT)
 			$(shell find $(SRC_DIR)/token -name "*.c") \
 			$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \
 			$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
+			$(shell find $(SRC_DIR)/exec -name "*.c") \
 			$(shell find $(SRC_DIR)/parsing -name "*.c") \
 			$(shell find $(SRC_DIR)/expansion -name "*.c") \
 			-I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -Wall -Wextra -Werror -g3 $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \

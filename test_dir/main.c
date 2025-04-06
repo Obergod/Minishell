@@ -271,25 +271,25 @@ int	main(int ac, char **av, char **envp)
 		if (token)
 		{
 			token = expand_vars(token, &minishell);
-			print_token(token);
+			//print_token(token);
 		}
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
 
 		// Appel de la fonction pour imprimer la liste de commandes
-		if (cmd_head)
-			print_cmd_list(cmd_head);
-		else
+		//if (cmd_head)
+			//print_cmd_list(cmd_head);
+		if (!cmd_head)
 			printf("Aucune commande valide n'a été trouvée.\n");
 
 		ast = build_ast(cmd_head, &minishell);
 		// test_ast(ast);
 
-		visualize_ast(ast, 3);
+//		visualize_ast(ast, 3);
 
 		// Effectuer les trois types de parcours
-		if (ast)
+/*		if (ast)
 		{
 			printf("\n--- Parcours Préfixe ---\n");
 			parcours_prefixe(ast);
@@ -300,8 +300,9 @@ int	main(int ac, char **av, char **envp)
 			printf("\n--- Parcours Suffixe ---\n");
 			parcours_suffixe(ast);
 			printf("\n");
-		}
+		}*/
 
+		prefix_exec(ast, &minishell);
 		if (*input)
 			add_history(input);
 		free(input);
@@ -310,3 +311,5 @@ int	main(int ac, char **av, char **envp)
 	handle_signal(SIGTERM);
 	return (0);
 }
+
+//
