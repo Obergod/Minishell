@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/05 19:51:15 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/06 19:14:10 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,17 +44,19 @@ typedef struct s_redir
 	struct s_redir *next;
 } t_redir;
 
+
+//ls -> | -> grep -e "salut"
 typedef struct s_cmd
 {
     char *command_raw; //grep -e "salut"
     char **command; //["grep"] ["-e"] ["salut"] [NULL]
+	char *cmd_path;
 	size_t _arg_count;
 	size_t _arg_capacity;
 	enum e_logic_operator_type logic_operator_type; //&& || ( )
 	struct s_redir *redirs; // liste des redirections
 	struct s_cmd *next; //des que ya un pipe on passe au prochain
 } t_cmd;
-
 
 enum	error_parsing
 {
