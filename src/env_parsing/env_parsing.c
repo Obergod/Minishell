@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 16:48:21 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/05 19:39:07 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/06 20:46:33 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,34 @@ t_env *env_parsing(char **envp, t_minishell *minishell)
 	}
 	check_env(head, minishell);
 	return (head);
+}
+
+char **convert_t_env_to_array(t_minishell *minishell)
+{
+	char **result;
+	t_env *current;
+	int size;
+
+	current = minishell->env;
+	size = 0;
+	while (current)
+	{
+		size++;
+		current = current->next;
+	}
+	result = gc_malloc((sizeof(char *) * size) + 1, minishell->gc);
+	if (!result)
+		return (NULL);
+	current = minishell->env;
+	size = 0;
+	while (current)
+	{
+		result[size] = current->raw;
+		size++;
+		current = current->next;
+	}
+	result[size] = NULL;
+	return (result);
 }
 
 int edit_in_env(char *key, char *new_value, t_minishell *minishell)
