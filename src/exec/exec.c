@@ -14,11 +14,6 @@
 
 void	prefix_exec(t_ast_node *node, t_minishell *minishell)
 {
-	while(node)
-	{
-		node = node->right;
-	}
-	node = END;
 	if (!node)
 		return ;
 	process(node, minishell);
@@ -31,8 +26,8 @@ void	process(t_ast_node *node, t_minishell *minishell)
 {
 	if (node->type == NODE_PIPE)
 		exec_pipes(node, minishell);
-//	else if (node->type == NODE_CMD)
-//		exec_cmd(node);
+	else if (node->type == NODE_CMD)
+		exec_cmd(node, minishell);
 }
 
 int	exec_pipes(t_ast_node *node, t_minishell *minishell)
@@ -107,9 +102,9 @@ char	*get_cmd_path(t_minishell *minishell, char *cmd)
 		return (NULL);
 	}
 	value = find_in_env("PATH", minishell);
-	if (!value)
-		cmd_path[0] = gc_strdup("/usr/bin/", minishell->gc);
-	cmd_path[1] = NULL;
+	//if (!value)
+	//	cmd_path[0] = gc_strdup("/usr/bin/", minishell->gc);
+	//cmd_path[1] = NULL;
 		//PATH n'existe pas donc surement env -i'
 	cmd_path = gc_split(value, ':', minishell->gc);
 	if (!cmd_path)
@@ -122,7 +117,9 @@ int	exec_cmd(t_ast_node *node, t_minishell *minishell)
 	node->cmd->cmd_path = get_cmd_path(minishell, node->cmd->command[0]);
 	if (!node->cmd->cmd_path)
 		return (-1);
-	
+	execve(node->cmd->cmd_path, node->cmd->command, NULL);
+	perror("exec failed");
+	return (1);
 }
 
 

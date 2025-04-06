@@ -28,6 +28,7 @@ typedef struct	s_pipe
 /*****		A trier		*******/
 void	prefix_exec(t_ast_node *node, t_minishell *minishell);
 void	process(t_ast_node *node, t_minishell *minishell);
-int	exec_pipes(t_ast_node *node, t_minishell *minishell);
+int		exec_pipes(t_ast_node *node, t_minishell *minishell);
+int		exec_cmd(t_ast_node *node, t_minishell *minishell);
 
 #endif
