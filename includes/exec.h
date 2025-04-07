@@ -15,6 +15,7 @@
 
 # include <stdlib.h>
 # include <sys/wait.h>
+#include "../full_libft/include/get_next_line.h"
 
 typedef struct	s_pipe
 {
@@ -28,7 +29,14 @@ typedef struct	s_pipe
 /*****		A trier		*******/
 void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
 void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
+
+/*****		exec_types		*****/
 int		exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
 int		exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
+
+/*****		exec_types_utils		*****/
+char	*try_path(char **cmd_path, char *cmd, t_minishell *minishell);
+char	*get_cmd_path(t_minishell *minishell, char *cmd);
+int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_out);
 
 #endif
