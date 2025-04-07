@@ -255,6 +255,7 @@ int	main(int ac, char **av, char **envp)
 	t_minishell	minishell;
 	t_cmd		*cmd_head;
 	t_ast_node *ast;
+	t_ast_node *head;
 
 	if (ac < 1)
 		return (1);
@@ -284,6 +285,7 @@ int	main(int ac, char **av, char **envp)
 			printf("Aucune commande valide n'a été trouvée.\n");
 
 		ast = build_ast(cmd_head, &minishell);
+		head = ast;
 		// test_ast(ast);
 
 //		visualize_ast(ast, 3);
@@ -302,7 +304,7 @@ int	main(int ac, char **av, char **envp)
 			printf("\n");
 		}*/
 
-		prefix_exec(ast, &minishell);
+		prefix_exec(ast, head, &minishell);
 		if (*input)
 			add_history(input);
 		free(input);

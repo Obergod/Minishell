@@ -12,25 +12,27 @@
 
 #include "../../includes/main.h"
 
-void	prefix_exec(t_ast_node *node, t_minishell *minishell)
+void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
 	if (!node)
 		return ;
-	process(node, minishell);
-	prefix_exec(node->left, minishell);
-	prefix_exec(node->right, minishell);
+	process(node, head, minishell);
+	if (node->left && node->left->type != NODE_CMD && node->left->type != NODE_PIPE)
+		prefix_exec(node->left, head, minishell);
+	if (node->right && node->right->type != NODE_CMD && node->left->type != NODE_PIPE)
+		prefix_exec(node->right, head, minishell);
 }
 
 
-void	process(t_ast_node *node, t_minishell *minishell)
+void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
 	if (node->type == NODE_PIPE)
-		exec_pipes(node, minishell);
+		exec_pipes(node, head, minishell);
 	else if (node->type == NODE_CMD)
-		exec_cmd(node, minishell);
+		exec_cmd(node, head, minishell);
 }
 
-int	exec_pipes(t_ast_node *node, t_minishell *minishell)
+int	exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
 	t_pipe	pipes;
 
@@ -47,8 +49,8 @@ int	exec_pipes(t_ast_node *node, t_minishell *minishell)
 		close(pipes.pipes[0]);
 		dup2(pipes.pipes[1], STDOUT_FILENO);
 		close(pipes.pipes[1]);
-		prefix_exec(node->left, minishell);
-		return (-1);
+		prefix_exec(node->left, head, minishell);
+		exit(EXIT_FAILURE);
 	}
 	pipes.pid_r = fork();
 	if (pipes.pid_r < 0)
@@ -61,8 +63,8 @@ int	exec_pipes(t_ast_node *node, t_minishell *minishell)
 		close(pipes.pipes[1]);
 		dup2(pipes.pipes[0], STDIN_FILENO);
 		close(pipes.pipes[0]);
-		prefix_exec(node->right, minishell);
-		return (-1);
+		prefix_exec(node->right, head, minishell);
+		exit(EXIT_FAILURE);
 	}
 	close(pipes.pipes[0]);
 	close(pipes.pipes[1]);
@@ -112,13 +114,37 @@ char	*get_cmd_path(t_minishell *minishell, char *cmd)
 	return (try_path(cmd_path, cmd, minishell));
 }
 
-int	exec_cmd(t_ast_node *node, t_minishell *minishell)
+int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
+	pid_t	pid;
+	int		status;
+
 	node->cmd->cmd_path = get_cmd_path(minishell, node->cmd->command[0]);
 	if (!node->cmd->cmd_path)
 		return (-1);
-	execve(node->cmd->cmd_path, node->cmd->command, NULL);
-	perror("exec failed");
+	if (node == head)
+	{
+		pid = fork();
+		if (pid == 0)
+		{
+			execve(node->cmd->cmd_path, node->cmd->command, NULL);
+			perror("exec failed");
+			exit(EXIT_FAILURE);
+		}
+		else if (pid < 0)
+		{
+			perror("fork failed");
+			return (-1);
+		}
+		waitpid(pid, &status, 0);
+		return(WEXITSTATUS(status));
+	}
+	else
+	{
+		execve(node->cmd->cmd_path, node->cmd->command, NULL);
+		perror("exec failed");
+		exit(EXIT_FAILURE);
+	}
 	return (1);
 }
 

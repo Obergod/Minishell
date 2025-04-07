@@ -48,4 +48,7 @@ void	finalize_token(t_tokenizer *tok, t_minishell *minishell)
 		tok->buff[tok->nb_tok] = '\0';
 		add_token(&tok->token_list, tok->buff, T_WORD, tok->token_state, minishell);
 	}
+	else if (tok->nb_tok == 0 && tok->i == 0)
+		add_token(&tok->token_list, NULL, T_WORD, tok->token_state, minishell);
+
 }

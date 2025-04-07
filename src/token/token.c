@@ -106,7 +106,10 @@ void	add_token(t_token **token, char *buff, enum e_token_type type, enum e_state
 	new_token->type = type;
 	new_token->state = state;
 	new_token->next = NULL;
-	new_token->str = gc_strdup((buff), minishell->gc);
+	if (!buff || !buff[0])
+		new_token->str = gc_strdup("", minishell->gc);
+	else
+		new_token->str = gc_strdup((buff), minishell->gc);
 //		if (!new_token->str)
 //			clean_up_and_exit;
 	if (*token == NULL)
