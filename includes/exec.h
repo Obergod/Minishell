@@ -35,8 +35,12 @@ int		exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
 int		exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
 
 /*****		exec_types_utils		*****/
-char	*try_path(char **cmd_path, char *cmd, t_minishell *minishell);
-char	*get_cmd_path(t_minishell *minishell, char *cmd);
+char	*try_path(char **cmd_path, char *cmd, t_minishell *minishell, int *err);
+char	*get_cmd_path(t_minishell *minishell, char *cmd, int *err);
 int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_out);
+
+/****		errors		*******/
+int	check_file_accesss(char *file, int in_out);
+int	check_cmd_access(char *cmd);
 
 #endif

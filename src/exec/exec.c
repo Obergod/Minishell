@@ -27,9 +27,11 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
 	if (node->type == NODE_PIPE)
-		exec_pipes(node, head, minishell);
+		minishell->exit_status = exec_pipes(node, head, minishell);
 	else if (node->type == NODE_CMD)
-		exec_cmd(node, head, minishell);
+		minishell->exit_status = exec_cmd(node, head, minishell);
+	if (minishell->exit_status == 126 || minishell->exit_status == 127)
+		perror("cmd error");
 }
 
 

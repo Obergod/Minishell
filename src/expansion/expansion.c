@@ -67,7 +67,7 @@ char	*expand_str(char *str, t_minishell *minishell)
 			full_var = get_vars(str, &i, minishell);
 			if (!full_var)
 				return (NULL);
-			ft_strlcpy(new_str + j, full_var, ft_strlen(full_var));
+			ft_strlcpy(new_str + j, full_var, ft_strlen(full_var) + 1);
 			j += ft_strlen(full_var);
 		}
 		else
@@ -90,7 +90,7 @@ char	*get_vars(char *str, int *i, t_minishell *minishell)
 	if (str[*i] == '?')
 	{
 		(*i)++;
-		res = ft_itoa(g_exit_status);
+		res = ft_itoa(minishell->exit_status);
 		if (!res)
 			return (NULL);
 		return (res);

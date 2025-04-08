@@ -18,8 +18,6 @@
 # include "env_parsing.h"
 # include "garbage_collector.h"
 
-extern int g_exit_status;
-
 enum		e_state
 {
 	NORMAL,
@@ -35,7 +33,6 @@ enum		e_token_type
 	T_REDIR,
 	T_LOGIC,
 	T_PARANTHESIS
-	//T_PARANTHESIS_L
 };
 
 typedef struct	s_token

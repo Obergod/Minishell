@@ -17,12 +17,12 @@ int	exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	t_pipe	pipes;
 
 	if (pipe(pipes.pipes) == -1)
-		return (-1);
+		return (1);
 	pipes.pid_l = fork();
 	if (pipes.pid_l < 0)
 	{
 		perror("Fork failed");
-		return (-1);
+		return (1);
 	}	
 	else if (pipes.pid_l == 0)
 	{
@@ -36,7 +36,7 @@ int	exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	if (pipes.pid_r < 0)
 	{
 		perror("Fork failed");
-		return (-1);
+		return (1);
 	}	
 	else if (pipes.pid_r == 0)
 	{
@@ -60,31 +60,37 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	int	fd_in;
 	int	fd_out;
 
-	node->cmd->cmd_path = get_cmd_path(minishell, node->cmd->command[0]);
+	node->cmd->cmd_path = get_cmd_path(minishell, node->cmd->command[0], &status);
+	if (status && status == 127)
+		return (127);
 	if (!node->cmd->cmd_path)
-		return (-1);
+		return (1);
+	if (access(node->cmd->cmd_path, X_OK == -1))
+		return (126);
 	if (node == head)
 	{
 		pid = fork();
 		if (pid == 0)
 		{
-			handle_redir(node, minishell, &fd_in, &fd_out);
-			execve(node->cmd->cmd_path, node->cmd->command, NULL);
+			if (handle_redir(node, minishell, &fd_in, &fd_out) == 1)
+				exit(EXIT_FAILURE);
+			execve(node->cmd->cmd_path, node->cmd->command, minishell->env_array);
 			perror("exec failed");
 			exit(EXIT_FAILURE);
 		}
 		else if (pid < 0)
 		{
 			perror("fork failed");
-			return (-1);
+			return (1);
 		}
 		waitpid(pid, &status, 0);
 		return(WEXITSTATUS(status));
 	}
 	else
 	{
-		handle_redir(node, minishell, &fd_in, &fd_out);
-		execve(node->cmd->cmd_path, node->cmd->command, NULL);
+		if (handle_redir(node, minishell, &fd_in, &fd_out) == 1)
+			exit(EXIT_FAILURE);
+		execve(node->cmd->cmd_path, node->cmd->command, minishell->env_array);
 		perror("exec failed");
 		exit(EXIT_FAILURE);
 	}
@@ -92,7 +98,7 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		close(fd_in);
 	if (fd_out)
 		close(fd_out);
-	return (1);
+	return (0);
 }
 
 static void	handle_line(char *line, char *limiter, int *pipes)
@@ -135,7 +141,6 @@ int	here_doc(char *limiter)
 
 int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_out)
 {
-
 	if (!minishell)
 		return (-1);
 	while (node->cmd->redirs)
@@ -145,6 +150,8 @@ int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_o
 			*fd_in = open(node->cmd->redirs->file_or_delimiter, O_RDONLY);
 			if (*fd_in == -1)
 				perror(node->cmd->redirs->file_or_delimiter);
+			if (check_file_accesss(node->cmd->redirs->file_or_delimiter, 0) == 126)
+				return (126);
 			dup2(*fd_in, STDIN_FILENO);
 		}
 		if (node->cmd->redirs->type == REDIR_HEREDOC)
@@ -165,6 +172,8 @@ int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_o
 				perror(node->cmd->redirs->file_or_delimiter);
 				return (-1);
 			}
+			if (check_file_accesss(node->cmd->redirs->file_or_delimiter, 1) == 126)
+				return (126);
 			dup2(*fd_out, STDOUT_FILENO);
 		}
 		node->cmd->redirs = node->cmd->redirs->next;
