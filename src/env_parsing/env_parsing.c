@@ -172,7 +172,8 @@ char **convert_t_env_to_array(t_minishell *minishell)
 		size++;
 		current = current->next;
 	}
-	result[size] = NULL;
+// A voir avec Hugo ancinennement a [size] mais causait des leaks
+	result[size - 1] = NULL;
 	return (result);
 }
 
