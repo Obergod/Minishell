@@ -33,11 +33,14 @@ void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
 /*****		exec_types		*****/
 int		exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
 int		exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
+int		exec_log_operators(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
+int		exec_builtins(t_ast_node *node, t_minishell *minishell);
 
 /*****		exec_types_utils		*****/
 char	*try_path(char **cmd_path, char *cmd, t_minishell *minishell, int *err);
 char	*get_cmd_path(t_minishell *minishell, char *cmd, int *err);
 int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_out);
+int	is_builtin(t_ast_node *node);
 
 /****		errors		*******/
 int	check_file_accesss(char *file, int in_out);

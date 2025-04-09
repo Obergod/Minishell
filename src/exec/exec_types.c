@@ -68,6 +68,7 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		return (1);
 	if (access(node->cmd->cmd_path, X_OK == -1))
 		return (126);
+	// omg ca fonctionne pas a cause de &&
 	if (node == head)
 	{
 		pid = fork();
@@ -75,6 +76,8 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		{
 			if (handle_redir(node, minishell, &fd_in, &fd_out) == 1)
 				exit(EXIT_FAILURE);
+			if (is_builtin(node))
+				return (exec_builtins(node, minishell));
 			execve(node->cmd->cmd_path, node->cmd->command, minishell->env_array);
 			perror("exec failed");
 			exit(EXIT_FAILURE);
@@ -91,6 +94,8 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	{
 		if (handle_redir(node, minishell, &fd_in, &fd_out) == 1)
 			exit(EXIT_FAILURE);
+		if (is_builtin(node))
+			return (exec_builtins(node, minishell));
 		execve(node->cmd->cmd_path, node->cmd->command, minishell->env_array);
 		perror("exec failed");
 		exit(EXIT_FAILURE);
@@ -102,3 +107,19 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	return (0);
 }
 
+int	exec_log_operators(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
+{
+	head = node->left;
+	prefix_exec(node->left, head, minishell);
+	if (node->type == NODE_AND && minishell->exit_status == 0)
+	{
+		head = node->right;
+		prefix_exec(node->right, head, minishell);
+	}
+	else if (node->type == NODE_OR && minishell->exit_status != 0)
+	{
+		head = node->right;
+		prefix_exec(node->right, head, minishell);
+	}
+	return (0);
+}

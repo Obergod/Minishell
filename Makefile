@@ -118,6 +118,7 @@ test: $(LIBFT)
 			$(shell find $(SRC_DIR)/exec -name "*.c") \
 			$(shell find $(SRC_DIR)/parsing -name "*.c") \
 			$(shell find $(SRC_DIR)/expansion -name "*.c") \
+			$(shell find $(SRC_DIR)/builtin -name "*.c") \
 			-I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -Wall -Wextra -Werror -g3 $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
 	done
 	@echo "$(BOLD)$(GREEN)✅ Tous les tests ont été compilés avec succès !$(RESET)"
