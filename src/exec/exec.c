@@ -12,23 +12,19 @@
 
 #include "../../includes/main.h"
 
-int	is_empty_cmd(t_ast_node *node)
-{
-	return (node->cmd && node->cmd->command &&
-			node->cmd->command[0] && node->cmd->command[0][0] == '\0');
-}
 
 void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
 	if (!node)
 		return ;
-	if (node == head && is_empty_cmd(node))
+	else if (node == head && skip_cmd(node))
 		return ;
+	else if (is_cmd(node) && !ft_strcmp(node->cmd->command[0], "cd"))
+	{
+		minishell->exit_status = ft_cd(node->cmd->command, minishell);
+		return ;
+	}
 	process(node, head, minishell);
-//	if (node->left && node->left->type != NODE_CMD && node->left->type != NODE_PIPE)
-//		prefix_exec(node->left, head, minishell);
-//	if (node->right && node->right->type != NODE_CMD && node->left->type != NODE_PIPE)
-//		prefix_exec(node->right, head, minishell);
 }
 
 

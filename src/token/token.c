@@ -89,7 +89,7 @@ t_token	*tokenize(const char *input, t_minishell *minishell)
 		else if (tok.state == IN_DQUOTE)
 			handle_quotes(input, &tok, '"');
 	}
-	finalize_token(&tok, minishell);
+	finalize_token(&tok, minishell, input);
 	result = tok.token_list;
 	//gc_free(tok.buff, minishell->gc);
 	return (result);

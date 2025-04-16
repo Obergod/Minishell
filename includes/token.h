@@ -75,7 +75,7 @@ int					quotes_verif(const char *input);
 void				init_tokenizer(t_tokenizer *tok, const char *input, t_minishell *minishell);
 void				handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minishell);
 void				handle_quotes(const char *input, t_tokenizer *tok, char quote);
-void				finalize_token(t_tokenizer *tok, t_minishell *minishell);
+void				finalize_token(t_tokenizer *tok, t_minishell *minishell, const char *input);
 void				process_space(t_tokenizer *tok, t_minishell *minishell);
 void				process_operator(const char *input, t_tokenizer *tok, t_minishell *minishell);
 
