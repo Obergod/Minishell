@@ -61,13 +61,16 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	int	fd_out;
 
 	status = 0;
-	node->cmd->cmd_path = get_cmd_path(minishell, node->cmd->command[0], &status);
-	if (status)
-		return (status);
-	if (!node->cmd->cmd_path)
-		return (1);
-	if (access(node->cmd->cmd_path, X_OK == -1))
-		return (126);
+	if (!is_builtin(node))
+	{
+		node->cmd->cmd_path = get_cmd_path(minishell, node->cmd->command[0], &status);
+		if (status)
+			return (status);
+		if (!node->cmd->cmd_path)
+			return (1);
+		if (access(node->cmd->cmd_path, X_OK == -1))
+			return (126);
+		}
 	if (node == head)
 	{
 		pid = fork();
@@ -80,7 +83,6 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 				minishell->exit_status = exec_builtins(node, minishell);
 				exit(minishell->exit_status);
 			}
-//				return (exec_builtins(node, minishell);
 			execve(node->cmd->cmd_path, node->cmd->command, minishell->env_array);
 			perror("exec failed");
 			exit(EXIT_FAILURE);
