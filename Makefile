@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/04/18 15:04:48 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/04/18 19:40:36 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -119,6 +119,8 @@ test: $(LIBFT)
 			$(shell find $(SRC_DIR)/parsing -name "*.c") \
 			$(shell find $(SRC_DIR)/expansion -name "*.c") \
 			$(shell find $(SRC_DIR)/builtin -name "*.c") \
+			$(shell find $(SRC_DIR)/readline -name "*.c") \
+			$(shell find $(SRC_DIR)/utils -name "*.c") \
 			-I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -Wall -Wextra -Werror -g3 $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
 	done
 	@echo "$(BOLD)$(GREEN)✅ Tous les tests ont été compilés avec succès !$(RESET)"

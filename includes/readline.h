@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 16:53:40 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/18 17:31:05 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/18 19:40:03 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,6 @@
 #define PROMPT "🍕 pizzshell : "
 
 int	ft_readline(t_minishell *minishell);
-void setup_signals(void)
+void setup_signals(void);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/18 16:48:24 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/18 19:41:54 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,27 +21,6 @@ static char	*ft_add_readline(const char *prompt, char **stock)
 	return (*stock);
 }
 
-// Gestionnaire de signal
-static void	handle_signal(int sig)
-{
-	if (sig == SIGINT) // Ctrl+C
-	{
-		printf("^C");
-		printf("\n");
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
-	else if (sig == SIGTERM) // Ctrl + D
-	{
-		printf("\nSignal de terminaison, il faut bien exit proprement.\n");
-		exit(1);
-	}
-	else if (sig == SIGQUIT) // Ctrl+ "\"
-	{
-		printf("Ctrl + \\\n");
-	}
-}
 
 int	init_minishell(t_minishell *minishell, char **envp)
 {
@@ -53,7 +32,7 @@ int	init_minishell(t_minishell *minishell, char **envp)
 
 	// Initialize environment
 	minishell->env = env_parsing(envp, minishell);
-	minishell->env_array = convert_t_env_to_array(minishell); 
+	minishell->env_array = convert_t_env_to_array(minishell);
 	if (!minishell->env) {
 		printf("Error: Failed to parse environment\n"); //creer un environnement
 															//PWD=/home/ufalzone/42cursus/Cercle-3/Minishell/off-minishell-github/test_dir/bin
@@ -264,9 +243,7 @@ int	main(int ac, char **av, char **envp)
 		return (1);
 	if (init_minishell(&minishell, envp) == 1)
 		return (1);
-	rl_catch_signals = 0; // Desactive la gestion auto des signaux de readline
-	signal(SIGINT, handle_signal);
-	signal(SIGQUIT, SIG_IGN);
+	setup_signals();
 	while (ft_add_readline(PROMPT, &input) != NULL)
 	{
 		token = tokenize(input, &minishell);
@@ -307,8 +284,7 @@ int	main(int ac, char **av, char **envp)
 			add_history(input);
 		free(input);
 	}
-	rl_clear_history();
-	handle_signal(SIGTERM);
+	clean_exit(&minishell);
 	return (0);
 }
 
