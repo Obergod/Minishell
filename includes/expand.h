@@ -14,11 +14,11 @@
 # define EXPAND_H
 
 # include "../full_libft/include/libft.h"
-#include "token.h"
+#include "main.h"
 #include <string.h>
 
 /****		A trier		****/
-t_token	*expand_vars(t_token *token, t_minishell *minishell);
+char	**expand_vars(char **cmd, t_minishell *minishell);
 char	*expand_str(char *str, t_minishell *minishell);
 char	*get_vars(char *str, int *i, t_minishell *minishell);
 int		get_full_len(char *str, t_minishell *minishell);

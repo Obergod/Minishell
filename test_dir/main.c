@@ -271,10 +271,7 @@ int	main(int ac, char **av, char **envp)
 	{
 		token = tokenize(input, &minishell);
 		if (token)
-		{
-			token = expand_vars(token, &minishell);
-			//print_token(token);
-		}
+		{}
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
