@@ -54,7 +54,7 @@ void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		minishell->exit_status = exec_pipes(node, head, minishell);
 	else if (node->type == NODE_CMD)
 	{
-		//node->cmd->command = expand_vars(node->cmd->command, minishell);
+		node->cmd->command = expand_vars(node->cmd->command, minishell);
 		minishell->exit_status = exec_cmd(node, head, minishell);
 	}
 	else if (node->type == NODE_AND || node->type == NODE_OR)

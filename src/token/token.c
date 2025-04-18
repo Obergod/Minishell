@@ -38,18 +38,6 @@ void	handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minis
 	if (input[tok->i] == ' ' || input[tok->i] == '\t')
 		process_space(tok, minishell);
 	// laisser quotes et retirer dans l'expand ?
-	else if (input[tok->i] == '"')
-	{
-		tok->state = IN_DQUOTE;
-		if (tok->nb_tok == 0)
-			tok->token_state = tok->state;
-	}
-	else if (input[tok->i] == '\'')
-	{
-		tok->state = IN_SQUOTE;
-		if (tok->nb_tok == 0)
-			tok->token_state = tok->state;
-	}
 	else if (is_operator(input[tok->i]))
 		process_operator(input, tok, minishell);
 	else
@@ -84,10 +72,6 @@ t_token	*tokenize(const char *input, t_minishell *minishell)
 	{
 		if (tok.state == NORMAL)
 			handle_normal_state(input, &tok, minishell);
-		else if (tok.state == IN_SQUOTE)
-			handle_quotes(input, &tok, '\'');
-		else if (tok.state == IN_DQUOTE)
-			handle_quotes(input, &tok, '"');
 	}
 	finalize_token(&tok, minishell, input);
 	result = tok.token_list;
