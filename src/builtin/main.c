@@ -6,12 +6,52 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 17:06:08 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/05 18:38:59 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/18 16:49:18 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/builtin.h"
+#include "../../includes/readline.h"
+#include "../../full_libft/include/libft.h"
 #include <stdio.h>
+
+static char	*ft_add_readline(const char *prompt, char **stock)
+{
+	(*stock) = readline(prompt);
+	if (*stock == NULL)
+		return (NULL);
+	return (*stock);
+}
+
+void test_builtin(char *input, t_minishell *minishell)
+{
+	char **args = gc_split(input, ' ', minishell->gc);
+	if (!args || !args[0])
+		return;
+	if (ft_strcmp(args[0], "pwd") == 0)
+		ft_pwd();
+	else if (ft_strcmp(args[0], "echo") == 0)
+		ft_echo(args);
+	else if (ft_strcmp(args[0], "cd") == 0)
+		ft_cd(args, minishell);
+	else if (ft_strcmp(args[0], "env") == 0)
+		ft_env(minishell);
+	else if (ft_strcmp(args[0], "export") == 0)
+		ft_export(args, minishell);
+	else if (ft_strcmp(args[0], "unset") == 0) 
+		ft_unset(args, minishell);
+	else if (ft_strcmp(args[0], "exit") == 0)
+		ft_exit(args, minishell);
+	else if (ft_strcmp(args[0], "ls") == 0)
+	{
+		if (access("/bin/ls", X_OK) == 0)
+			system("/bin/ls");
+		else
+			printf("'ls' n'est pas accessible\n");
+	}
+	else
+		printf("'%s' n'est pas un builtin\n", args[0]);
+}
 
 int main(int ac, char **av, char **envp)
 {
@@ -19,7 +59,7 @@ int main(int ac, char **av, char **envp)
 	t_gc_head *gc_head;
 
 	(void)ac;
-	// (void)av;
+	(void)av;
 	// char **test = { NULL };
 	// envp = test;
 
@@ -44,45 +84,14 @@ int main(int ac, char **av, char **envp)
 			env = env->next;
 		}
 	}
-
-	// Test de la commande ft_env
-	// printf("---- Test de la commande ft_env ----\n");
-	ft_env(&minishell);
-	// printf("---- Fin du test, code de retour: %d ----\n", status);
-
-	// printf("\n---- AVANT ft_export ----\n");
-	// int i;
-	// for (i = 0; av[i]; i++) {
-	// 	printf("av[%d]: %s\n", i, av[i]);
-	// }
-
-	int status2 = ft_export(av + 1, &minishell);
-	printf("---- Fin du test ft_unset, code de retour: %d ----\n", status2);
-
-	printf("\n---- APRÈS ft_export - Nouvel environnement ----\n");
-	// t_env *env = minishell.env;
-	// while (env)
-	// {
-	// 	printf("%s\n", env->raw);
-	// 	env = env->next;
-	// }
-
-	// Test de la commande ft_env
-	// printf("---- Test de la commande ft_env ----\n");
-	ft_env(&minishell);
-	// printf("---- Fin du test, code de retour: %d ----\n", status2);
-	//Test commande ft_echo
-	// char *test[] = {"echo",s "salut", NULL};
-	// printf("---- Test de la commande ft_echo ----\n");
-	// int status = ft_echo(av + 1);
-	// printf("---- Fin du test, code de retour: %d ----\n", status);
-
-	//Test commande cd
-	// printf("---- Test de la commande ft_cd ----\n");
-	// int status = ft_cd(av + 1);
-	// printf("---- Fin du test, code de retour: %d ----\n", status);
-
-	// Libération de la mémoire
-	gc_destroy(gc_head);
+	char *input;
+	while (ft_add_readline(PROMPT, &input) != NULL)
+	{
+		if (*input)
+			add_history(input);
+		test_builtin(input, &minishell);
+		free(input);
+	}
+	rl_clear_history();
 	return (0);
 }

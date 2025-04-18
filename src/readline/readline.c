@@ -6,11 +6,13 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 12:46:05 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 15:27:38 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/18 17:40:42 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/readline.h"
+#include "../../includes/main.h"
+
 
 static char	*ft_add_readline(const char *prompt, char **stock)
 {
@@ -20,35 +22,11 @@ static char	*ft_add_readline(const char *prompt, char **stock)
 	return (*stock);
 }
 
-// Gestionnaire de signal
-static void	handle_signal(int sig)
-{
-	if (sig == SIGINT) // Ctrl+C
-	{
-		printf("^C");
-		printf("\n");
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
-	else if (sig == SIGTERM) // Ctrl + D
-	{
-		printf("\nSignal de terminaison, il faut bien exit proprement.\n");
-		exit(1);
-	}
-	else if (sig == SIGQUIT) // Ctrl+ "\"
-	{
-		printf("Ctrl + \\\n");
-	}
-}
-
-int	ft_readline(void)
+int	ft_readline(t_minishell *minishell)
 {
 	char	*input;
 
-	rl_catch_signals = 0; // Desactive la gestion auto des signaux de readline
-	signal(SIGINT, handle_signal);
-	signal(SIGQUIT, handle_signal);
+	setup_signals();
 	while (ft_add_readline(PROMPT, &input) != NULL)
 	{
 		if (*input)
@@ -57,12 +35,13 @@ int	ft_readline(void)
 		free(input);
 	}
 	rl_clear_history();
-	handle_signal(SIGTERM);
+	printf("exit\n");
+	clean_exit(minishell);
 	return (0);
 }
 
- int main(void)
- {
- 	ft_readline();
- 	return (0);
- }
+//  int main(void)
+//  {
+//  	ft_readline();
+//  	return (0);
+//  }

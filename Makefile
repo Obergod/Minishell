@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/04/05 19:56:04 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/04/18 15:04:48 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -132,6 +132,7 @@ test_builtin: $(LIBFT)
 			$(shell find $(SRC_DIR)/garbage_collector -maxdepth 1 -name "*.c") \
 			$(shell find $(SRC_DIR)/garbage_collector/utils -name "*.c") \
 			$(shell find $(SRC_DIR)/env_parsing -name "*.c") \
+			$(shell find $(SRC_DIR)/utils -name "*.c") \
 			-g3\
 			$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
 		echo "$(BOLD)$(GREEN)✅ Tests builtin compilés avec succès !$(RESET)"; \

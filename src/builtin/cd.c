@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:17:04 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/05 17:27:36 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/18 15:13:16 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int ft_cd(char **args, t_minishell *minishell)
 		target = find_in_env("HOME", minishell);
 		if (!target)
 		{
-			printf("cd: HOME not set");
+			printf("cd: HOME not set\n");
 			return (1);
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 16:48:21 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/06 20:46:33 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/18 16:24:50 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,15 @@ void check_env(t_env *head, t_minishell *minishell)
 		add_to_env(&head, create_value_env("_", "/usr/bin/env", minishell));
 }
 
+static char *shell_lvl(char **result_split)
+{
+	if (ft_strcmp("SHLVL", result_split[0]) == 0)
+	{
+		return (ft_itoa(ft_atoi(result_split[1]) + 1));
+	}
+	return result_split[1];
+}
+
 t_env *env_parsing(char **envp, t_minishell *minishell)
 {
 	t_env *current;
@@ -136,8 +145,8 @@ t_env *env_parsing(char **envp, t_minishell *minishell)
 		tmp = gc_malloc(sizeof(t_env), minishell->gc);
 		if (!tmp)
 			return (NULL);
-
 		tmp->key = result_split[0];
+		result_split[1] = shell_lvl(result_split);
 		tmp->value = result_split[1] ? result_split[1] : "";
 		tmp->raw = gc_strjoin_three(result_split[0], "=", result_split[1] ? result_split[1] : "", minishell->gc);
 		tmp->next = NULL;
