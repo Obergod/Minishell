@@ -41,14 +41,28 @@ int	quotes_verif(const char *input)
 	return (0);
 }
 
-void	finalize_token(t_tokenizer *tok, t_minishell *minishell)
+int	is_only_space(const char *str)
+{
+	int	i;
+
+	i = -1;
+	while (str[++i])
+	{
+		if (str[i] != ' ')
+			return (0);
+	}
+	return (1);
+}
+
+void	finalize_token(t_tokenizer *tok, t_minishell *minishell, const char *input)
 {
 	if (tok->nb_tok > 0)
 	{
 		tok->buff[tok->nb_tok] = '\0';
 		add_token(&tok->token_list, tok->buff, T_WORD, tok->token_state, minishell);
 	}
-	else if (tok->nb_tok == 0 && tok->i == 0)
+	else if ((tok->nb_tok == 0 && tok->i == 0) || is_only_space(input))
 		add_token(&tok->token_list, NULL, T_WORD, tok->token_state, minishell);
 
 }
+

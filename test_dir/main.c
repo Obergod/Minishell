@@ -12,7 +12,6 @@
 
 #include "../includes/main.h"
 
-int	g_exit_status = 0;
 
 static char	*ft_add_readline(const char *prompt, char **stock)
 {
@@ -48,11 +47,13 @@ int	init_minishell(t_minishell *minishell, char **envp)
 {
 	t_gc_head	*gc_head;
 
+	minishell->exit_status = 0;
 	gc_head = gc_init();
 	minishell->gc = gc_head;
 
 	// Initialize environment
 	minishell->env = env_parsing(envp, minishell);
+	minishell->env_array = convert_t_env_to_array(minishell); 
 	if (!minishell->env) {
 		printf("Error: Failed to parse environment\n"); //creer un environnement
 															//PWD=/home/ufalzone/42cursus/Cercle-3/Minishell/off-minishell-github/test_dir/bin
@@ -270,10 +271,7 @@ int	main(int ac, char **av, char **envp)
 	{
 		token = tokenize(input, &minishell);
 		if (token)
-		{
-			token = expand_vars(token, &minishell);
-			//print_token(token);
-		}
+		{}
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);

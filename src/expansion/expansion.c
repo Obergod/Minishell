@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/token.h"
 #include "../../includes/expand.h"
 
 //gerer l'export
+/*
 t_token	*expand_vars(t_token *token, t_minishell *minishell)
 {
 	char	*new_str;
@@ -42,6 +42,37 @@ t_token	*expand_vars(t_token *token, t_minishell *minishell)
 	}
 	return (head);
 }
+*/
+
+char	**expand_vars(char **cmd, t_minishell *minishell)
+{
+	char	*new_str;
+	char	**res;
+	int	i;
+
+	i = 0;
+	while (cmd[i])
+		i++;
+	res = malloc(sizeof(char *) * i + 1);
+	i = 0;
+	while (cmd[i])
+	{
+		if (ft_strchr(cmd[i], '$'))
+		{
+			new_str = expand_str(cmd[i], minishell);
+			if (!new_str)
+				return (NULL); //temporaire pour pas d'erreur
+			res[i] = new_str;
+		}
+		else
+			res[i] = cmd[i];
+//			if (ft_strchr(token->str, '*'))
+//				expand_wildcards()
+		i++;
+	}
+	res[i] = 0;
+	return (res);
+}
 
 char	*expand_str(char *str, t_minishell *minishell)
 {
@@ -50,6 +81,8 @@ char	*expand_str(char *str, t_minishell *minishell)
 	char	*new_str;
 	int		i;
 	int		j;
+	int		in_squotes = 0;
+	int		in_dquotes = 0;
 
 	i = 0;
 	j = 0;
@@ -61,13 +94,23 @@ char	*expand_str(char *str, t_minishell *minishell)
 		return (NULL);
 	while (str[i])
 	{
-		if (str[i] == '$' && str[i + 1])
+		if (str[i] == '\'' && !in_dquotes)
+		{
+			in_squotes = !in_squotes;
+			new_str[j++] = str[i++];
+		}
+		else if (str[i] == '\"' && !in_squotes)
+		{
+			in_dquotes = !in_dquotes;
+			new_str[j++] = str[i++];
+		}
+		else if (str[i] == '$' && !in_squotes)
 		{
 			i++;
 			full_var = get_vars(str, &i, minishell);
 			if (!full_var)
 				return (NULL);
-			ft_strlcpy(new_str + j, full_var, ft_strlen(full_var));
+			ft_strlcpy(new_str + j, full_var, ft_strlen(full_var) + 1);
 			j += ft_strlen(full_var);
 		}
 		else
@@ -86,11 +129,11 @@ char	*get_vars(char *str, int *i, t_minishell *minishell)
 	var_name = NULL;
 	res = NULL;
 	if (str[*i] != '?' && !ft_isalpha(str[*i]))
-		return (gc_strdup("", minishell->gc));
+		return (gc_strdup("$", minishell->gc));
 	if (str[*i] == '?')
 	{
 		(*i)++;
-		res = ft_itoa(g_exit_status);
+		res = ft_itoa(minishell->exit_status);
 		if (!res)
 			return (NULL);
 		return (res);
@@ -101,9 +144,9 @@ char	*get_vars(char *str, int *i, t_minishell *minishell)
 	if (!var_name)
 		return(NULL);
 	res = find_in_env(var_name, minishell);
-	free(var_name);
 	if (!res)
-		return (gc_strdup("", minishell->gc));
+		return (gc_strjoin("$", var_name, minishell->gc));
+	free(var_name);
 	return (res);
 }
 

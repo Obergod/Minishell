@@ -22,10 +22,11 @@ struct s_gc_head;
 
 typedef struct s_minishell
 {
-	struct s_env *env;
-	struct s_cmd *cmd;
-	struct s_gc_head *gc;
-	int exit_status;
+	struct s_env		*env;
+	char				**env_array;
+	struct s_cmd		*cmd;
+	struct s_gc_head	*gc;
+	int 				exit_status;
 } t_minishell;
 
 //Utils
