@@ -14,7 +14,10 @@
 # define MAIN_H
 
 #include <errno.h>
+<<<<<<< HEAD
 #include "../full_libft/include/ft_printf.h"
+=======
+>>>>>>> d1afceb (smol fix)
 
 # include "ast.h"
 # include "minishell.h"
