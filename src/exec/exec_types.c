@@ -61,7 +61,7 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	int	fd_out;
 
 	status = 0;
-	if (!is_builtin(node))
+	if (!is_fork_builtin(node))
 	{
 		node->cmd->cmd_path = get_cmd_path(minishell, node->cmd->command[0], &status);
 		if (status)
@@ -78,9 +78,9 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		{
 			if (handle_redir(node, minishell, &fd_in, &fd_out) == 1)
 				exit(EXIT_FAILURE);
-			if (is_builtin(node))
+			if (is_fork_builtin(node))
 			{
-				minishell->exit_status = exec_builtins(node, minishell);
+				minishell->exit_status = exec_fork_builtins(node, minishell);
 				exit(minishell->exit_status);
 			}
 			execve(node->cmd->cmd_path, node->cmd->command, minishell->env_array);
@@ -99,9 +99,9 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	{
 		if (handle_redir(node, minishell, &fd_in, &fd_out) == 1)
 			exit(EXIT_FAILURE);
-		if (is_builtin(node))
+		if (is_fork_builtin(node))
 		{
-			minishell->exit_status = exec_builtins(node, minishell);
+			minishell->exit_status = exec_fork_builtins(node, minishell);
 			exit(minishell->exit_status);
 		}
 		execve(node->cmd->cmd_path, node->cmd->command, minishell->env_array);

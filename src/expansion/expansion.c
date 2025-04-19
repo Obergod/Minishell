@@ -53,7 +53,7 @@ char	**expand_vars(char **cmd, t_minishell *minishell)
 	i = 0;
 	while (cmd[i])
 		i++;
-	res = malloc(sizeof(char *) * i + 1);
+	res = gc_malloc(sizeof(char *) * i + 1, minishell->gc);
 	i = 0;
 	while (cmd[i])
 	{
@@ -71,7 +71,41 @@ char	**expand_vars(char **cmd, t_minishell *minishell)
 		i++;
 	}
 	res[i] = 0;
+	i = -1;
+	while (res[++i])
+	{
+		new_str = remove_quotes(res[i], minishell);
+		if (!new_str)
+			return (NULL); //temporaire pour pas d'erreur
+		res[i] = new_str;
+	}
+	res[i] = 0;
 	return (res);
+}
+
+char	*remove_quotes(char *str, t_minishell *minishell)
+{
+	char	*new_str;
+	int		i;
+	int		j;
+	int		in_squotes = 0;
+	int		in_dquotes = 0;
+	
+	i = -1;
+	j = 0;
+	new_str = gc_calloc(ft_strlen(str) + 1, sizeof(char), minishell->gc);
+	if (!new_str)
+		return (NULL);
+	while (str[++i])
+	{
+		if (str[i] == '\'' && !in_dquotes)
+			in_squotes = !in_squotes;
+		else if (str[i] == '\"' && !in_squotes)
+			in_dquotes = !in_dquotes;
+		else
+			new_str[j++] = str[i];
+	}
+	return (new_str);
 }
 
 char	*expand_str(char *str, t_minishell *minishell)

@@ -20,21 +20,17 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 
 	if (!node)
 		return ;
-	pid = 456;
+	pid = 1;
 	if (node->subshell == 1)
 		pid = fork();
 	else if (node == head && skip_cmd(node))
 		return ;
 	if (pid == 0 || node->subshell == 0)
 	{
-		if (is_cmd(node) && (!ft_strcmp(node->cmd->command[0], "cd") ||
-				!ft_strcmp(node->cmd->command[0], "export")))
+		if (is_cmd(node) && is_builtin(node))
 		{
-			if (!ft_strcmp(node->cmd->command[0], "export"))
-				ft_export(node->cmd->command, minishell);
-			else
-				minishell->exit_status = ft_cd(node->cmd->command, minishell);
-			return ;
+				minishell->exit_status = exec_builtins(node, minishell);
+				return ;
 		}
 		process(node, head, minishell);
 	}
