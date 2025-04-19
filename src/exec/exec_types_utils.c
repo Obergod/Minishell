@@ -24,7 +24,7 @@ char	*try_path(char **cmd_path, char *cmd, t_minishell *minishell, int *err)
 		if (access(full_path, F_OK) == 0)
 			return (full_path);
 	}
-	*err = 127;
+	*err = check_cmd_access(cmd);
 	return (NULL);
 }
 
@@ -77,13 +77,25 @@ int	check_file_accesss(char *file, int in_out)
 	return (0);
 }
 
-int	check_cmd_access(char *cmd)
+int check_cmd_access(char *cmd)
 {
-	if (access(cmd, F_OK) == -1)
-		return (127);
-	if (access(cmd, X_OK) == -1)
-		return (126);
-	return (0);
+	struct stat stat_buffer;
+
+    if (stat(cmd, &stat_buffer) == -1) {
+        if (errno == ENOENT) {
+            return 127;
+        } else {
+            return 126;
+        }
+    }
+    if (S_ISDIR(stat_buffer.st_mode)) {
+        return 126;
+    }
+    if (access(cmd, X_OK) == -1) {
+        return 126;
+    }
+
+    return (0); // Success
 }
 
 

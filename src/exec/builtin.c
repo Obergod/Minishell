@@ -22,6 +22,8 @@ int	is_builtin(t_ast_node *node)
 			return (1);
 		else if (!ft_strcmp(node->cmd->command[0], "exit")) 
 			return (1);
+		else if (!ft_strcmp(node->cmd->command[0], "cd")) 
+			return (1);
 	}
 	return (0);
 }
@@ -50,6 +52,8 @@ int	exec_builtins(t_ast_node *node, t_minishell *minishell)
 			return (ft_unset(node->cmd->command, minishell));
 		else if (!ft_strcmp(node->cmd->command[0], "exit")) 
 			return (ft_exit(node->cmd->command, minishell));
+		else if (!ft_strcmp(node->cmd->command[0], "cd")) 
+			return (ft_cd(node->cmd->command, minishell));
 	}
 	return (0);	
 }

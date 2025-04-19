@@ -13,6 +13,8 @@
 #ifndef MAIN_H
 # define MAIN_H
 
+#include <errno.h>
+
 # include "ast.h"
 # include "minishell.h"
 # include "garbage_collector.h"

@@ -29,6 +29,7 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	{
 		if (is_cmd(node) && is_builtin(node))
 		{
+				node->cmd->command = expand_vars(node->cmd->command, minishell);
 				minishell->exit_status = exec_builtins(node, minishell);
 				return ;
 		}
