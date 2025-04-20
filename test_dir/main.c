@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/20 15:21:21 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/20 17:50:32 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,6 +246,7 @@ int	main(int ac, char **av, char **envp)
 	setup_signals();
 	while (ft_add_readline(PROMPT, &input) != NULL)
 	{
+		update_exit_status_from_signal(&minishell);
 		token = tokenize(input, &minishell);
 		if (token)
 		{}

@@ -6,13 +6,13 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 17:21:50 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/20 17:17:00 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/20 17:54:34 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/main.h"
 
-int g_sig_received = 0;
+int	g_sig_received = 0;
 
 static void	handle_signal(int sig)
 {

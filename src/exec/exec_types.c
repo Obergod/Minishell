@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_types.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 18:50:50 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/07 18:50:51 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/04/20 17:47:44 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	{
 		perror("Fork failed");
 		return (1);
-	}	
+	}
 	else if (pipes.pid_l == 0)
 	{
 		reset_signals_child();
@@ -38,7 +38,7 @@ int	exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	{
 		perror("Fork failed");
 		return (1);
-	}	
+	}
 	else if (pipes.pid_r == 0)
 	{
 		reset_signals_child();
@@ -59,7 +59,7 @@ int	exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 			minishell->exit_status = 131;
 			ft_putendl_fd("Quit (core dumped)", 2);
 		}
-		else if (WTERMSIG(pipes.exit_status_l) == SIGINT || WTERMSIG(pipes.exit_status_r) == SIGINT)
+		else if (WTERMSIG(pipes.exit_status_l) == SIGINT || WTERMSIG(pipes.exit_status_r) == SIGINT  || g_sig_received == 130)
         	minishell->exit_status = 130;
 		return (minishell->exit_status);
 	}
@@ -107,6 +107,12 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 			return (1);
 		}
 		waitpid(pid, &status, 0);
+		if (g_sig_received == SIGINT)
+		{
+			minishell->exit_status = 130;
+			g_sig_received = 0;
+			return (minishell->exit_status);
+		}
 		if (WIFSIGNALED(status))
 		{
 			if (WTERMSIG(status) == SIGQUIT)
@@ -114,8 +120,6 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 				minishell->exit_status = 131;
 				ft_putendl_fd("Quit (core dumped)", 2);
 			}
-			else if (WTERMSIG(status) == SIGINT)
-            	minishell->exit_status = 130;
 			return (minishell->exit_status);
 		}
 		return(WEXITSTATUS(status));
