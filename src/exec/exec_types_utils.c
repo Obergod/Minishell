@@ -39,9 +39,9 @@ char	*get_cmd_path(t_minishell *minishell, char *cmd, int *err)
 		return (NULL);
 	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
 	{
+		*err = check_cmd_access(cmd);
 		if (access(cmd, F_OK | X_OK) == 0)
 			return (gc_strdup(cmd, minishell->gc));
-		*err = check_cmd_access(cmd);
 		return (NULL);
 	}
 	value = find_in_env("PATH", minishell);
@@ -83,19 +83,19 @@ int check_cmd_access(char *cmd)
 
     if (stat(cmd, &stat_buffer) == -1) {
         if (errno == ENOENT) {
-            return 127;
+            return (127);
         } else {
-            return 126;
+            return (126);
         }
     }
     if (S_ISDIR(stat_buffer.st_mode)) {
-        return 126;
+        return (126);
     }
     if (access(cmd, X_OK) == -1) {
-        return 126;
+        return (126);
     }
 
-    return (0); // Success
+    return (0);
 }
 
 

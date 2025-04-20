@@ -52,8 +52,8 @@ int	here_doc(char *limiter)
 
 int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_out)
 {
-	if (!minishell)
-		return (-1);
+	if (remove_quotes_redirs(node->cmd->redirs, minishell) == -1)
+		return (1);
 	while (node->cmd->redirs)
 	{
 		if (node->cmd->redirs->type == REDIR_IN)
@@ -81,7 +81,7 @@ int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_o
 				if (*fd_in)
 					close(*fd_in);
 				perror(node->cmd->redirs->file_or_delimiter);
-				return (-1);
+				return (1);
 			}
 			if (check_file_accesss(node->cmd->redirs->file_or_delimiter, 1) == 1)
 				return (1);

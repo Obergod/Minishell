@@ -26,6 +26,7 @@ int	exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	}	
 	else if (pipes.pid_l == 0)
 	{
+		reset_signals_child();
 		close(pipes.pipes[0]);
 		dup2(pipes.pipes[1], STDOUT_FILENO);
 		close(pipes.pipes[1]);
@@ -40,6 +41,7 @@ int	exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	}	
 	else if (pipes.pid_r == 0)
 	{
+		reset_signals_child();
 		close(pipes.pipes[1]);
 		dup2(pipes.pipes[0], STDIN_FILENO);
 		close(pipes.pipes[0]);
@@ -50,6 +52,17 @@ int	exec_pipes(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	close(pipes.pipes[1]);
 	waitpid(pipes.pid_l, &pipes.exit_status_l, 0);
 	waitpid(pipes.pid_r, &pipes.exit_status_r, 0);
+	if (WIFSIGNALED(pipes.exit_status_l) || WIFSIGNALED(pipes.exit_status_r))
+	{
+		if (WTERMSIG(pipes.exit_status_l) == SIGQUIT || WTERMSIG(pipes.exit_status_r) == SIGQUIT)
+		{
+			minishell->exit_status = 131;
+			ft_putendl_fd("Quit (core dumped)", 2);
+		}
+		else if (WTERMSIG(pipes.exit_status_l) == SIGINT || WTERMSIG(pipes.exit_status_r) == SIGINT)
+        	minishell->exit_status = 130;
+		return (minishell->exit_status);
+	}
 	return(WEXITSTATUS(pipes.exit_status_r));
 }
 
@@ -76,6 +89,7 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		pid = fork();
 		if (pid == 0)
 		{
+			reset_signals_child();
 			if (handle_redir(node, minishell, &fd_in, &fd_out) == 1)
 				exit(EXIT_FAILURE);
 			if (is_fork_builtin(node))
@@ -93,6 +107,17 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 			return (1);
 		}
 		waitpid(pid, &status, 0);
+		if (WIFSIGNALED(status))
+		{
+			if (WTERMSIG(status) == SIGQUIT)
+			{
+				minishell->exit_status = 131;
+				ft_putendl_fd("Quit (core dumped)", 2);
+			}
+			else if (WTERMSIG(status) == SIGINT)
+            	minishell->exit_status = 130;
+			return (minishell->exit_status);
+		}
 		return(WEXITSTATUS(status));
 	}
 	else

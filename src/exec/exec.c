@@ -29,9 +29,12 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	{
 		if (is_cmd(node) && is_builtin(node))
 		{
-				node->cmd->command = expand_vars(node->cmd->command, minishell);
-				minishell->exit_status = exec_builtins(node, minishell);
+			node->cmd->command = expand_vars(node->cmd->command, minishell);
+			node->cmd->command = check_empty(node->cmd->command);
+			if (!node->cmd->command)
 				return ;
+			minishell->exit_status = exec_builtins(node, minishell);
+			return ;
 		}
 		process(node, head, minishell);
 	}
@@ -52,6 +55,9 @@ void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	else if (node->type == NODE_CMD)
 	{
 		node->cmd->command = expand_vars(node->cmd->command, minishell);
+		node->cmd->command = check_empty(node->cmd->command);
+		if (!node->cmd->command)
+			return ;
 		minishell->exit_status = exec_cmd(node, head, minishell);
 	}
 	else if (node->type == NODE_AND || node->type == NODE_OR)

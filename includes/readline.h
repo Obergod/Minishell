@@ -23,5 +23,6 @@
 
 int	ft_readline(t_minishell *minishell);
 void setup_signals(void);
+void reset_signals_child(void);
 
 #endif

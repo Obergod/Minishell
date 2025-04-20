@@ -23,5 +23,6 @@ char	*expand_str(char *str, t_minishell *minishell);
 char	*get_vars(char *str, int *i, t_minishell *minishell);
 int		get_full_len(char *str, t_minishell *minishell);
 char	*remove_quotes(char *str, t_minishell *minishell);
+int		remove_quotes_redirs(t_redir *redirs, t_minishell *minishell);
 
 #endif

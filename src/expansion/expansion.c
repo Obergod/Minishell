@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/expand.h"
+#include "../../includes/main.h"
 
 //gerer l'export
 /*
@@ -81,6 +81,23 @@ char	**expand_vars(char **cmd, t_minishell *minishell)
 	}
 	res[i] = 0;
 	return (res);
+}
+
+int	remove_quotes_redirs(t_redir *redirs, t_minishell *minishell)
+{
+	t_redir *cur;
+	char	*new_str;
+
+	cur = redirs;
+	while (cur)
+	{
+		new_str = remove_quotes(cur->file_or_delimiter, minishell);
+		if (!new_str)
+			return (-1);
+		cur->file_or_delimiter = new_str;
+		cur = cur->next;
+	}
+	return (0);
 }
 
 char	*remove_quotes(char *str, t_minishell *minishell)
@@ -179,7 +196,8 @@ char	*get_vars(char *str, int *i, t_minishell *minishell)
 		return(NULL);
 	res = find_in_env(var_name, minishell);
 	if (!res)
-		return (gc_strjoin("$", var_name, minishell->gc));
+		return (gc_strdup("", minishell->gc));
+//		return (gc_strjoin("$", var_name, minishell->gc));
 	free(var_name);
 	return (res);
 }

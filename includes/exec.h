@@ -46,6 +46,7 @@ int		is_fork_builtin(t_ast_node *node);
 int		is_cmd(t_ast_node *node);
 int		skip_cmd(t_ast_node *node);
 int		is_only_space(char *str);
+char	**check_empty(char **cmd);
 
 /****		errors		*******/
 int		check_file_accesss(char *file, int in_out);
