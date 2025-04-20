@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 17:25:38 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/05 18:38:20 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/20 15:18:11 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,10 @@ int ft_export(char **args, t_minishell *minishell)
 			return (0);
 		result = gc_split_first_word(args[i], '=', minishell->gc);
 		if (ft_export_verif_key(result[0]) != 0 || ft_export_verif_value(result[1]) != 0)
-			return (0);
+			return (1);
 		edit_status = edit_in_env(result[0], result[1], minishell);
+		if (edit_status == 1)
+			return (1);
 	}
 	return (0);
 }

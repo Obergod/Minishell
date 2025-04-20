@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 15:16:18 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/18 14:56:14 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/20 15:21:13 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,6 @@ typedef struct s_minishell
 } t_minishell;
 
 //Utils
-int		clean_exit(t_minishell *minishell);
+int		clean_exit(int exit_code, t_minishell *minishell);
 
 #endif
