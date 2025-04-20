@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 16:48:21 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/18 19:31:37 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/20 15:17:57 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,7 @@ char **convert_t_env_to_array(t_minishell *minishell)
 int edit_in_env(char *key, char *new_value, t_minishell *minishell)
 {
 	t_env *current;
+
 	if (!key || !minishell || !minishell->env)
 		return (1);
 	current = minishell->env;
@@ -198,6 +199,8 @@ int edit_in_env(char *key, char *new_value, t_minishell *minishell)
 		{
 			current->value = gc_strdup(new_value, minishell->gc);
 			current->raw = gc_strjoin_three(current->key, "=", new_value, minishell->gc);
+			if (!current->value || !current->raw)
+				return (1);
 			return (0);
 		}
 		current = current->next;

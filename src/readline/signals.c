@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 17:21:50 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/18 19:29:54 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/20 17:17:00 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ static void	handle_signal(int sig)
 	g_sig_received = sig;
 	if (sig == SIGINT) // Ctrl+C
 	{
-		write(1, "^C", 1);
 		write(1, "\n", 1);
 		rl_on_new_line();
 		rl_replace_line("", 0);
@@ -44,4 +43,14 @@ void setup_signals(void)
 	sigaction(SIGINT, &sa, NULL); //ctrl C
 	sa.sa_handler = SIG_IGN; //ignoree
 	sigaction(SIGQUIT, &sa, NULL);
+}
+
+//appeler ca a chaque readline
+void update_exit_status_from_signal(t_minishell *minishell)
+{
+	if (g_sig_received == SIGINT)
+	{
+		minishell->exit_status = 130;
+		g_sig_received = 0;
+	}
 }
