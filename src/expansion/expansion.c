@@ -76,6 +76,23 @@ int	remove_quotes_redirs(t_redir *redirs, t_minishell *minishell)
 	return (0);
 }
 
+int	remove_quotes_redirs(t_redir *redirs, t_minishell *minishell)
+{
+	t_redir *cur;
+	char	*new_str;
+
+	cur = redirs;
+	while (cur)
+	{
+		new_str = remove_quotes(cur->file_or_delimiter, minishell);
+		if (!new_str)
+			return (-1);
+		cur->file_or_delimiter = new_str;
+		cur = cur->next;
+	}
+	return (0);
+}
+
 char	*remove_quotes(char *str, t_minishell *minishell)
 {
 	char	*new_str;

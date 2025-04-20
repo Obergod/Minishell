@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 17:45:47 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/16 17:45:48 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:22:17 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,19 @@ int	skip_cmd(t_ast_node *node)
 	return (0);
 }
 
-char	**check_empty(char **cmd, t_minishell *minishell)
+char	**check_empty(char **cmd)
 {
 	while (cmd && *cmd && **cmd == '\0')
 			cmd++;
-	 if (cmd && !*cmd)  // *cmd is NULL (no non-empty args left)
-        minishell->exit_status = 0;
 	return (cmd);
+}
+
+int skip_empty(char ***cmdp)
+{
+    char **cmd = *cmdp;
+    while (cmd && *cmd && **cmd == '\0')
+        cmd++;
+    *cmdp = cmd;
+    /* if we ran out of strings entirely, signal as empty */
+    return (cmd == NULL || *cmd == NULL);
 }
