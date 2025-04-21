@@ -80,6 +80,7 @@ char	**expand_vars(char **cmd, t_minishell *minishell)
 		res[i] = new_str;
 	}
 	res[i] = 0;
+	res = check_empty(res, minishell);
 	return (res);
 }
 

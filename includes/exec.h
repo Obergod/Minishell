@@ -46,7 +46,11 @@ int		is_fork_builtin(t_ast_node *node);
 int		is_cmd(t_ast_node *node);
 int		skip_cmd(t_ast_node *node);
 int		is_only_space(char *str);
-char	**check_empty(char **cmd);
+char	**check_empty(char **cmd, t_minishell *minishell);
+
+/****	handle_redirs		*****/
+int here_doc(char *delimiter);
+int	handle_heredoc(t_redir *redir, int *fd_in);
 
 /****		errors		*******/
 int		check_file_accesss(char *file, int in_out);

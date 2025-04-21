@@ -11,83 +11,107 @@
 /* ************************************************************************** */
 
 #include "../../includes/main.h"
-
-static void	handle_line(char *line, char *limiter, int *pipes)
+int here_doc(char *delimiter)
 {
-	if (!line)
+    int pipes[2];
+    char *line;
+
+    if (pipe(pipes) == -1)
+        return (1);
+    while (1)
 	{
-		free(limiter);
-		close(pipes[1]);
-		return ;
-	}
-	if (ft_strcmp(line, limiter))
-		write(pipes[1], line, ft_strlen(line));
+        line = readline("heredoc> ");
+        if (!line) 
+            break;
+        if (ft_strcmp(line, delimiter) == 0) {
+            free(line);
+            break;
+        }
+        write(pipes[1], line, ft_strlen(line));
+        write(pipes[1], "\n", 1);
+        free(line);
+    }
+    close(pipes[1]);
+    return (pipes[0]);
 }
 
-int	here_doc(char *limiter)
+int	handle_heredoc(t_redir *redir, int *fd_in)
 {
-	char	*line;
-	int		pipes[2];
+	int	new_fd;
 
-	limiter = ft_strjoin(limiter, "\n");
-	if (!limiter)
-		exit(EXIT_FAILURE);
-	if (pipe(pipes) == -1)
+	if (*fd_in != -1)
+		close(*fd_in);
+	new_fd = here_doc(redir->file_or_delimiter);
+	if (new_fd == -1)
+		return (1);
+	*fd_in = new_fd;
+	return (0);
+}
+
+int	handle_input(t_redir *redir, int *fd_in)
+{
+	int	new_fd;
+
+	if (*fd_in != -1)
+		close(*fd_in);
+	new_fd = open(redir->file_or_delimiter, O_RDONLY);
+	if (new_fd == -1)
 	{
-		free(limiter);
-		exit(EXIT_FAILURE);
+		perror(redir->file_or_delimiter);
+		return (1);
 	}
-	while (1)
+	if (check_file_accesss(redir->file_or_delimiter, 0) == 1)
+		return (1);
+	*fd_in = new_fd;
+	return (0);
+}
+
+int	handle_output(t_redir *redir, int *fd_out)
+{
+	int	new_fd;
+	int	flags;
+
+	flags = O_WRONLY | O_CREAT;
+	if (redir->type == REDIR_APPEND)
+		flags |= O_APPEND;
+	else
+		flags |= O_TRUNC;
+	if (*fd_out != -1)
+		close(*fd_out);
+	new_fd = open(redir->file_or_delimiter, flags, 0644);
+	if (new_fd == -1)
 	{
-		write(1, "heredoc> ", 9);
-		line = get_next_line(STDIN_FILENO);
-		handle_line(line, limiter, pipes);
-		if (!line || !ft_strcmp(line, limiter))
-			break ;
-		free(line);
+		perror(redir->file_or_delimiter);
+		return (1);
 	}
-	close(pipes[1]);
-	return (pipes[0]);
+	if (check_file_accesss(redir->file_or_delimiter, 1) == 1)
+		return (1);
+	*fd_out = new_fd;
+	return (0);
 }
 
 int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_out)
 {
+	t_redir *cur;
+
+	*fd_in = -1;
+	*fd_out = -1;
+	cur = node->cmd->redirs;
 	if (remove_quotes_redirs(node->cmd->redirs, minishell) == -1)
 		return (1);
-	while (node->cmd->redirs)
+	while (cur)
 	{
-		if (node->cmd->redirs->type == REDIR_IN)
-		{
-			*fd_in = open(node->cmd->redirs->file_or_delimiter, O_RDONLY);
-			if (*fd_in == -1)
-				perror(node->cmd->redirs->file_or_delimiter);
-			if (check_file_accesss(node->cmd->redirs->file_or_delimiter, 0) == 1)
-				return (1);
-			dup2(*fd_in, STDIN_FILENO);
-		}
-		if (node->cmd->redirs->type == REDIR_HEREDOC)
-		{
-			*fd_in = here_doc(node->cmd->redirs->file_or_delimiter);
-			dup2(*fd_in, STDIN_FILENO);
-		}
-		if (node->cmd->redirs->type == REDIR_OUT || node->cmd->redirs->type == REDIR_APPEND)
-		{
-			if (node->cmd->redirs->type == REDIR_APPEND)
-				*fd_out = open(node->cmd->redirs->file_or_delimiter, O_WRONLY | O_CREAT | O_APPEND, 0644);
-			else if (node->cmd->redirs->type == REDIR_OUT)
-				*fd_out = open(node->cmd->redirs->file_or_delimiter, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			if (*fd_out == -1)
-			{
-				if (*fd_in)
-					close(*fd_in);
-				perror(node->cmd->redirs->file_or_delimiter);
-				return (1);
-			}
-			if (check_file_accesss(node->cmd->redirs->file_or_delimiter, 1) == 1)
-				return (1);
-			dup2(*fd_out, STDOUT_FILENO);
-		}
-		node->cmd->redirs = node->cmd->redirs->next;
+		if (cur->type == REDIR_IN && handle_input(cur, fd_in))
+			return (1);
+		else if (cur->type == REDIR_HEREDOC && handle_heredoc(cur, fd_in))
+			return (1);
+		else if ((cur->type == REDIR_OUT || cur->type == REDIR_APPEND) && handle_output(cur, fd_out))
+			return (1);
+		cur = cur->next;
 	}
+	if (*fd_in != -1 && dup2(*fd_in, STDIN_FILENO) == -1)
+		return (perror("minishell: dup2"), 1);
+	if (*fd_out != -1 && dup2(*fd_out, STDOUT_FILENO) == -1)
+		return (perror("minishell: dup2"), 1);
 	return (0);
 }
