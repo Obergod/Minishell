@@ -6,11 +6,12 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:17:04 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/18 15:13:16 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/22 17:29:52 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/builtin.h"
+#include "../../includes/main.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -46,6 +47,12 @@ int ft_cd(char **args, t_minishell *minishell)
 
 	if (!args || !args[0] || ft_strcmp(args[0], "cd") != 0)
 		return (1);
+	if (args[2])
+	{
+		ft_putstr_fd(PROMPT, 2);
+		ft_putendl_fd("cd: too many arguments", 2);
+		return (1);
+	}
 	if (args[1])
 		target = args[1];
 	else
@@ -53,7 +60,8 @@ int ft_cd(char **args, t_minishell *minishell)
 		target = find_in_env("HOME", minishell);
 		if (!target)
 		{
-			printf("cd: HOME not set\n");
+			ft_putstr_fd(PROMPT, 2);
+			ft_putendl_fd("cd: HOME not set", 2);
 			return (1);
 		}
 	}

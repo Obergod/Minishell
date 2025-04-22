@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 16:53:40 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/18 19:40:03 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/20 17:45:05 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,5 @@
 int	ft_readline(t_minishell *minishell);
 void setup_signals(void);
 void reset_signals_child(void);
-
+void update_exit_status_from_signal(t_minishell *minishell);
 #endif

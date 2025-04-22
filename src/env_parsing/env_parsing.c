@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 16:48:21 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/20 15:17:57 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/22 12:31:02 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,7 @@ t_env *env_parsing(char **envp, t_minishell *minishell)
 	i = 0;
 	while (envp[++i])
 	{
-		result_split = gc_split(envp[i], '=', minishell->gc);
+		result_split = gc_split_first_word(envp[i], '=', minishell->gc);
 		if (!result_split)
 			return (NULL);
 
@@ -147,8 +147,10 @@ t_env *env_parsing(char **envp, t_minishell *minishell)
 			return (NULL);
 		tmp->key = result_split[0];
 		result_split[1] = shell_lvl(result_split);
-		tmp->value = result_split[1] ? result_split[1] : "";
-		tmp->raw = gc_strjoin_three(result_split[0], "=", result_split[1] ? result_split[1] : "", minishell->gc);
+		if (!result_split[1])
+			result_split[1] = "";
+		tmp->value = result_split[1];
+		tmp->raw = gc_strjoin_three(result_split[0], "=", result_split[1], minishell->gc);
 		tmp->next = NULL;
 		current->next = tmp;
 		current = current->next;
