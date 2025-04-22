@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/06 19:14:22 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/22 14:49:58 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,32 @@ static enum error_parsing start_end_check_parsing(t_token *token, int status)
 	return (SUCCESS);
 }
 
+static enum error_parsing check_parenthesis(t_token *token_p)
+{
+	t_token *token;
+	int is_parenthesis;
+	int close_parenthesis;
+
+	token = token_p;
+	is_parenthesis = 0;
+	close_parenthesis = 0;
+	while (token)
+	{
+		if (token->type == T_PARANTHESIS && ft_strcmp(token->str, "(") == 0)
+			is_parenthesis++;
+		if (token->type == T_PARANTHESIS && ft_strcmp(token->str, ")") == 0)
+			is_parenthesis--;
+		if (token->type == T_PARANTHESIS && ft_strcmp(token->str, "(") == 0 && close_parenthesis == 0)
+			close_parenthesis = -1;
+		else if (token->type == T_PARANTHESIS && ft_strcmp(token->str, ")") == 0 && close_parenthesis == 0)
+			close_parenthesis = 1;
+		token = token->next;
+	}
+	if (is_parenthesis != 0 || close_parenthesis == 1)
+		return (ERR_SYNTAX_TOKEN);
+	return (SUCCESS);
+}
+
 enum error_parsing check_parsing(t_token *token_p)
 {
 	t_token *token;
@@ -59,20 +85,20 @@ enum error_parsing check_parsing(t_token *token_p)
 		return (start_end_check_parsing(token, 0));
 	while (token->next)
 	{
-		if (token->next && token->type == T_PIPE && token->next->type == T_PIPE)
+		if (token->type == T_PIPE && token->next->type == T_PIPE)
 			return (ERR_SYNTAX_PIPE);
-		if (token->next && token->type == T_REDIR && token->next->type != T_WORD)
+		else if (token->type == T_REDIR && token->next->type != T_WORD)
 			return (ERR_SYNTAX_REDIRECT);
-		if (token->next && token->type == T_LOGIC && token->next->type == T_LOGIC)
+		else if (token->type == T_LOGIC && token->next->type == T_LOGIC)
 			return (ERR_SYNTAX_LOGIC);
 		token = token->next;
 	}
-	//on est au dernier token de la liste
 	if (start_end_check_parsing(token, 1) != SUCCESS)
 		return (start_end_check_parsing(token, 1));
+	if (check_parenthesis(token_p) != SUCCESS)
+		return (ERR_SYNTAX_TOKEN);
 	return (SUCCESS);
 }
-
 
 t_cmd	*new_cmd(t_minishell *minishell)
 {

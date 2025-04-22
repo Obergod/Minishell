@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/20 17:50:32 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/22 14:16:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,14 +249,22 @@ int	main(int ac, char **av, char **envp)
 		update_exit_status_from_signal(&minishell);
 		token = tokenize(input, &minishell);
 		if (token)
-		{}
+		{
+			printf("Tokens trouvés :\n");
+			t_token *current = token;
+			while (current)
+			{
+				printf("Type: %d, Valeur: '%s'\n", current->type, current->str);
+				current = current->next;
+			}
+		}
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
 
 		// Appel de la fonction pour imprimer la liste de commandes
-		//if (cmd_head)
-			//print_cmd_list(cmd_head);
+		if (cmd_head)
+			print_cmd_list(cmd_head);
 		if (!cmd_head)
 			printf("Aucune commande valide n'a été trouvée.\n");
 
