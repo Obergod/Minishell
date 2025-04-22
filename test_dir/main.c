@@ -228,6 +228,18 @@ void parcours_suffixe(t_ast_node *node)
 		printf("Suffixe OR\n");
 }
 
+int	get_input(char *input)
+{
+	if (isatty(STDIN_FILENO))
+	{
+		if (ft_add_readline(PROMPT, &input) != NULL)
+			return (1);
+	}
+	else
+		input = get_next_line(0);
+	return (0);
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	char		*input;
@@ -243,9 +255,14 @@ int	main(int ac, char **av, char **envp)
 		return (1);
 	if (init_minishell(&minishell, envp) == 1)
 		return (1);
-	setup_signals();
-	while (ft_add_readline(PROMPT, &input) != NULL)
+	while (1)
 	{
+		if (isatty(STDIN_FILENO))
+			ft_add_readline(PROMPT, &input);
+		else
+			input = get_next_line(0);
+		if (!input && isatty(STDIN_FILENO))
+			break ;
 		token = tokenize(input, &minishell);
 		if (token)
 		{}
