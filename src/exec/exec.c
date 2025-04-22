@@ -12,6 +12,18 @@
 
 #include "../../includes/main.h"
 
+static int	handle_builtins(t_ast_node *node, t_minishell *minishell)
+{
+	if (is_cmd(node) && is_builtin(node))
+	{
+		node->cmd->command = expand_vars(node->cmd->command, minishell);
+		if (!node->cmd->command || node->cmd->command[0] == 0)
+			return (1);
+		minishell->exit_status = exec_builtins(node, minishell);
+		return (1);
+	}
+	return (0);
+}
 
 void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
@@ -27,14 +39,8 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		return ;
 	if (pid == 0 || node->subshell == 0)
 	{
-		if (is_cmd(node) && is_builtin(node))
-		{
-			node->cmd->command = expand_vars(node->cmd->command, minishell);
-			if (!node->cmd->command || node->cmd->command[0] == 0)
-				return ;
-			minishell->exit_status = exec_builtins(node, minishell);
+		if (handle_builtins(node, minishell) == 1)
 			return ;
-		}
 		process(node, head, minishell);
 	}
 	if (pid == 0)
@@ -45,7 +51,6 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		minishell->exit_status = WEXITSTATUS(status);
 	}
 }
-
 
 void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
@@ -63,5 +68,3 @@ void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	if (minishell->exit_status == 126 || minishell->exit_status == 127)
 		perror(node->cmd->command[0]);
 }
-
-

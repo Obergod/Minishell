@@ -12,8 +12,8 @@
 
 #include "../../includes/main.h"
 
-
-int	handle_cmd(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_out)
+int	handle_cmd(t_ast_node *node, t_minishell *minishell,
+				int *fd_in, int *fd_out)
 {
 	if (handle_redir(node, minishell, fd_in, fd_out) == 1)
 		exit(EXIT_FAILURE);
@@ -29,7 +29,8 @@ int	handle_cmd(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_out
 
 int	handle_path(t_minishell *minishell, t_ast_node *node, t_wait *p_s)
 {
-	node->cmd->cmd_path = get_cmd_path(minishell, node->cmd->command[0], &p_s->status);
+	node->cmd->cmd_path = get_cmd_path(minishell,
+			node->cmd->command[0], &p_s->status);
 	if (p_s->status)
 		return (p_s->status);
 	if (!node->cmd->cmd_path)
@@ -49,7 +50,7 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	{
 		p_s.status = handle_path(minishell, node, &p_s);
 		if (p_s.status)
-			return(p_s.status);
+			return (p_s.status);
 	}
 	if (node == head)
 	{
@@ -68,7 +69,8 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	return (0);
 }
 
-int	exec_log_operators(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
+int	exec_log_operators(t_ast_node *node,
+		t_ast_node *head, t_minishell *minishell)
 {
 	head = node->left;
 	prefix_exec(node->left, head, minishell);

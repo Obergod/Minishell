@@ -49,6 +49,37 @@ void	operator_str(const char *input, char *buff, int i)
 	}
 }
 
+int	is_redir(char op, char next_char, int *i)
+{
+	if (op == '<')
+	{
+		if (next_char == '<')
+			(*i)++;
+		return (1);
+	}
+	else if (op == '>')
+	{
+		if (next_char == '>')
+			(*i)++;
+		return (1);
+	}
+	return (0);
+}
+
+int	is_pipe_or_or(char op, char next_char, int *i)
+{
+	if (op == '|')
+	{
+		if (next_char == '|')
+		{
+			(*i)++;
+			return (2);
+		}
+		return (1);
+	}
+	return (0);
+}
+
 enum e_token_type	handle_operator(const char *input, int *i)
 {
 	char	op;
@@ -56,29 +87,14 @@ enum e_token_type	handle_operator(const char *input, int *i)
 
 	op = input[*i];
 	next_char = input[*i + 1];
-	if (op == '<')
-	{
-		if (next_char == '<')
-			(*i)++;
+	if (is_redir(op, next_char, i) == 1)
 		return (T_REDIR);
-	}
-	else if (op == '>')
-	{
-		if (next_char == '>')
-			(*i)++;
-		return (T_REDIR);
-	}
-	else if (op == '|')
-	{
-		if (next_char == '|')
-		{
-			(*i)++;
-			return (T_LOGIC);
-		}
-		return (T_PIPE);
-	}
 	else if (op == '(' || op == ')')
 		return (T_PARANTHESIS);
+	else if (is_pipe_or_or(op, next_char, i) == 1)
+		return (T_PIPE);
+	else if (is_pipe_or_or(op, next_char, i) == 2)
+		return (T_LOGIC);
 	else if (op == '&')
 	{
 		if (next_char == '&')
