@@ -92,12 +92,42 @@ int check_cmd_access(char *cmd)
         return (126);
     }
     if (access(cmd, X_OK) == -1) {
-        return (126);
+return (126);
     }
 
     return (0);
 }
 
+void	close_pipes(int *pipes)
+{
+	close(pipes[0]);
+	close(pipes[1]);
+}
+
+void	close_fds(int *fd_in, int *fd_out)
+{
+	if (*fd_in)
+		close(*fd_in);
+	if (*fd_out)
+		close(*fd_out);
+}
+
+int	wait_and_signal(pid_t pid, int status, t_minishell *minishell)
+{
+		waitpid(pid, &status, 0);
+		if (WIFSIGNALED(status))
+		{
+			if (WTERMSIG(status) == SIGQUIT)
+			{
+				minishell->exit_status = 131;
+				ft_putendl_fd("Quit (core dumped)", 2);
+			}
+			else if (WTERMSIG(status) == SIGINT)
+            	minishell->exit_status = 130;
+			return (minishell->exit_status);
+		}
+		return(WEXITSTATUS(status));
+}
 
 
 

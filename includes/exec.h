@@ -26,6 +26,18 @@ typedef struct	s_pipe
 	int		exit_status_r;
 }	t_pipe;
 
+typedef struct s_wait
+{
+	pid_t 	pid;
+	int		status;
+}	t_wait;
+
+typedef struct s_fds
+{
+	int	fd_in;
+	int	fd_out;
+}	t_fds;
+
 /*****		A trier		*******/
 void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
 void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell);
@@ -47,6 +59,8 @@ int		is_cmd(t_ast_node *node);
 int		skip_cmd(t_ast_node *node);
 int		is_only_space(char *str);
 char	**check_empty(char **cmd, t_minishell *minishell);
+void	close_pipes(int *pipes);
+int		wait_and_signal(pid_t pid, int status, t_minishell *minishell);
 
 /****	handle_redirs		*****/
 int here_doc(char *delimiter);
