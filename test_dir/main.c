@@ -255,6 +255,7 @@ int	main(int ac, char **av, char **envp)
 		return (1);
 	if (init_minishell(&minishell, envp) == 1)
 		return (1);
+	setup_signals();
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))

@@ -14,6 +14,7 @@
 # define MAIN_H
 
 #include <errno.h>
+#include "../full_libft/include/ft_printf.h"
 
 # include "ast.h"
 # include "minishell.h"

@@ -12,76 +12,51 @@
 
 #include "../../includes/main.h"
 
-//gerer l'export
-/*
-t_token	*expand_vars(t_token *token, t_minishell *minishell)
-{
-	char	*new_str;
-	t_token	*head;
-
-	head = token;
-	while (token)
-	{
-		if (token->type == T_WORD && token->state != IN_SQUOTE)
-		{
-			if (ft_strchr(token->str, '$'))
-			{
-				new_str = expand_str(token->str, minishell);
-				if (!new_str)
-					return (NULL); //temporaire pour pas d'erreur
-				//	cleanup_and_exit();
-				free(token->str);
-				token->str = new_str;
-			}
-//			if (ft_strchr(token->str, '*'))
-//				expand_wildcards()
-			token = token->next;
-		}
-		else
-			token = token->next;
-	}
-	return (head);
-}
-*/
 
 char	**expand_vars(char **cmd, t_minishell *minishell)
 {
 	char	*new_str;
 	char	**res;
-	int	i;
+	int		i;
+	int		count;
 
-	i = 0;
-	while (cmd[i])
-		i++;
-	res = gc_malloc(sizeof(char *) * i + 1, minishell->gc);
-	i = 0;
-	while (cmd[i])
+	i = -1;
+	count = 0;
+	while (cmd[count])
+		count++;
+	res = gc_malloc(sizeof(char *) * (count + 1), minishell->gc);
+	if (!res)
+		return (NULL);
+	while (++i < count)
 	{
 		if (ft_strchr(cmd[i], '$'))
 		{
 			new_str = expand_str(cmd[i], minishell);
-			if (!new_str)
-				return (NULL); //temporaire pour pas d'erreur
-			res[i] = new_str;
+			if (new_str)
+				res[i] = new_str;
+			else
+			{
+				res[i] = gc_strdup(cmd[i], minishell->gc);
+				if (!res[i])
+					return (NULL);
+			}
 		}
 		else
-			res[i] = cmd[i];
-//			if (ft_strchr(token->str, '*'))
-//				expand_wildcards()
-		i++;
+		{
+			res[i] = gc_strdup(cmd[i], minishell->gc);
+			if (!res[i])
+				return (NULL);
+		}
 	}
-	res[i] = 0;
+	res[i] = NULL;
 	i = -1;
 	while (res[++i])
 	{
 		new_str = remove_quotes(res[i], minishell);
-		if (!new_str)
-			return (NULL); //temporaire pour pas d'erreur
-		res[i] = new_str;
+		if (new_str && new_str != res[i])
+			res[i] = new_str;
 	}
-	res[i] = 0;
-	res = check_empty(res, minishell);
-	return (res);
+	return (check_empty(res, minishell));
 }
 
 int	remove_quotes_redirs(t_redir *redirs, t_minishell *minishell)
@@ -180,12 +155,12 @@ char	*get_vars(char *str, int *i, t_minishell *minishell)
 	start = *i;
 	var_name = NULL;
 	res = NULL;
-	if (str[*i] != '?' && !ft_isalpha(str[*i]))
+	if (str[*i] != '?' && !ft_isalpha(str[*i]) && str[*i] != '_')
 		return (gc_strdup("$", minishell->gc));
 	if (str[*i] == '?')
 	{
 		(*i)++;
-		res = ft_itoa(minishell->exit_status);
+		res = gc_itoa(minishell->exit_status, minishell->gc);
 		if (!res)
 			return (NULL);
 		return (res);

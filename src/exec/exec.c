@@ -44,7 +44,7 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		process(node, head, minishell);
 	}
 	if (pid == 0)
-		exit(minishell->exit_status);
+		clean_exit(minishell->exit_status, minishell);
 	if (node->subshell == 1)
 	{
 		waitpid(pid, &status, 0);

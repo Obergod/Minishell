@@ -43,7 +43,10 @@ int	handle_heredoc(t_redir *redir, int *fd_in)
 		close(*fd_in);
 	new_fd = here_doc(redir->file_or_delimiter);
 	if (new_fd == -1)
+	{
+		perror("heredoc");
 		return (1);
+	}
 	*fd_in = new_fd;
 	return (0);
 }
@@ -109,9 +112,19 @@ int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_o
 			return (1);
 		cur = cur->next;
 	}
-	if (*fd_in != -1 && dup2(*fd_in, STDIN_FILENO) == -1)
-		return (perror("minishell: dup2"), 1);
-	if (*fd_out != -1 && dup2(*fd_out, STDOUT_FILENO) == -1)
-		return (perror("minishell: dup2"), 1);
+	if (*fd_in != -1)
+	{
+		if (dup2(*fd_in, STDIN_FILENO) == -1)
+			return (perror("minishell: dup2"), 1);
+		close(*fd_in);
+		*fd_in = -1;
+	}
+	if (*fd_out != -1)
+	{
+		if (dup2(*fd_out, STDOUT_FILENO) == -1)
+			return (perror("minishell: dup2"), 1);
+		close(*fd_out);
+		*fd_out = -1;
+	}
 	return (0);
 }

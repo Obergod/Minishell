@@ -70,7 +70,7 @@ t_token	*expand_wildcards(t_token *token, t_minishell *minishell)
 	if (!dir)
 	{
 		perror("opendir failed\n");
-		exit(EXIT_FAILURE);
+		clean_exit(EXIT_FAILURE, minishell);
 	}
 	while (1)
 	{

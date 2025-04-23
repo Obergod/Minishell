@@ -60,6 +60,7 @@ int		skip_cmd(t_ast_node *node);
 int		is_only_space(char *str);
 char	**check_empty(char **cmd, t_minishell *minishell);
 void	close_pipes(int *pipes);
+void	close_fds(int *fd_in, int *fd_out);
 int		wait_and_signal(pid_t pid, int status, t_minishell *minishell);
 
 /****	handle_redirs		*****/

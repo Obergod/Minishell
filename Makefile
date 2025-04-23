@@ -111,7 +111,7 @@ test: $(LIBFT)
 	@for test in $(wildcard test_dir/*.c); do \
 		test_name=$$(basename $$test .c); \
 		echo "$(BOLD)$(CYAN)📝 Compilation de $$test_name...$(RESET)"; \
-		$(CC) -o test_dir/bin/$$test_name $$test \
+		$(CC) -o $$test_name $$test \
 			$(shell find $(SRC_DIR)/token -name "*.c") \
 			$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \
 			$(shell find $(SRC_DIR)/env_parsing -name "*.c") \

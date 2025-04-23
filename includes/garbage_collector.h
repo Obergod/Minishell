@@ -69,5 +69,6 @@ char			*gc_substr(char const *s, unsigned int start, size_t len, t_gc_head *gc);
 char			**gc_strndup_array(char **s1, size_t size, t_gc_head *gc);
 void			*gc_calloc(size_t count, size_t size, t_gc_head *gc);
 char			**gc_strdup_array(char **s1, t_gc_head *gc);
+char			*gc_itoa(int nb, t_gc_head *gc);
 
 #endif

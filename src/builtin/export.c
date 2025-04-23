@@ -59,14 +59,25 @@ int ft_export(char **args, t_minishell *minishell)
 	i = 0;
 	while (args[++i])
 	{
+		if (!ft_isalpha(args[i][0]) && args[i][0] != '_')
+		{
+			ft_putendl_fd("not a valid identifier", 2);
+			return (1);
+		}
 		if (ft_strchr(args[i], '=') == NULL)
 			return (0);
 		result = gc_split_first_word(args[i], '=', minishell->gc);
 		if (ft_export_verif_key(result[0]) != 0 || ft_export_verif_value(result[1]) != 0)
+		{
+			ft_putendl_fd("not a valid identifier", 2);
 			return (1);
+		}
 		edit_status = edit_in_env(result[0], result[1], minishell);
 		if (edit_status == 1)
+		{
+			ft_putendl_fd("not a valid identifier", 2);
 			return (1);
+		}
 	}
 	return (0);
 }
