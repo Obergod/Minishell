@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/22 14:16:06 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/20 15:21:21 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,6 +228,18 @@ void parcours_suffixe(t_ast_node *node)
 		printf("Suffixe OR\n");
 }
 
+int	get_input(char *input)
+{
+	if (isatty(STDIN_FILENO))
+	{
+		if (ft_add_readline(PROMPT, &input) != NULL)
+			return (1);
+	}
+	else
+		input = get_next_line(0);
+	return (0);
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	char		*input;
@@ -243,28 +255,24 @@ int	main(int ac, char **av, char **envp)
 		return (1);
 	if (init_minishell(&minishell, envp) == 1)
 		return (1);
-	setup_signals();
-	while (ft_add_readline(PROMPT, &input) != NULL)
+	while (1)
 	{
-		update_exit_status_from_signal(&minishell);
+		if (isatty(STDIN_FILENO))
+			ft_add_readline(PROMPT, &input);
+		else
+			input = get_next_line(0);
+		if (!input && isatty(STDIN_FILENO))
+			break ;
 		token = tokenize(input, &minishell);
 		if (token)
-		{
-			printf("Tokens trouvés :\n");
-			t_token *current = token;
-			while (current)
-			{
-				printf("Type: %d, Valeur: '%s'\n", current->type, current->str);
-				current = current->next;
-			}
-		}
+		{}
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
 
 		// Appel de la fonction pour imprimer la liste de commandes
-		if (cmd_head)
-			print_cmd_list(cmd_head);
+		//if (cmd_head)
+			//print_cmd_list(cmd_head);
 		if (!cmd_head)
 			printf("Aucune commande valide n'a été trouvée.\n");
 
