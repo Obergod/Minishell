@@ -17,16 +17,16 @@ static void ft_echo_print_all(char **args, int is_n)
 {
 	int i;
 
-	i = 0;
-	while (args[i] != NULL)
+	i = -1;
+	while (args[++i] != NULL)
 	{
-		ft_printf("%s", args[i]);
-		i++;
-		if (args[i] != NULL)
+		printf("%s", args[i]);
+		//printf("i + 1 connard : %s", args[i + 1]);
+		if (args[i + 1] != NULL)
 			printf(" ");
 	}
 	if (is_n == 0)
-		ft_printf("\n");
+		printf("\n");
 }
 
 static int ft_echo_is_n(char *str)
@@ -54,7 +54,7 @@ int ft_echo(char **args)
 		return (1);
 	if (args[0] && args[1] == NULL)
 	{
-		ft_printf("\n");
+		printf("\n");
 		return (0);
 	}
 	else if (args[1] && ft_echo_is_n(args[1]) == 0)
