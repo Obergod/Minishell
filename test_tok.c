@@ -112,7 +112,6 @@ int	main(int ac, char **av, char **envp)
 	if (token)
 	{
 		token = expand_vars(token, &minishell);
-
 		// Print token information
 		t_token *current = token;
 		printf("******/		tokenization		******/\n\n");

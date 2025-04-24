@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/22 14:16:06 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/24 21:14:24 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -252,11 +252,13 @@ int	main(int ac, char **av, char **envp)
 		{
 			printf("Tokens trouvés :\n");
 			t_token *current = token;
+			char *new_input = expand_wildcards(input, &minishell);
 			while (current)
 			{
 				printf("Type: %d, Valeur: '%s'\n", current->type, current->str);
 				current = current->next;
 			}
+			printf("new_input: %s\n", new_input);
 		}
 		else
 			printf("Error: Failed to tokenize input\n");

@@ -1,0 +1,18 @@
+src/expansion/ugo_wildcard.c: Error!
+Error: TOO_MANY_ARGS        (line:  45, col:  44):	Function has more than 4 arguments
+Error: LINE_TOO_LONG        (line:  69, col:   1):	line too long
+Error: LINE_TOO_LONG        (line:  69, col: 125):	line too long
+Error: TOO_MANY_LINES       (line: 102, col:   1):	Function has more than 25 lines
+Error: TOO_MANY_FUNCS       (line: 105, col:   1):	Too many functions in file
+Error: LINE_TOO_LONG        (line: 105, col:  82):	line too long
+Error: TOO_MANY_FUNCS       (line: 128, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 146, col:   1):	Too many functions in file
+Error: TOO_MANY_LINES       (line: 175, col:   1):	Function has more than 25 lines
+Error: TOO_MANY_FUNCS       (line: 178, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 188, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 206, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 225, col:   1):	Too many functions in file
+Error: TOO_MANY_LINES       (line: 255, col:   1):	Function has more than 25 lines
+Error: TOO_MANY_FUNCS       (line: 257, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 286, col:   1):	Too many functions in file
+Error: TOO_MANY_FUNCS       (line: 301, col:   1):	Too many functions in file

@@ -1,33 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.h                                             :+:      :+:    :+:   */
+/*   ft_strcat.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/24 14:00:33 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/24 20:24:56 by ufalzone         ###   ########.fr       */
+/*   Created: 2025/04/24 21:02:43 by ufalzone          #+#    #+#             */
+/*   Updated: 2025/04/24 21:03:20 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MAIN_H
-# define MAIN_H
+char	*ft_strcat(char *dest, const char *src)
+{
+	int	i;
+	int	j;
 
-#include <errno.h>
-
-# include "ast.h"
-# include "minishell.h"
-# include "garbage_collector.h"
-# include "token.h"
-# include "env_parsing.h"
-# include "expand.h"
-# include "readline.h"
-# include "parsing.h"
-# include "builtin.h"
-# include "exec.h"
-# include "wildcard.h"
-
-extern int g_sig_received;
-/* Function declarations for main */
-
-#endif
+	i = 0;
+	while (dest[i])
+		i++;
+	j = 0;
+	while (src[j])
+	{
+		dest[i] = src[j];
+		i++;
+		j++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
