@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 15:20:50 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/06 17:38:54 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/25 19:13:31 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,6 +212,7 @@ t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
 		(*parenthesis_count)--;
 		if (*parenthesis_count < 0)
 			return (NULL);
+		left->subshell_redir = (*cmd_list)->redirs;
 		*cmd_list = (*cmd_list)->next;
 		return (left);
 	}

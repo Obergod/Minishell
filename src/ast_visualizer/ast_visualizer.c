@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 00:00:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/04 16:56:17 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/25 19:26:44 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,7 +211,7 @@ void    write_node(FILE *dot_file, t_ast_node *node, int *node_counter)
         return;
     }
 
-    char *label = get_node_label(node);
+    char *label = NULL;
     char *color = get_node_color(node->type);
 
     // Configuration avancée du style en fonction du type de nœud
@@ -245,49 +245,98 @@ void    write_node(FILE *dot_file, t_ast_node *node, int *node_counter)
         strcat(node_style, node->type == NODE_CMD ? ",rounded" : "");
     }
 
-    // Traitement spécial pour les commandes avec redirections
-    if (node->type == NODE_CMD && node->cmd && node->cmd->redirs)
-    {
-        t_redir *redir = node->cmd->redirs;
-        char border_color[8];
-
-        // Compter les différents types de redirections
-        int in_count = 0, out_count = 0, append_count = 0, heredoc_count = 0;
-        t_redir *temp_redir = redir;
-
-        while (temp_redir) {
-            switch (temp_redir->type) {
-                case REDIR_IN: in_count++; break;
-                case REDIR_OUT: out_count++; break;
-                case REDIR_APPEND: append_count++; break;
-                case REDIR_HEREDOC: heredoc_count++; break;
-            }
-            temp_redir = temp_redir->next;
-        }
-
-        // Déterminer la couleur de bordure en fonction des redirections présentes
-        if (heredoc_count > 0)
-            strcpy(border_color, "#9900cc"); // Violet pour heredoc (priorité la plus haute)
-        else if (in_count > 0 && (out_count > 0 || append_count > 0))
-            strcpy(border_color, "#ff6600"); // Orange pour entrée+sortie
-        else if (in_count > 0)
-            strcpy(border_color, "#009900"); // Vert foncé pour l'entrée uniquement
-        else if (out_count > 0 || append_count > 0)
-            strcpy(border_color, "#cc3300"); // Rouge pour la sortie uniquement
-        else
-            strcpy(border_color, "#3366ff"); // Bleu par défaut (ne devrait pas arriver)
-
-        // Définir l'épaisseur de la bordure en fonction du nombre total de redirections
-        int total_redirs = in_count + out_count + append_count + heredoc_count;
-        float border_width = 2.0 + (total_redirs > 3 ? 1.5 : total_redirs * 0.5);
-
-        // Si le nœud a déjà des attributs pour sous-shell, ajouter à ceux-ci
+    // === Construction du label HTML pour Graphviz ===
+    if (node->type == NODE_CMD) {
+        // Début du tableau HTML
+        char html[2048] = "";
+        strcat(html, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">");
+        // Titre
+        strcat(html, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\"><B>COMMANDE");
         if (node->subshell)
-            sprintf(extra_attrs, ", penwidth=%.1f, style=\"filled,rounded,dashed\", color=\"%s\"",
-                    border_width, border_color);
-        else
-            sprintf(extra_attrs, ", penwidth=%.1f, style=\"filled,rounded\", color=\"%s\"",
-                    border_width, border_color);
+            strcat(html, " (subshell)");
+        strcat(html, "</B></FONT></TD></TR>");
+        // Nom de la commande
+        if (node->cmd && node->cmd->command && node->cmd->command[0]) {
+            strcat(html, "<TR><TD ALIGN=\"center\" VALIGN=\"center\"><FONT POINT-SIZE=\"13\">≻ ");
+            strcat(html, node->cmd->command[0]);
+            strcat(html, " ≺</FONT></TD></TR>");
+        } else {
+            strcat(html, "<TR><TD ALIGN=\"center\">(Vide)</TD></TR>");
+        }
+        // Arguments
+        if (node->cmd && node->cmd->command) {
+            int arg_count = 0;
+            while (node->cmd->command[arg_count]) arg_count++;
+            if (arg_count > 1) {
+                strcat(html, "<TR><TD><FONT POINT-SIZE=\"12\"><I>Arguments:</I></FONT></TD></TR>");
+                for (int i = 1; i < arg_count; i++) {
+                    strcat(html, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\">[");
+                    char idx[8]; sprintf(idx, "%d", i);
+                    strcat(html, idx);
+                    strcat(html, "]: ");
+                    strcat(html, node->cmd->command[i]);
+                    strcat(html, "</FONT></TD></TR>");
+                }
+            }
+        }
+        // Redirections classiques
+        if (node->cmd && node->cmd->redirs) {
+            strcat(html, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIRECTIONS</B><HR/></FONT></TD></TR>");
+            t_redir *redir = node->cmd->redirs;
+            int redir_count = 0;
+            while (redir) {
+                if (redir_count > 0)
+                    strcat(html, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
+                strcat(html, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+                switch (redir->type) {
+                    case REDIR_IN: strcat(html, "<FONT COLOR=\"green\">ENTRÉE (&lt;)</FONT>"); break;
+                    case REDIR_OUT: strcat(html, "<FONT COLOR=\"red\">SORTIE (&gt;)</FONT>"); break;
+                    case REDIR_APPEND: strcat(html, "<FONT COLOR=\"orange\">APPEND (&gt;&gt;)</FONT>"); break;
+                    case REDIR_HEREDOC: strcat(html, "<FONT COLOR=\"purple\">HEREDOC (&lt;&lt;)</FONT>"); break;
+                    default: strcat(html, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>"); break;
+                }
+                strcat(html, "</FONT></TD></TR>");
+                strcat(html, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> ");
+                strcat(html, redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+                strcat(html, "</FONT></TD></TR>");
+                redir = redir->next;
+                redir_count++;
+            }
+        } else {
+            strcat(html, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir NULL</FONT></TD></TR>");
+        }
+        // Redirections de subshell
+        if (node->subshell_redir) {
+            strcat(html, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIR SUBSHELL</B><HR/></FONT></TD></TR>");
+            t_redir *redir = node->subshell_redir;
+            int redir_count = 0;
+            while (redir) {
+                if (redir_count > 0)
+                    strcat(html, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
+                strcat(html, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+                switch (redir->type) {
+                    case REDIR_IN: strcat(html, "<FONT COLOR=\"green\">ENTRÉE (&lt;)</FONT>"); break;
+                    case REDIR_OUT: strcat(html, "<FONT COLOR=\"red\">SORTIE (&gt;)</FONT>"); break;
+                    case REDIR_APPEND: strcat(html, "<FONT COLOR=\"orange\">APPEND (&gt;&gt;)</FONT>"); break;
+                    case REDIR_HEREDOC: strcat(html, "<FONT COLOR=\"purple\">HEREDOC (&lt;&lt;)</FONT>"); break;
+                    default: strcat(html, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>"); break;
+                }
+                strcat(html, "</FONT></TD></TR>");
+                strcat(html, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> ");
+                strcat(html, redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+                strcat(html, "</FONT></TD></TR>");
+                redir = redir->next;
+                redir_count++;
+            }
+        } else {
+            strcat(html, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir_subshell NULL</FONT></TD></TR>");
+        }
+        // Fin du tableau
+        strcat(html, "</TABLE>");
+        label = strdup(html);
+    } else {
+        // Pour les autres types de nœuds, garder l'ancien affichage
+        label = get_node_label(node);
     }
 
     // Écrire le nœud avec tous ses attributs
@@ -409,6 +458,52 @@ char    *get_node_label(t_ast_node *node)
                         // Ajouter à la chaîne des redirections
                         strcat(redir_part, temp_redir);
 
+                        redir = redir->next;
+                        redir_count++;
+                    }
+                }
+
+                // Affichage des redirections de subshell si présentes
+                if (node->subshell_redir)
+                {
+                    strcat(redir_part, "\\n\\n━━━━ REDIR SUBSHELL ━━━━");
+                    t_redir *redir = node->subshell_redir;
+                    int redir_count = 0;
+                    while (redir)
+                    {
+                        char temp_redir[256];
+                        char redir_symbol[5] = "";
+                        char redir_type[20] = "";
+                        switch (redir->type)
+                        {
+                            case REDIR_IN:
+                                strcpy(redir_symbol, "<");
+                                strcpy(redir_type, "ENTRÉE");
+                                break;
+                            case REDIR_OUT:
+                                strcpy(redir_symbol, ">");
+                                strcpy(redir_type, "SORTIE");
+                                break;
+                            case REDIR_APPEND:
+                                strcpy(redir_symbol, ">>");
+                                strcpy(redir_type, "APPEND");
+                                break;
+                            case REDIR_HEREDOC:
+                                strcpy(redir_symbol, "<<");
+                                strcpy(redir_type, "HEREDOC");
+                                break;
+                            default:
+                                strcpy(redir_symbol, "?");
+                                strcpy(redir_type, "INCONNU");
+                                break;
+                        }
+                        if (redir_count > 0)
+                            strcat(redir_part, "\\n──────────────────");
+                        snprintf(temp_redir, sizeof(temp_redir),
+                                "\\n• Type: %s (%s)\\n• Fichier: %s",
+                                redir_type, redir_symbol,
+                                redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+                        strcat(redir_part, temp_redir);
                         redir = redir->next;
                         redir_count++;
                     }

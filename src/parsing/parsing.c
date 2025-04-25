@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/22 14:49:58 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/25 19:34:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,65 +247,38 @@ static void t_logic_parsing(t_token *token, t_cmd **current_cmd)
 
 t_cmd *parsing(t_token *token, t_minishell *minishell)
 {
-	t_cmd *cmd_list;
-	t_cmd *current_cmd;
-	int position;
-	int parenthesis_level;
-	t_token *prev_token;
-	t_cmd *prev_cmd; // Pour garder une trace du token précédent
-
-	cmd_list = NULL;
-	prev_token = NULL;
-	current_cmd = new_cmd(minishell);
-	position = 0;
-	parenthesis_level = 0;
+	t_cmd *cmd_list = NULL;
+	t_cmd *current_cmd = new_cmd(minishell);
+	t_cmd *last_cmd = NULL;
+	int parenthesis_level = 0;
 
 	if (check_parsing(token) != SUCCESS)
 	{
 		print_error(check_parsing(token));
 		return (NULL);
 	}
+
 	while (token)
 	{
 		if (token->type == T_WORD)
+		{
 			add_arg_to_cmd(current_cmd, token->str, minishell->gc);
+		}
 		else if (token->type == T_REDIR)
 		{
-			// di on est apres une parenthese fermante et que parenthesis_level == 0,
-			// alors les redirections s'appliquent a toute la sous-commande precedente
-			if (position > 0 && parenthesis_level == 0 &&
-				prev_token && prev_token->type == T_PARANTHESIS &&
-				ft_strcmp(prev_token->str, ")") == 0)
-			{
-				// Trouver la commande précédente qui a reçu la parenthèse fermante
-				prev_cmd = cmd_list;
-				while (prev_cmd && prev_cmd->next)
-					prev_cmd = prev_cmd->next;
-
-				// Appliquer la redirection à cette commande
-				if (prev_cmd)
-				{
-					// Stocker la redirection dans la commande précédente
-					t_redir_parsing(token, &prev_cmd, minishell);
-				}
-				else
-				{
-					// Si pas de commande précédente (ne devrait pas arriver),
-					// le traiter normalement
-					t_redir_parsing(token, &current_cmd, minishell);
-				}
-			}
+			if (last_cmd && last_cmd->logic_operator_type == CLOSE_PARENTHESIS)
+				t_redir_parsing(token, &last_cmd, minishell);
 			else
-			{
-				// Comportement normal pour les redirections
 				t_redir_parsing(token, &current_cmd, minishell);
-			}
-			prev_token = token; // Mémoriser le token actuel
+			// Avancer de deux tokens : la redirection et son argument
 			token = token->next;
+			if (token)
+				token = token->next;
+			continue;
 		}
 		else if (token->type == T_PIPE || token->type == T_LOGIC || token->type == T_PARANTHESIS)
 		{
-			// Gérer le niveau de parenthèses
+			// Mise à jour du niveau de parenthèses
 			if (token->type == T_PARANTHESIS)
 			{
 				if (ft_strcmp(token->str, "(") == 0)
@@ -314,34 +287,38 @@ t_cmd *parsing(t_token *token, t_minishell *minishell)
 					parenthesis_level--;
 			}
 
-			// Ajouter la commande courante à la liste seulement si elle contient quelque chose
+			// On ajoute la commande courante si elle n'est pas vide
 			if (current_cmd->command[0] != NULL || current_cmd->redirs != NULL)
 			{
 				add_cmd_to_list(&cmd_list, current_cmd);
+				last_cmd = current_cmd;
 				current_cmd = new_cmd(minishell);
 			}
 
-			// Créer un nœud spécifique pour l'opérateur
-			if (token->type == T_PIPE || token->type == T_PARANTHESIS || token->type == T_LOGIC)
-				t_logic_parsing(token, &current_cmd);
+			// On prépare un nœud pour l'opérateur
+			t_logic_parsing(token, &current_cmd);
+
+			// On ajoute ce nœud opérateur à la liste
 			add_cmd_to_list(&cmd_list, current_cmd);
+			last_cmd = current_cmd;
 
-			if (token->next != NULL)
-				current_cmd = new_cmd(minishell);
-			else
-				current_cmd = NULL;
-
-			position++;
-			prev_token = token; // Mémoriser le token actuel
-		}
-		else
-		{
-			prev_token = token; // Mémoriser le token actuel
+			// On prépare la prochaine commande
+			current_cmd = new_cmd(minishell);
 		}
 		token = token->next;
 	}
-	if (current_cmd != NULL && (current_cmd->command[0] != NULL || current_cmd->redirs != NULL))
+
+	// Ajout de la dernière commande si elle n'est pas vide
+	if (current_cmd && (current_cmd->command[0] != NULL || current_cmd->redirs != NULL))
+	{
 		add_cmd_to_list(&cmd_list, current_cmd);
-	return (cmd_list);
+	}
+	else if (current_cmd)
+	{
+		// Libère la mémoire si inutilisée (optionnel selon ton GC)
+		// gc_free(current_cmd, minishell->gc);
+	}
+
+	return cmd_list;
 }
 
