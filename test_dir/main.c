@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/20 15:21:21 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:06:04 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,7 +302,7 @@ int	main(int ac, char **av, char **envp)
 			add_history(input);
 		free(input);
 	}
-	clean_exit(0, &minishell);
+	clean_exit(&minishell);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 17:31:26 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/21 15:43:53 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/24 21:03:01 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void				*ft_memcpy(void *dest, const void *src, size_t n);
 char				*ft_strrchr(const char *src, int c);
 char				*ft_strchr(const char *s, int c);
 int					ft_memcmp(const void *str1, const void *str2, size_t n);
-
+char				*ft_strcat(char *dest, const char *src);
 /*
 	part 2
 */

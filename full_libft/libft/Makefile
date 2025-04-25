@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mafioron <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/05 15:31:44 by mafioron          #+#    #+#              #
-#    Updated: 2024/11/14 20:05:25 by mafioron         ###   ########.fr        #
+#    Updated: 2025/04/24 21:02:51 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ SRC = ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c \
 	ft_lstnew.c ft_lstadd_front.c ft_lstsize.c ft_lstlast.c ft_lstadd_back.c \
 	ft_lstdelone.c ft_lstclear.c ft_lstiter.c ft_lstmap.c ft_swap.c ft_atol.c \
 	ft_strcmp.c ft_abs.c ft_atoi_base.c ft_free_split.c ft_strstr.c \
-	ft_is_even.c
+	ft_is_even.c ft_strcat.c
 
 SRCS = $(addprefix $(SRCS_DIR), $(SRC))
 OBJ = $(SRCS:.c=.o)
