@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 15:16:27 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/05 19:57:37 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:34:32 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,12 @@ char	**expand_vars(char **cmd, t_minishell *minishell)
 			res[i] = gc_strdup(cmd[i], minishell->gc);
 			if (!res[i])
 				return (NULL);
+		}
+		if (ft_strchr(cmd[i], '*'))
+		{
+			new_str = expand_wildcards(cmd[i], minishell);
+			if (new_str)
+				res[i] = new_str;
 		}
 	}
 	res[i] = NULL;

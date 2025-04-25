@@ -6,16 +6,17 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/25 16:06:04 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 15:57:13 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/main.h"
 
 
-static char	*ft_add_readline(const char *prompt, char **stock)
+static char	*ft_add_readline(const char *prompt, char **stock, t_minishell *minishell)
 {
 	(*stock) = readline(prompt);
+	update_exit_status_from_signal(minishell);
 	if (*stock == NULL)
 		return (NULL);
 	return (*stock);
@@ -228,11 +229,11 @@ void parcours_suffixe(t_ast_node *node)
 		printf("Suffixe OR\n");
 }
 
-int	get_input(char *input)
+int	get_input(char *input, t_minishell *minishell)
 {
 	if (isatty(STDIN_FILENO))
 	{
-		if (ft_add_readline(PROMPT, &input) != NULL)
+		if (ft_add_readline(PROMPT, &input, minishell) != NULL)
 			return (1);
 	}
 	else
@@ -255,12 +256,12 @@ int	main(int ac, char **av, char **envp)
 		return (1);
 	if (init_minishell(&minishell, envp) == 1)
 		return (1);
-	setup_signals();
+	interactive_setup_signals();
 	while (1)
 	{
 		update_exit_status_from_signal(&minishell);
 		if (isatty(STDIN_FILENO))
-			ft_add_readline(PROMPT, &input);
+			ft_add_readline(PROMPT, &input, &minishell);
 		else
 			input = get_next_line(0);
 		if (!input && isatty(STDIN_FILENO))
@@ -271,18 +272,18 @@ int	main(int ac, char **av, char **envp)
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
-
+		print_cmd_list(cmd_head);
 		// Appel de la fonction pour imprimer la liste de commandes
 		//if (cmd_head)
 			//print_cmd_list(cmd_head);
 		if (!cmd_head)
 			printf("Aucune commande valide n'a été trouvée.\n");
-
+		
 		ast = build_ast(cmd_head, &minishell);
 		head = ast;
 		// test_ast(ast);
 
-//		visualize_ast(ast, 3);
+		visualize_ast(ast, 3);
 
 		// Effectuer les trois types de parcours
 /*		if (ast)
@@ -299,6 +300,7 @@ int	main(int ac, char **av, char **envp)
 		}*/
 
 		prefix_exec(ast, head, &minishell);
+		update_exit_status_from_signal(&minishell);
 		if (*input)
 			add_history(input);
 		free(input);
