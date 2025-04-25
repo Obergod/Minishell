@@ -106,10 +106,12 @@ void	close_pipes(int *pipes)
 
 void	close_fds(int *fd_in, int *fd_out)
 {
-	if (*fd_in)
+	if (*fd_in != -1)
 		close(*fd_in);
-	if (*fd_out)
+	if (*fd_out != -1)
 		close(*fd_out);
+	*fd_in = -1;
+	*fd_out = -1;
 }
 
 int	wait_and_signal(pid_t pid, int status, t_minishell *minishell)

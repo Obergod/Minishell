@@ -112,11 +112,11 @@ void check_env(t_env *head, t_minishell *minishell)
 		add_to_env(&head, create_value_env("_", "/usr/bin/env", minishell));
 }
 
-static char *shell_lvl(char **result_split)
+static char *shell_lvl(char **result_split, t_minishell *ms)
 {
 	if (ft_strcmp("SHLVL", result_split[0]) == 0)
 	{
-		return (ft_itoa(ft_atoi(result_split[1]) + 1));
+		return (gc_itoa(ft_atoi(result_split[1]) + 1, ms->gc));
 	}
 	return result_split[1];
 }
@@ -146,7 +146,7 @@ t_env *env_parsing(char **envp, t_minishell *minishell)
 		if (!tmp)
 			return (NULL);
 		tmp->key = result_split[0];
-		result_split[1] = shell_lvl(result_split);
+		result_split[1] = shell_lvl(result_split, minishell);
 		if (!result_split[1])
 			result_split[1] = "";
 		tmp->value = result_split[1];

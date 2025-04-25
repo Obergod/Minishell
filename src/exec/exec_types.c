@@ -12,19 +12,19 @@
 
 #include "../../includes/main.h"
 
-int	handle_cmd(t_ast_node *node, t_minishell *minishell,
+void	handle_cmd(t_ast_node *node, t_minishell *minishell,
 				int *fd_in, int *fd_out)
 {
 	if (handle_redir(node, minishell, fd_in, fd_out) == 1)
-		exit(EXIT_FAILURE);
+		clean_exit(EXIT_FAILURE, minishell);
 	if (is_fork_builtin(node))
 	{
 		minishell->exit_status = exec_fork_builtins(node, minishell);
-		exit(minishell->exit_status);
+		clean_exit(minishell->exit_status, minishell);
 	}
 	execve(node->cmd->cmd_path, node->cmd->command, minishell->env_array);
 	perror("exec failed");
-	exit(EXIT_FAILURE);
+	clean_exit(EXIT_FAILURE, minishell);
 }
 
 int	handle_path(t_minishell *minishell, t_ast_node *node, t_wait *p_s)
@@ -45,6 +45,8 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	t_wait	p_s;
 	t_fds	fds;
 
+	fds.fd_in = -1;
+	fds.fd_out = -1;
 	p_s.status = 0;
 	if (!is_fork_builtin(node))
 	{
@@ -62,6 +64,7 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		}
 		else if (p_s.pid < 0)
 			return (perror("fork failed"), 1);
+		close_fds(&fds.fd_in, &fds.fd_out);
 		return (wait_and_signal(p_s.pid, p_s.status, minishell));
 	}
 	else

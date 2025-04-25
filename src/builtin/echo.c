@@ -10,19 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/builtin.h"
+#include "../../includes/main.h"
 #include <string.h>
 
 static void ft_echo_print_all(char **args, int is_n)
 {
 	int i;
 
-	i = 0;
-	while (args[i] != NULL)
+	i = -1;
+	while (args[++i] != NULL)
 	{
 		printf("%s", args[i]);
-		i++;
-		if (args[i] != NULL)
+		//printf("i + 1 connard : %s", args[i + 1]);
+		if (args[i + 1] != NULL)
 			printf(" ");
 	}
 	if (is_n == 0)
@@ -47,6 +47,9 @@ static int ft_echo_is_n(char *str)
 
 int ft_echo(char **args)
 {
+	int	i;
+
+	i = 1;
 	if (!args || !args[0] || ft_strcmp(args[0], "echo") != 0)
 		return (1);
 	if (args[0] && args[1] == NULL)
@@ -56,7 +59,9 @@ int ft_echo(char **args)
 	}
 	else if (args[1] && ft_echo_is_n(args[1]) == 0)
 	{
-		ft_echo_print_all(args+2, 1);
+		while (ft_echo_is_n(args[i]) == 0)
+			i++;
+		ft_echo_print_all(args + i, 1);
 		return (0);
 	}
 	else if (args[1] && ft_echo_is_n(args[1]) != 0)
