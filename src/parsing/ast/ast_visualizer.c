@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:55:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/04 16:14:41 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/25 19:17:49 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -404,7 +404,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\"><B>COMMANDE</B></FONT></TD></TR>");
 
 				// Nom de la commande avec formatage
-				if (node->cmd->command && node->cmd->command[0])
+				if (node->cmd && node->cmd->command && node->cmd->command[0])
 				{
 					fprintf(dot_file, "<TR><TD ALIGN=\"center\" VALIGN=\"center\">");
 					fprintf(dot_file, "<FONT POINT-SIZE=\"13\">≻ %s ≺</FONT>", node->cmd->command[0]);
@@ -412,36 +412,30 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 
 					// Ajouter les arguments supplémentaires
 					int arg_count = 1;
-					if (node->cmd->command[arg_count]) {
-						fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"12\"><I>Arguments:</I></FONT></TD></TR>");
-					}
-
-					while (node->cmd->command[arg_count])
-					{
+					while (node->cmd->command[arg_count]) {
+						if (arg_count == 1)
+							fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"12\"><I>Arguments:</I></FONT></TD></TR>");
 						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\">[%d]: %s</FONT></TD></TR>",
 							arg_count, node->cmd->command[arg_count]);
 						arg_count++;
 					}
 				}
 				else
+				{
 					fprintf(dot_file, "<TR><TD ALIGN=\"center\">(Vide)</TD></TR>");
+				}
 
 				// Afficher les redirections
-				if (node->cmd->redirs)
+				if (node->cmd && node->cmd->redirs)
 				{
 					t_redir *redir = node->cmd->redirs;
-					// Séparateur pour les redirections
 					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIRECTIONS</B><HR/></FONT></TD></TR>");
-
 					int redir_count = 0;
 					while (redir)
 					{
 						if (redir_count > 0)
 							fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
-
-						// Type de redirection avec couleur appropriée
 						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
-
 						switch (redir->type)
 						{
 							case REDIR_IN:
@@ -459,44 +453,204 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 							default:
 								fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
 						}
-
 						fprintf(dot_file, "</FONT></TD></TR>");
-
-						// Fichier ou délimiteur
 						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
 							redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
-
 						redir = redir->next;
 						redir_count++;
 					}
+				}
+				else
+				{
+					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir NULL</FONT></TD></TR>");
 				}
 
 				// Indication de subshell si nécessaire
 				if (node->subshell)
 					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\" COLOR=\"#444444\"><I>(subshell)</I></FONT></TD></TR>");
 
+				// Affichage des redirections de subshell pour tous les types de nœuds
+				if (node->subshell_redir)
+				{
+					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIR SUBSHELL</B><HR/></FONT></TD></TR>");
+					t_redir *redir = node->subshell_redir;
+					int redir_count = 0;
+					while (redir)
+					{
+						if (redir_count > 0)
+							fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
+						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+						switch (redir->type)
+						{
+							case REDIR_IN:
+								fprintf(dot_file, "<FONT COLOR=\"green\">ENTRÉE (&lt;)</FONT>");
+								break;
+							case REDIR_OUT:
+								fprintf(dot_file, "<FONT COLOR=\"red\">SORTIE (&gt;)</FONT>");
+								break;
+							case REDIR_APPEND:
+								fprintf(dot_file, "<FONT COLOR=\"orange\">APPEND (&gt;&gt;)</FONT>");
+								break;
+							case REDIR_HEREDOC:
+								fprintf(dot_file, "<FONT COLOR=\"purple\">HEREDOC (&lt;&lt;)</FONT>");
+								break;
+							default:
+								fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
+						}
+						fprintf(dot_file, "</FONT></TD></TR>");
+						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
+							redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+						redir = redir->next;
+						redir_count++;
+					}
+				}
+				else
+				{
+					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir_subshell NULL</FONT></TD></TR>");
+				}
+
 				fprintf(dot_file, "</TABLE>");
 			}
 			else
+			{
 				fprintf(dot_file, "<B>COMMANDE</B><BR/>(Aucune cmd)");
+			}
 			break;
 		case NODE_PIPE:
+			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\"><B>PIPE</B></FONT></TD></TR>");
 			if (node->subshell)
-				fprintf(dot_file, "<B>PIPE</B><BR/><FONT POINT-SIZE=\"20\">|</FONT><BR/><FONT POINT-SIZE=\"10\">(subshell)</FONT>");
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#444444\"><I>(subshell)</I></FONT></TD></TR>");
+			// Affichage des redirections de subshell
+			if (node->subshell_redir)
+			{
+				t_redir *redir = node->subshell_redir;
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIR SUBSHELL</B><HR/></FONT></TD></TR>");
+				int redir_count = 0;
+				while (redir)
+				{
+					if (redir_count > 0)
+						fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+					switch (redir->type)
+					{
+						case REDIR_IN:
+							fprintf(dot_file, "<FONT COLOR=\"green\">ENTRÉE (&lt;)</FONT>");
+							break;
+						case REDIR_OUT:
+							fprintf(dot_file, "<FONT COLOR=\"red\">SORTIE (&gt;)</FONT>");
+							break;
+						case REDIR_APPEND:
+							fprintf(dot_file, "<FONT COLOR=\"orange\">APPEND (&gt;&gt;)</FONT>");
+							break;
+						case REDIR_HEREDOC:
+							fprintf(dot_file, "<FONT COLOR=\"purple\">HEREDOC (&lt;&lt;)</FONT>");
+							break;
+						default:
+							fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
+					}
+					fprintf(dot_file, "</FONT></TD></TR>");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
+						redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+					redir = redir->next;
+					redir_count++;
+				}
+			}
 			else
-				fprintf(dot_file, "<B>PIPE</B><BR/><FONT POINT-SIZE=\"20\">|</FONT>");
+			{
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir_subshell NULL</FONT></TD></TR>");
+			}
+			fprintf(dot_file, "</TABLE>");
 			break;
 		case NODE_AND:
+			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\"><B>AND</B></FONT></TD></TR>");
 			if (node->subshell)
-				fprintf(dot_file, "<B>AND</B><BR/><FONT POINT-SIZE=\"16\">&amp;&amp;</FONT><BR/><FONT POINT-SIZE=\"10\">(subshell)</FONT>");
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#444444\"><I>(subshell)</I></FONT></TD></TR>");
+			if (node->subshell_redir)
+			{
+				t_redir *redir = node->subshell_redir;
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIR SUBSHELL</B><HR/></FONT></TD></TR>");
+				int redir_count = 0;
+				while (redir)
+				{
+					if (redir_count > 0)
+						fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+					switch (redir->type)
+					{
+						case REDIR_IN:
+							fprintf(dot_file, "<FONT COLOR=\"green\">ENTRÉE (&lt;)</FONT>");
+							break;
+						case REDIR_OUT:
+							fprintf(dot_file, "<FONT COLOR=\"red\">SORTIE (&gt;)</FONT>");
+							break;
+						case REDIR_APPEND:
+							fprintf(dot_file, "<FONT COLOR=\"orange\">APPEND (&gt;&gt;)</FONT>");
+							break;
+						case REDIR_HEREDOC:
+							fprintf(dot_file, "<FONT COLOR=\"purple\">HEREDOC (&lt;&lt;)</FONT>");
+							break;
+						default:
+							fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
+					}
+					fprintf(dot_file, "</FONT></TD></TR>");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
+						redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+					redir = redir->next;
+					redir_count++;
+				}
+			}
 			else
-				fprintf(dot_file, "<B>AND</B><BR/><FONT POINT-SIZE=\"16\">&amp;&amp;</FONT>");
+			{
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir_subshell NULL</FONT></TD></TR>");
+			}
+			fprintf(dot_file, "</TABLE>");
 			break;
 		case NODE_OR:
+			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\"><B>OR</B></FONT></TD></TR>");
 			if (node->subshell)
-				fprintf(dot_file, "<B>OR</B><BR/><FONT POINT-SIZE=\"16\">||</FONT><BR/><FONT POINT-SIZE=\"10\">(subshell)</FONT>");
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#444444\"><I>(subshell)</I></FONT></TD></TR>");
+			if (node->subshell_redir)
+			{
+				t_redir *redir = node->subshell_redir;
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIR SUBSHELL</B><HR/></FONT></TD></TR>");
+				int redir_count = 0;
+				while (redir)
+				{
+					if (redir_count > 0)
+						fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+					switch (redir->type)
+					{
+						case REDIR_IN:
+							fprintf(dot_file, "<FONT COLOR=\"green\">ENTRÉE (&lt;)</FONT>");
+							break;
+						case REDIR_OUT:
+							fprintf(dot_file, "<FONT COLOR=\"red\">SORTIE (&gt;)</FONT>");
+							break;
+						case REDIR_APPEND:
+							fprintf(dot_file, "<FONT COLOR=\"orange\">APPEND (&gt;&gt;)</FONT>");
+							break;
+						case REDIR_HEREDOC:
+							fprintf(dot_file, "<FONT COLOR=\"purple\">HEREDOC (&lt;&lt;)</FONT>");
+							break;
+						default:
+							fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
+					}
+					fprintf(dot_file, "</FONT></TD></TR>");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
+						redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+					redir = redir->next;
+					redir_count++;
+				}
+			}
 			else
-				fprintf(dot_file, "<B>OR</B><BR/><FONT POINT-SIZE=\"16\">||</FONT>");
+			{
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir_subshell NULL</FONT></TD></TR>");
+			}
+			fprintf(dot_file, "</TABLE>");
 			break;
 		case NODE_OPEN_PARENTHESIS:
 			fprintf(dot_file, "<B>PARENTHÈSE</B><BR/><FONT POINT-SIZE=\"20\">(</FONT>");

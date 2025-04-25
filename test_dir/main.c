@@ -6,11 +6,12 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/25 18:55:36 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/25 19:20:01 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/main.h"
+#include <sys/select.h>
 
 
 static char	*ft_add_readline(const char *prompt, char **stock, t_minishell *minishell)
@@ -170,7 +171,15 @@ void parcours_prefixe(t_ast_node *node)
 	if (node->type == NODE_CMD)
 		printf("Préfixe CMD: %s\n", node->cmd->command_raw);
 	else if (node->type == NODE_PIPE)
+	{
+		t_redir *current = node->subshell_redir;
 		printf("Préfixe PIPE\n");
+		while (current)
+		{
+			printf("%s", current->file_or_delimiter);
+			current = current->next;
+		}
+	}
 	else if (node->type == NODE_AND)
 		printf("Préfixe AND\n");
 	else if (node->type == NODE_OR)
@@ -282,21 +291,21 @@ int	main(int ac, char **av, char **envp)
 		head = ast;
 		// test_ast(ast);
 
-		visualize_ast(ast, 3);
+		// visualize_ast(ast, 3);
 
 		// Effectuer les trois types de parcours
-/*		if (ast)
-		{
-			printf("\n--- Parcours Préfixe ---\n");
+		// if (ast)
+		// {
+		// 	printf("\n--- Parcours Préfixe ---\n");
 			parcours_prefixe(ast);
 
-			printf("\n--- Parcours Infixe ---\n");
-			parcours_infixe(ast);
+		// 	printf("\n--- Parcours Infixe ---\n");
+		// 	parcours_infixe(ast);
 
-			printf("\n--- Parcours Suffixe ---\n");
-			parcours_suffixe(ast);
-			printf("\n");
-		}*/
+		// 	printf("\n--- Parcours Suffixe ---\n");
+		// 	parcours_suffixe(ast);
+		// 	printf("\n");
+		// }
 
 		prefix_exec(ast, head, &minishell);
 		update_exit_status_from_signal(&minishell);
