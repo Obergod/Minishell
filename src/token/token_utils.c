@@ -45,3 +45,24 @@ void	finalize_token(t_tokenizer *tok, t_minishell *minishell, const char *input)
 
 }
 
+int	verif_quotes(const char *input)
+{
+	int	i;
+	int		in_squotes = 0;
+	int		in_dquotes = 0;
+
+	in_squotes = 0;
+	in_dquotes = 0;
+	i = -1;
+	while (input[++i])
+	{
+		if (input[i] == '\'' && !in_dquotes)
+			in_squotes = !in_squotes;
+		else if (input[i] == '\"' && !in_squotes)
+			in_dquotes = !in_dquotes;
+	}
+	if (in_dquotes || in_squotes)
+		return (1);
+	else
+		return (0);
+}

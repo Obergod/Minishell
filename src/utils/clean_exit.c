@@ -17,7 +17,7 @@ int clean_exit(int exit_code, t_minishell *minishell)
 	if (minishell)
 	{
 		if (minishell->gc)
-		gc_destroy(minishell->gc);
+			gc_destroy(minishell->gc);
 		rl_clear_history();
 	}
 	exit(exit_code);

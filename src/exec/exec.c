@@ -65,6 +65,15 @@ void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	}
 	else if (node->type == NODE_AND || node->type == NODE_OR)
 		exec_log_operators(node, head, minishell);
-	if (minishell->exit_status == 126 || minishell->exit_status == 127)
+	
+	if (minishell->exit_status == 127)
+	{
+		if (node->type == NODE_CMD && node->cmd->command && node->cmd->command[0])
+		{
+			ft_putstr_fd(node->cmd->command[0], 2);
+			ft_putendl_fd(": command not found", 2);
+		}
+	}
+	else if (minishell->exit_status == 126)
 		perror(node->cmd->command[0]);
 }

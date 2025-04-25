@@ -189,7 +189,6 @@ void print_error(enum error_parsing error)
     switch (error)
     {
         case SUCCESS:
-            printf("SUCCESS\n");
             break;
         case ERR_SYNTAX_REDIRECT:
             printf("ERR_SYNTAX_NEWLINE\n");

@@ -258,6 +258,7 @@ int	main(int ac, char **av, char **envp)
 	setup_signals();
 	while (1)
 	{
+		update_exit_status_from_signal(&minishell);
 		if (isatty(STDIN_FILENO))
 			ft_add_readline(PROMPT, &input);
 		else
@@ -302,7 +303,7 @@ int	main(int ac, char **av, char **envp)
 			add_history(input);
 		free(input);
 	}
-	clean_exit(&minishell);
+	clean_exit(EXIT_SUCCESS, &minishell);
 	return (0);
 }
 

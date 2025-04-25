@@ -61,8 +61,6 @@ typedef struct	s_wildcard
 	struct s_wildcard *next;
 }	t_wildcard;
 
-/*****		A trier			*****/
-t_token	*tokenize(const char *input, t_minishell *minishell);
 
 /*****		token_utils		*****/
 int					is_operator(char c);
@@ -70,8 +68,10 @@ void				operator_str(const char *input, char *buff, int i);
 enum e_token_type	handle_operator(const char *input, int *i);
 void				add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state, t_minishell *minishell);
 int					quotes_verif(const char *input);
+int					verif_quotes(const char *input);
 
 /*****		token_process	*****/
+t_token				*tokenize(const char *input, t_minishell *minishell);
 void				init_tokenizer(t_tokenizer *tok, const char *input, t_minishell *minishell);
 void				handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minishell);
 void				handle_quotes(const char *input, t_tokenizer *tok, char quote);

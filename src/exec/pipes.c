@@ -26,11 +26,11 @@ int	handle_l_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 		if (dup2(pipes.pipes[1], STDOUT_FILENO) == -1)
 		{
 			perror("dup2 failed");
-			clean_exit(EXIT_FAILURE, minishell);
+			clean_exit(minishell->exit_status, minishell);
 		}
 		close(pipes.pipes[1]);
 		prefix_exec(node->left, head, minishell);
-		clean_exit(EXIT_FAILURE, minishell);
+		clean_exit(minishell->exit_status, minishell);
 	}
 	return (0);
 }
@@ -49,11 +49,11 @@ int	handle_r_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 		if (dup2(pipes.pipes[0], STDIN_FILENO) == -1)
 		{
 			perror("dup2 failed");
-			clean_exit(EXIT_FAILURE, minishell);
+			clean_exit(minishell->exit_status, minishell);
 		}
 		close(pipes.pipes[0]);
 		prefix_exec(node->right, head, minishell);
-		clean_exit(EXIT_FAILURE, minishell);
+		clean_exit(minishell->exit_status, minishell);
 	}
 	return (0);
 }
