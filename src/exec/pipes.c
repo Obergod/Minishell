@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:46:03 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/22 14:46:04 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/04/25 18:19:34 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	handle_l_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 	}
 	else if (pipes.pid_l == 0)
 	{
-		reset_signals_child();
+		exec_setup_signals();
 		close(pipes.pipes[0]);
 		if (dup2(pipes.pipes[1], STDOUT_FILENO) == -1)
 		{
@@ -30,6 +30,7 @@ int	handle_l_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 		}
 		close(pipes.pipes[1]);
 		prefix_exec(node->left, head, minishell);
+		interactive_setup_signals();
 		clean_exit(EXIT_FAILURE, minishell);
 	}
 	return (0);
@@ -44,7 +45,7 @@ int	handle_r_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 	}	
 	else if (pipes.pid_r == 0)
 	{
-		reset_signals_child();
+		exec_setup_signals();
 		close(pipes.pipes[1]);
 		if (dup2(pipes.pipes[0], STDIN_FILENO) == -1)
 		{
@@ -53,6 +54,7 @@ int	handle_r_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 		}
 		close(pipes.pipes[0]);
 		prefix_exec(node->right, head, minishell);
+		interactive_setup_signals();
 		clean_exit(EXIT_FAILURE, minishell);
 	}
 	return (0);

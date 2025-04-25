@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/04/24 20:55:59 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/04/25 18:23:31 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -121,7 +121,6 @@ test: $(LIBFT)
 			$(shell find $(SRC_DIR)/builtin -name "*.c") \
 			$(shell find $(SRC_DIR)/readline -name "*.c") \
 			$(shell find $(SRC_DIR)/utils -name "*.c") \
-			$(shell find $(SRC_DIR)/expansion/ugo_wildcard_2 -name "*.c") \
 			-I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -Wall -Wextra -Werror -g3 $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
 	done
 	@echo "$(BOLD)$(GREEN)✅ Tous les tests ont été compilés avec succès !$(RESET)"
