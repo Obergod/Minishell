@@ -22,7 +22,10 @@ int here_doc(char *delimiter)
 	{
         line = readline("heredoc> ");
         if (!line) 
+		{
+			ft_putendl_fd("warning: here-document at line 1 delimited by end-of-file", 2);
             break;
+		}
         if (ft_strcmp(line, delimiter) == 0) {
             free(line);
             break;
