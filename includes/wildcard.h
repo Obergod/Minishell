@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 20:24:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/24 21:11:16 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 16:32:41 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ t_wc_token	*split_line(const char *input, t_minishell *minishell);
 t_strlist	*wc_dup_token(const char *str, t_minishell *minishell);
 char	*expand_wildcards(const char *input, t_minishell *minishell);
 t_strlist	*expand_token(const char *pattern, t_minishell *minishell);
-t_wc_token	*wc_add_token(t_wc_token **lst, const char *str, int is_wc,
-		int is_sep, t_minishell *minishell);
+t_wc_token	*wc_add_token(t_wc_token **lst, const char *str, int flags,
+			   t_minishell *minishell);
 int	match_pattern(const char *pattern, const char *str);
 #endif

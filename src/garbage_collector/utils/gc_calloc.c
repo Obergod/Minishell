@@ -6,14 +6,15 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 17:23:15 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/03/21 17:23:27 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 16:42:40 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/garbage_collector.h"
 
 /**
- * @brief Alloue et initialise à zéro un bloc de mémoire avec le garbage collector
+ * @brief Alloue et initialise à zéro un 
+ bloc de mémoire avec le garbage collector
  *
  * @param count Nombre d'éléments à allouer
  * @param size Taille de chaque élément

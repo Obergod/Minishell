@@ -12,14 +12,15 @@
 
 #include "../../../includes/garbage_collector.h"
 
-char *gc_strjoin_three(char *s1, char *s2, char *s3, t_gc_head *gc)
+char	*gc_strjoin_three(char *s1, char *s2, char *s3, t_gc_head *gc)
 {
-	char *result;
-	int i;
-	int j;
-	int k;
+	char	*result;
+	int		i;
+	int		j;
+	int		k;
 
-	result = gc_malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + ft_strlen(s3) + 1), gc);
+	result = gc_malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2)
+				+ ft_strlen(s3) + 1), gc);
 	if (!result)
 		return (NULL);
 	i = -1;

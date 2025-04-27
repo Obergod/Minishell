@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/25 19:20:01 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 17:00:13 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,7 +280,7 @@ int	main(int ac, char **av, char **envp)
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
-		print_cmd_list(cmd_head);
+		// print_cmd_list(cmd_head);
 		// Appel de la fonction pour imprimer la liste de commandes
 		//if (cmd_head)
 			//print_cmd_list(cmd_head);
@@ -297,7 +297,7 @@ int	main(int ac, char **av, char **envp)
 		// if (ast)
 		// {
 		// 	printf("\n--- Parcours Préfixe ---\n");
-			parcours_prefixe(ast);
+		//	parcours_prefixe(ast);
 
 		// 	printf("\n--- Parcours Infixe ---\n");
 		// 	parcours_infixe(ast);

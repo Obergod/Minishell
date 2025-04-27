@@ -80,7 +80,6 @@ char	**gc_split_first_word(const char *str, char c, t_gc_head *gc)
 		if (result[1])
 			result[1][0] = '\0';
 	}
-
 	result[2] = NULL;
 	return (result);
 }
