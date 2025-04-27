@@ -6,22 +6,20 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 15:15:13 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/23 16:11:57 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 15:05:20 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/main.h"
-#include <string.h>
 
-static void ft_echo_print_all(char **args, int is_n)
+static void	ft_echo_print_all(char **args, int is_n)
 {
-	int i;
+	int	i;
 
 	i = -1;
 	while (args[++i] != NULL)
 	{
 		printf("%s", args[i]);
-		//printf("i + 1 connard : %s", args[i + 1]);
 		if (args[i + 1] != NULL)
 			printf(" ");
 	}
@@ -29,9 +27,9 @@ static void ft_echo_print_all(char **args, int is_n)
 		printf("\n");
 }
 
-static int ft_echo_is_n(char *str)
+static int	ft_echo_is_n(char *str)
 {
-	int i;
+	int	i;
 
 	if (!str || str[0] != '-')
 		return (1);
@@ -45,7 +43,7 @@ static int ft_echo_is_n(char *str)
 	return (0);
 }
 
-int ft_echo(char **args)
+int	ft_echo(char **args)
 {
 	int	i;
 
@@ -66,7 +64,7 @@ int ft_echo(char **args)
 	}
 	else if (args[1] && ft_echo_is_n(args[1]) != 0)
 	{
-		ft_echo_print_all(args+1, 0);
+		ft_echo_print_all(args + 1, 0);
 		return (0);
 	}
 	return (1);

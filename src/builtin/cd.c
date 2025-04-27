@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:17:04 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/22 17:29:52 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 15:05:08 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-/*
- * Rappel :
- * La commande "cd" doit être exécutée dans le processus principal (le shell lui-même).
- * Si "chdir" est appelée dans un processus enfant (par exemple, via un fork),
- * le changement de répertoire n'affectera que ce processus enfant et sera perdu une fois ce dernier terminé.
- * C'est pourquoi il est important de traiter les builtins comme "cd" directement dans le shell,
- * pour que l'appel à "chdir" modifie réellement le répertoire de travail du shell.
- */
 
-static int access_cd(char *path, t_minishell *minishell)
+// cd doit etre execute dans le shell principal 
+//sinon le changement de dossier ne sera pas garde
+
+static int	access_cd(char *path, t_minishell *minishell)
 {
-	char *old_pwd;
-	char *pwd;
+	char	*old_pwd;
+	char	*pwd;
 
 	gc_alloc(old_pwd = getcwd(NULL, 0), minishell->gc);
 	if (chdir(path) == -1)
@@ -41,9 +36,9 @@ static int access_cd(char *path, t_minishell *minishell)
 	return (0);
 }
 
-int ft_cd(char **args, t_minishell *minishell)
+int	ft_cd(char **args, t_minishell *minishell)
 {
-	char *target;
+	char	*target;
 
 	if (!args || !args[0] || ft_strcmp(args[0], "cd") != 0)
 		return (1);
