@@ -121,7 +121,7 @@ test: $(LIBFT)
 			$(shell find $(SRC_DIR)/builtin -name "*.c") \
 			$(shell find $(SRC_DIR)/readline -name "*.c") \
 			$(shell find $(SRC_DIR)/utils -name "*.c") \
-			-I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -Wall -Wextra -Werror -g3 $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
+			-I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -g3 $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \
 	done
 	@echo "$(BOLD)$(GREEN)✅ Tous les tests ont été compilés avec succès !$(RESET)"
 

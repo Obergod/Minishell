@@ -23,6 +23,7 @@ t_ast_node *init_ast_node(enum node_type type, t_cmd *cmd, t_minishell *minishel
 	node->type = type;
 	node->cmd = cmd;
 	node->subshell = 0;
+	node->subshell_redir = NULL;
 	node->left = NULL;
 	node->right = NULL;
 	return (node);
@@ -35,6 +36,7 @@ static int handle_parenthesis(t_cmd **cmd_list, t_ast_node **ast,
 							t_minishell *minishell, int *parenthesis_count)
 {
 	t_ast_node *subshell_node;
+	t_ast_node *op_node;
 	t_cmd *tmp;
 	int op_type;
 
@@ -51,15 +53,18 @@ static int handle_parenthesis(t_cmd **cmd_list, t_ast_node **ast,
 			return (0);
 
 		subshell_node->subshell = 1;
+		
+		if (*cmd_list && (*cmd_list)->redirs)
+		{
+			subshell_node->subshell_redir = (*cmd_list)->redirs;
+		}
+		
 		*ast = subshell_node;
 
-		// Si après la parenthèse il y a un opérateur, le traiter
 		if (*cmd_list && ((*cmd_list)->logic_operator_type == PIPE ||
 						(*cmd_list)->logic_operator_type == AND ||
 						(*cmd_list)->logic_operator_type == OR))
 		{
-			t_ast_node *op_node;
-
 			if ((*cmd_list)->logic_operator_type == PIPE)
 				op_type = NODE_PIPE;
 			else if ((*cmd_list)->logic_operator_type == AND)
@@ -71,14 +76,14 @@ static int handle_parenthesis(t_cmd **cmd_list, t_ast_node **ast,
 			if (!op_node)
 				return (0);
 
+			op_node->subshell_redir = subshell_node->subshell_redir;
+			
 			op_node->left = *ast;
 
-			// Avancer au token suivant
 			*cmd_list = (*cmd_list)->next;
 			if (!*cmd_list)
 				return (0);
 
-			// Construire la partie droite de l'opérateur
 			op_node->right = build_ast_recursive(cmd_list, minishell, parenthesis_count);
 			if (!op_node->right)
 				return (0);
@@ -93,8 +98,17 @@ static int handle_parenthesis(t_cmd **cmd_list, t_ast_node **ast,
 		(*parenthesis_count)--;
 		if (*parenthesis_count < 0)
 			return (0);
-
+		
+		t_redir *saved_redirs = (*cmd_list)->redirs;
+		
+		t_cmd *prev_cmd = *cmd_list;
 		*cmd_list = (*cmd_list)->next;
+		
+		if (saved_redirs && *cmd_list)
+		{
+			(*cmd_list)->redirs = saved_redirs;
+		}
+		
 		return (2);
 	}
 
@@ -121,14 +135,12 @@ static t_ast_node *build_expr(t_cmd **cmd_list, t_minishell *minishell,
 		return (node);
 	}
 
-	// Si le token est un opérateur logique sans commande, on le saute
 	if ((*cmd_list)->logic_operator_type != 0 && !(*cmd_list)->command_raw)
 	{
 		*cmd_list = (*cmd_list)->next;
 		return (build_expr(cmd_list, minishell, parenthesis_count));
 	}
 
-	// Création du nœud de commande
 	node = init_ast_node(NODE_CMD, *cmd_list, minishell);
 	if (!node)
 		return (NULL);
@@ -138,19 +150,16 @@ static t_ast_node *build_expr(t_cmd **cmd_list, t_minishell *minishell,
 	return (node);
 }
 
-// Gestion des pipes (priorité plus élevée que AND/OR)
 static t_ast_node *handle_pipes(t_cmd **cmd_list, t_minishell *minishell, int *parenthesis_count)
 {
 	t_ast_node *left;
 	t_ast_node *root;
 	t_cmd *op_cmd;
 
-	// Construction du nœud de gauche
 	left = build_expr(cmd_list, minishell, parenthesis_count);
 	if (!left)
 		return (NULL);
 
-	// Si on trouve un pipe, on le traite en priorité
 	while (*cmd_list && (*cmd_list)->logic_operator_type == PIPE)
 	{
 		op_cmd = *cmd_list;
@@ -164,12 +173,10 @@ static t_ast_node *handle_pipes(t_cmd **cmd_list, t_minishell *minishell, int *p
 
 		root->left = left;
 
-		// Construction du nœud de droite (récursivement pour gérer des pipes en chaîne)
 		root->right = build_expr(cmd_list, minishell, parenthesis_count);
 		if (!root->right)
 			return (NULL);
 
-		// Mise à jour du nœud gauche pour le prochain pipe éventuel
 		left = root;
 	}
 
@@ -187,37 +194,51 @@ t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
 	if (!*cmd_list)
 		return (NULL);
 
-	// Gestion des parenthèses fermantes au début
 	if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
 	{
 		(*parenthesis_count)--;
 		if (*parenthesis_count < 0)
 			return (NULL);
+		
+		t_redir *temp_redirs = (*cmd_list)->redirs;
 		*cmd_list = (*cmd_list)->next;
 		return (NULL);
 	}
 
-	// Construction du nœud de gauche en gérant les pipes (priorité supérieure)
 	left = handle_pipes(cmd_list, minishell, parenthesis_count);
 	if (!left)
 		return (NULL);
 
-	// Fin de la liste ou parenthèse fermante
 	if (!*cmd_list)
 		return (left);
 
-	// Gestion des parenthèses fermantes
+	// Handling closing parentheses
 	if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
 	{
 		(*parenthesis_count)--;
 		if (*parenthesis_count < 0)
 			return (NULL);
+		
+		// DEBUG: Print when we encounter a CLOSE_PARENTHESIS and attach redirs
+		printf("DEBUG: Found CLOSE_PARENTHESIS with redirs %p, attaching to node %p\n", 
+			(void*)(*cmd_list)->redirs, (void*)left);
+		
+		// Attach redirs to left node
 		left->subshell_redir = (*cmd_list)->redirs;
+		
+		// Print debug info about the redirection
+		if (left->subshell_redir)
+		{
+			printf("DEBUG: Attached redirection type: %d, file: %s\n", 
+				left->subshell_redir->type, 
+				left->subshell_redir->file_or_delimiter);
+		}
+		
 		*cmd_list = (*cmd_list)->next;
 		return (left);
 	}
 
-	// Gestion des opérateurs logiques AND/OR (priorité inférieure aux pipes)
+	// Handling logical operators AND/OR (lower priority than pipes)
 	if ((*cmd_list)->logic_operator_type == AND ||
 		(*cmd_list)->logic_operator_type == OR)
 	{
@@ -275,6 +296,7 @@ t_ast_node *build_ast(t_cmd *cmd_list, t_minishell *minishell)
 {
 	int parenthesis_count;
 	t_ast_node *root;
+	t_cmd *orig_cmd_list = cmd_list;  // Save original list for debugging
 
 	if (!cmd_list)
 		return (NULL);
@@ -282,7 +304,7 @@ t_ast_node *build_ast(t_cmd *cmd_list, t_minishell *minishell)
 	if (cmd_list->logic_operator_type == OPEN_PARENTHESIS && !cmd_list->command_raw && !cmd_list->next)
 		return (NULL);
 
-	// Vérifier l'équilibre des parenthèses avant de construire l'AST
+	// Check parenthesis balance before building the AST
 	if (!check_parenthesis_balance(cmd_list))
 		return (NULL);
 

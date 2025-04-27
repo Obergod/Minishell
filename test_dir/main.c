@@ -281,7 +281,7 @@ int	main(int ac, char **av, char **envp)
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
-		print_cmd_list(cmd_head);
+		//print_cmd_list(cmd_head);
 		// Appel de la fonction pour imprimer la liste de commandes
 		//if (cmd_head)
 			//print_cmd_list(cmd_head);
@@ -298,7 +298,7 @@ int	main(int ac, char **av, char **envp)
 		// if (ast)
 		// {
 		// 	printf("\n--- Parcours Préfixe ---\n");
-			parcours_prefixe(ast);
+	//		parcours_prefixe(ast);
 
 		// 	printf("\n--- Parcours Infixe ---\n");
 		// 	parcours_infixe(ast);

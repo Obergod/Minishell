@@ -25,36 +25,87 @@ static int	handle_builtins(t_ast_node *node, t_minishell *minishell)
 	return (0);
 }
 
+// New recursive function to find redirections in the AST
+t_redir *find_redirections_in_ast(t_ast_node *node)
+{
+	if (!node)
+		return (NULL);
+	
+	if (node->subshell_redir)
+		return (node->subshell_redir);
+	
+	t_redir *left_redirs = find_redirections_in_ast(node->left);
+	if (left_redirs)
+		return (left_redirs);
+	
+	return (find_redirections_in_ast(node->right));
+}
+
 void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
 	pid_t	pid;
 	int		status;
+	t_redir *redirections = NULL;
 
 	if (!node)
 		return ;
-	pid = 1;
+
 	if (node->subshell == 1)
+	{
+		redirections = find_redirections_in_ast(head);
+		
 		pid = fork();
+		if (pid == 0)
+		{
+			if (redirections)
+			{
+				t_ast_node dummy;
+				t_cmd dummy_cmd;
+				
+				ft_memset(&dummy, 0, sizeof(t_ast_node));
+				ft_memset(&dummy_cmd, 0, sizeof(t_cmd));
+				
+				dummy.type = NODE_CMD;
+				dummy.cmd = &dummy_cmd;
+				dummy.cmd->redirs = redirections;
+				
+				int fd_in = -1;
+				int fd_out = -1;
+				if (handle_redir(&dummy, minishell, &fd_in, &fd_out) == 1)
+					clean_exit(EXIT_FAILURE, minishell);
+			}
+			
+			if (node->cmd && handle_builtins(node, minishell) == 1)
+				clean_exit(minishell->exit_status, minishell);
+			
+			process(node, head, minishell);
+			clean_exit(minishell->exit_status, minishell);
+		}
+		else if (pid > 0)
+		{
+			waitpid(pid, &status, 0);
+			minishell->exit_status = WEXITSTATUS(status);
+		}
+		else
+		{
+			perror("fork");
+			return;
+		}
+	}
 	else if (node == head && skip_cmd(node))
 		return ;
-	if (pid == 0 || node->subshell == 0)
+	else
 	{
 		if (handle_builtins(node, minishell) == 1)
 			return ;
 		process(node, head, minishell);
-	}
-	if (pid == 0)
-		clean_exit(minishell->exit_status, minishell);
-	if (node->subshell == 1)
-	{
-		waitpid(pid, &status, 0);
-		minishell->exit_status = WEXITSTATUS(status);
 	}
 }
 
 void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
 	exec_setup_signals();
+	
 	if (node->type == NODE_PIPE)
 		minishell->exit_status = exec_pipes(node, head, minishell);
 	else if (node->type == NODE_CMD)
