@@ -48,8 +48,8 @@ void	finalize_token(t_tokenizer *tok, t_minishell *minishell, const char *input)
 int	verif_quotes(const char *input)
 {
 	int	i;
-	int		in_squotes = 0;
-	int		in_dquotes = 0;
+	int		in_squotes;
+	int		in_dquotes;
 
 	in_squotes = 0;
 	in_dquotes = 0;
