@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 16:58:15 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:08:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct s_cmd
 	size_t _arg_count;
 	size_t _arg_capacity;
 	enum e_logic_operator_type logic_operator_type; //&& || ( )
+	int is_redirect;
 	struct s_redir *redirs; // liste des redirections
 	struct s_cmd *next; //des que ya un pipe on passe au prochain
 } t_cmd;

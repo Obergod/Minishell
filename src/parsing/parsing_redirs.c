@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 16:45:13 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 16:45:54 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 18:50:02 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	t_redir_parsing(t_token *token, t_cmd **current_cmd,
 {
 	t_redir	*redir;
 
+	(*current_cmd)->is_redirect = 1;
 	if (ft_strcmp(token->str, "<") == 0)
 	{
 		redir = new_redir(REDIR_IN, token->next->str, minishell->gc);

@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 16:44:02 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 16:54:43 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 18:07:29 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ enum error_parsing	start_end_check_parsing(t_token *token, int status)
 	}
 	else if (status == 1)
 	{
-		if (token->type == T_REDIR) 
+		if (token->type == T_REDIR)
 			return (ERR_SYNTAX_REDIRECT);
 		if (token->type == T_PIPE)
 			return (ERR_SYNTAX_PIPE);

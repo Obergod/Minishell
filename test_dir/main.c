@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/27 17:00:13 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 18:47:54 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,7 @@ void	print_cmd_list(t_cmd *cmd_head)
 		printf("\n");
 
 		// Afficher les redirections
+		printf("\nil y'a des redirs ? : %d\n", current->is_redirect);
 		printf("  redirections: ");
 		redir = current->redirs;
 		if (!redir)
@@ -280,10 +281,10 @@ int	main(int ac, char **av, char **envp)
 		else
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
-		// print_cmd_list(cmd_head);
+		print_cmd_list(cmd_head);
 		// Appel de la fonction pour imprimer la liste de commandes
 		//if (cmd_head)
-			//print_cmd_list(cmd_head);
+			//print_cmd_list(cmd_head);	
 		if (!cmd_head)
 			printf("Aucune commande valide n'a été trouvée.\n");
 		
