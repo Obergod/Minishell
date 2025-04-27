@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 20:03:56 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/05 20:03:56 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/04/25 17:48:51 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 
 void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
+	exec_setup_signals();
 	if (node->type == NODE_PIPE)
 		minishell->exit_status = exec_pipes(node, head, minishell);
 	else if (node->type == NODE_CMD)
@@ -76,4 +77,5 @@ void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	}
 	else if (minishell->exit_status == 126)
 		perror(node->cmd->command[0]);
+	interactive_setup_signals();
 }
