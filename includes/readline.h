@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 16:53:40 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/25 17:51:41 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 15:10:59 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "minishell.h"
-#define PROMPT "bash-5.2 : "
 
 int	ft_readline(t_minishell *minishell);
 void reset_signals_child(void);

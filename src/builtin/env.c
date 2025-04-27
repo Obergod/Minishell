@@ -12,9 +12,9 @@
 
 #include "../../includes/builtin.h"
 
-int ft_env(t_minishell *minishell)
+int	ft_env(t_minishell *minishell)
 {
-	t_env *env;
+	t_env	*env;
 
 	env = minishell->env;
 	if (!env)
@@ -29,4 +29,3 @@ int ft_env(t_minishell *minishell)
 	}
 	return (0);
 }
-

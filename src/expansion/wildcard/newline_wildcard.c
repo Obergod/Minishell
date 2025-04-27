@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 21:06:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/24 21:15:51 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 15:47:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,32 +15,26 @@
 //calculer la longueur de la ligne pour malloc
 size_t	rebuild_line_len(t_wc_token *tokens, t_minishell *minishell)
 {
-	size_t		len;
-	t_wc_token	*cur;
-	t_strlist	*exp;
+	size_t	len;
 	t_strlist	*e;
 
 	len = 0;
-	cur = tokens;
-	while (cur)
+	while (tokens)
 	{
-		if (cur->is_sep)
-			len += strlen(cur->str);
-		else if (cur->is_wildcard)
+		if (tokens->is_wildcard)
 		{
-			exp = expand_token(cur->str, minishell);
-			e = exp;
+			e = expand_token(tokens->str, minishell);
 			while (e)
 			{
 				len += strlen(e->str);
 				if (e->next)
-					len += 1;
+					len++;
 				e = e->next;
 			}
 		}
 		else
-			len += strlen(cur->str);
-		cur = cur->next;
+			len += strlen(tokens->str);
+		tokens = tokens->next;
 	}
 	return (len);
 }

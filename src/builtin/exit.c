@@ -25,7 +25,7 @@ static int	ft_exit_is_digit(char *args)
 	return (0);
 }
 
-static void print_ft_exit_not_numeric(char *args)
+static void	print_ft_exit_not_numeric(char *args)
 {
 	ft_putstr_fd(PROMPT, 2);
 	ft_putstr_fd("exit: ", 2);
