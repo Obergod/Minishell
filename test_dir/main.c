@@ -6,17 +6,20 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/27 15:58:52 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:11:54 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/main.h"
 #include <sys/select.h>
+#include <sys/select.h>
 
 
 static char	*ft_add_readline(const char *prompt, char **stock, t_minishell *minishell)
+static char	*ft_add_readline(const char *prompt, char **stock, t_minishell *minishell)
 {
 	(*stock) = readline(prompt);
+	update_exit_status_from_signal(minishell);
 	update_exit_status_from_signal(minishell);
 	if (*stock == NULL)
 		return (NULL);
@@ -131,6 +134,7 @@ void	print_cmd_list(t_cmd *cmd_head)
 		printf("\n");
 
 		// Afficher les redirections
+		printf("\nil y'a des redirs ? : %d\n", current->is_redirect);
 		printf("  redirections: ");
 		redir = current->redirs;
 		if (!redir)
@@ -173,7 +177,15 @@ void parcours_prefixe(t_ast_node *node)
 	else if (node->type == NODE_PIPE)
 	{
 		t_redir *current = node->subshell_redir;
+	{
+		t_redir *current = node->subshell_redir;
 		printf("Préfixe PIPE\n");
+		while (current)
+		{
+			printf("%s", current->file_or_delimiter);
+			current = current->next;
+		}
+	}
 		while (current)
 		{
 			printf("%s", current->file_or_delimiter);
@@ -239,9 +251,11 @@ void parcours_suffixe(t_ast_node *node)
 }
 
 int	get_input(char *input, t_minishell *minishell)
+int	get_input(char *input, t_minishell *minishell)
 {
 	if (isatty(STDIN_FILENO))
 	{
+		if (ft_add_readline(PROMPT, &input, minishell) != NULL)
 		if (ft_add_readline(PROMPT, &input, minishell) != NULL)
 			return (1);
 	}
@@ -266,10 +280,12 @@ int	main(int ac, char **av, char **envp)
 	if (init_minishell(&minishell, envp) == 1)
 		return (1);
 	interactive_setup_signals();
+	interactive_setup_signals();
 	while (1)
 	{
 		update_exit_status_from_signal(&minishell);
 		if (isatty(STDIN_FILENO))
+			ft_add_readline(PROMPT, &input, &minishell);
 			ft_add_readline(PROMPT, &input, &minishell);
 		else
 			input = get_next_line(0);
@@ -284,14 +300,16 @@ int	main(int ac, char **av, char **envp)
 		//print_cmd_list(cmd_head);
 		// Appel de la fonction pour imprimer la liste de commandes
 		//if (cmd_head)
-			//print_cmd_list(cmd_head);
+			//print_cmd_list(cmd_head);	
 		if (!cmd_head)
 			printf("Aucune commande valide n'a été trouvée.\n");
+		
 		
 		ast = build_ast(cmd_head, &minishell);
 		head = ast;
 		// test_ast(ast);
 
+		// visualize_ast(ast, 3);
 		// visualize_ast(ast, 3);
 
 		// Effectuer les trois types de parcours
@@ -302,13 +320,20 @@ int	main(int ac, char **av, char **envp)
 
 		// 	printf("\n--- Parcours Infixe ---\n");
 		// 	parcours_infixe(ast);
+		// 	printf("\n--- Parcours Infixe ---\n");
+		// 	parcours_infixe(ast);
 
+		// 	printf("\n--- Parcours Suffixe ---\n");
+		// 	parcours_suffixe(ast);
+		// 	printf("\n");
+		// }
 		// 	printf("\n--- Parcours Suffixe ---\n");
 		// 	parcours_suffixe(ast);
 		// 	printf("\n");
 		// }
 
 		prefix_exec(ast, head, &minishell);
+		update_exit_status_from_signal(&minishell);
 		update_exit_status_from_signal(&minishell);
 		if (*input)
 			add_history(input);

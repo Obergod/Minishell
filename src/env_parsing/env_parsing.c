@@ -6,20 +6,24 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 16:48:21 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 15:31:29 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:09:57 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/env_parsing.h"
+#include <string.h>
+#include <unistd.h>
 
 // appelle cette fonction si lancee avec env -i
 t_env	*init_env(t_minishell *minishell)
 {
 	t_env	*head;
 	t_env	*current;
+	char *pwd;
 
 	head = NULL;
-	current = create_value_env("PWD", getcwd(NULL, 0), minishell);
+	gc_alloc(pwd = getcwd(NULL, 0), minishell->gc);
+	current = create_value_env("PWD", pwd, minishell);
 	add_to_env(&head, current);
 	current = create_value_env("SHLVL", "1", minishell);
 	add_to_env(&head, current);
@@ -36,6 +40,7 @@ void	check_env(t_env *head, t_minishell *minishell)
 {
 	t_env	*current;
 	int		check[3];
+	char *pwd;
 
 	current = head;
 	check[0] = 0;
@@ -51,8 +56,9 @@ void	check_env(t_env *head, t_minishell *minishell)
 			check[2] = 1;
 		current = current->next;
 	}
+	gc_alloc(pwd = getcwd(NULL, 0), minishell->gc);
 	if (check[0] == 0)
-		add_to_env(&head, create_value_env("PWD", getcwd(NULL, 0), minishell));
+		add_to_env(&head, create_value_env("PWD", pwd, minishell));
 	if (check[1] == 0)
 		add_to_env(&head, create_value_env("SHLVL", "1", minishell));
 	if (check[2] == 0)

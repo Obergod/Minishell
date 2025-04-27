@@ -5,10 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/22 14:46:03 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/27 15:58:01 by ufalzone         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2025/04/27 19:11:04 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "../../includes/main.h"
 
@@ -22,6 +23,7 @@ int	handle_l_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 	else if (pipes.pid_l == 0)
 	{
 		exec_setup_signals();
+		exec_setup_signals();
 		close(pipes.pipes[0]);
 		if (dup2(pipes.pipes[1], STDOUT_FILENO) == -1)
 		{
@@ -30,6 +32,7 @@ int	handle_l_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 		}
 		close(pipes.pipes[1]);
 		prefix_exec(node->left, head, minishell);
+		interactive_setup_signals();
 		interactive_setup_signals();
 		clean_exit(EXIT_FAILURE, minishell);
 		clean_exit(minishell->exit_status, minishell);
@@ -47,6 +50,7 @@ int	handle_r_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 	else if (pipes.pid_r == 0)
 	{
 		exec_setup_signals();
+		exec_setup_signals();
 		close(pipes.pipes[1]);
 		if (dup2(pipes.pipes[0], STDIN_FILENO) == -1)
 		{
@@ -55,6 +59,7 @@ int	handle_r_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 		}
 		close(pipes.pipes[0]);
 		prefix_exec(node->right, head, minishell);
+		interactive_setup_signals();
 		interactive_setup_signals();
 		clean_exit(EXIT_FAILURE, minishell);
 		clean_exit(minishell->exit_status, minishell);

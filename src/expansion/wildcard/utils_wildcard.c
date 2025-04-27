@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 20:59:26 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/24 21:04:52 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 16:25:16 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,10 @@ int	contain_wildcard(const char *s)
 	}
 	return (0);
 }
-// add une strlist a une liste chainee 
-t_strlist	*add_strlist(t_strlist **lst, const char *str, t_minishell *minishell)
+
+// add une strlist a une liste chainee
+t_strlist	*add_strlist(t_strlist **lst, const char *str,
+		t_minishell *minishell)
 {
 	t_strlist	*new;
 	t_strlist	*cur;

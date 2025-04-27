@@ -5,9 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/05 20:03:56 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/25 17:48:51 by ufalzone         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2025/04/27 19:10:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
+/* ************************************************************************** */
+
 /* ************************************************************************** */
 
 #include "../../includes/main.h"
@@ -128,5 +130,6 @@ void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	}
 	else if (minishell->exit_status == 126)
 		perror(node->cmd->command[0]);
+	interactive_setup_signals();
 	interactive_setup_signals();
 }

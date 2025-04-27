@@ -84,7 +84,7 @@ size_t	gc_count(t_gc_head *head)
 
 void	gc_print(t_gc_head *head)
 {
-	t_gc *current;
+	t_gc	*current;
 
 	if (!head)
 		return ;

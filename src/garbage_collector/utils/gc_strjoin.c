@@ -32,7 +32,6 @@ char	*gc_strjoin(char *s1, char *s2, t_gc_head *gc)
 		return (gc_strdup(s2, gc));
 	if (!s2)
 		return (gc_strdup(s1, gc));
-
 	result = gc_malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1), gc);
 	if (!result)
 		return (NULL);

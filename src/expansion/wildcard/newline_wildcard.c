@@ -6,16 +6,16 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 21:06:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 15:47:06 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:11:19 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/wildcard.h"
 
-//calculer la longueur de la ligne pour malloc
+// calculer la longueur de la ligne pour malloc
 size_t	rebuild_line_len(t_wc_token *tokens, t_minishell *minishell)
 {
-	size_t	len;
+	size_t		len;
 	t_strlist	*e;
 
 	len = 0;
@@ -39,21 +39,21 @@ size_t	rebuild_line_len(t_wc_token *tokens, t_minishell *minishell)
 	return (len);
 }
 
-//remplir la ligne avec les tokens
+// remplir la ligne avec les tokens
 void	rebuild_line_fill(char *res, t_wc_token *tokens, t_minishell *minishell)
 {
-	t_wc_token	*cur;
+	t_wc_token	*current;
 	t_strlist	*exp;
 	t_strlist	*e;
 
-	cur = tokens;
-	while (cur)
+	current = tokens;
+	while (current)
 	{
-		if (cur->is_sep)
-			ft_strcat(res, cur->str);
-		else if (cur->is_wildcard)
+		if (current->is_sep)
+			ft_strcat(res, current->str);
+		else if (current->is_wildcard)
 		{
-			exp = expand_token(cur->str, minishell);
+			exp = expand_token(current->str, minishell);
 			e = exp;
 			while (e)
 			{
@@ -64,12 +64,12 @@ void	rebuild_line_fill(char *res, t_wc_token *tokens, t_minishell *minishell)
 			}
 		}
 		else
-			ft_strcat(res, cur->str);
-		cur = cur->next;
+			ft_strcat(res, current->str);
+		current = current->next;
 	}
 }
 
-//reconstruire la ligne
+// reconstruire la ligne
 char	*rebuild_line(t_wc_token *tokens, t_minishell *minishell)
 {
 	char	*res;
@@ -84,37 +84,45 @@ char	*rebuild_line(t_wc_token *tokens, t_minishell *minishell)
 	return (res);
 }
 
-// decoupe la ligne en tokens (mots ou separateurs) pour savoir ou sont les wildcards et remettre bien apres les separateurs
+// decoupe la ligne en tokens (mots ou separateurs)
+// pour savoir ou sont les wildcards et remettre bien apres les separateurs
+static int	fill_buf(const char *p, char *buf, int sep)
+{
+	int	len;
+
+	len = 0;
+	while ((sep && is_meta(p[len])) || (p[len] && !sep && !is_meta(p[len])))
+	{
+		buf[len] = p[len];
+		len++;
+	}
+	buf[len] = '\0';
+	return (len);
+}
+
 t_wc_token	*split_line(const char *input, t_minishell *minishell)
 {
 	t_wc_token	*lst;
-	int			i;
-	int			start;
+	const char	*p;
 	char		buf[1024];
-	int			j;
+	int			len;
+	int			flag;
 
+	p = input;
 	lst = NULL;
-	i = 0;
-	while (input[i])
+	while (*p)
 	{
-		if (is_meta(input[i]))
+		flag = 0;
+		if (is_meta(*p))
+			flag = 2;
+		len = fill_buf(p, buf, flag == 2);
+		if (flag == 0)
 		{
-			start = i;
-			while (is_meta(input[i]) && input[i])
-				i++;
-			ft_memcpy(buf, &input[start], i - start);
-			buf[i - start] = '\0';
-			wc_add_token(&lst, buf, 0, 1, minishell);
+			if (contain_wildcard(buf))
+				flag = 1;
 		}
-		else
-		{
-			start = i;
-			j = 0;
-			while (input[i] && !is_meta(input[i]))
-				buf[j++] = input[i++];
-			buf[j] = '\0';
-			wc_add_token(&lst, buf, contain_wildcard(buf), 0, minishell);
-		}
+		wc_add_token(&lst, buf, flag, minishell);
+		p += len;
 	}
 	return (lst);
 }

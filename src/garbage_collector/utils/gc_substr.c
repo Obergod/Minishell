@@ -21,8 +21,7 @@
  * @param gc Structure de tête du garbage collector
  * @return char* Sous-chaîne extraite et allouée
  */
-char	*gc_substr(char const *s, unsigned int start, size_t len,
-		t_gc_head *gc)
+char	*gc_substr(char const *s, unsigned int start, size_t len, t_gc_head *gc)
 {
 	char	*result;
 	size_t	s_len;
