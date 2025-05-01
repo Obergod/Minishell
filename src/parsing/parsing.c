@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ugo <ugo@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 19:11:31 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/01 19:27:30 by ugo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,14 +147,21 @@ t_cmd	*parsing(t_token *token, t_minishell *minishell)
 	while (token)
 	{
 		if (token->type == T_WORD)
+		{
 			add_arg_to_cmd(current, token->str, minishell->gc);
+		}
 		else if (token->type == T_REDIR)
 		{
 			t_redir_parsing(token, &current, minishell);
 			token = token->next->next;
 			continue ;
 		}
-		handle_parsing_operator(token, &head, &current, minishell);
+		else
+		{
+			handle_parsing_operator(token, &head, &current, minishell);
+			token = token->next;
+			continue ;
+		}
 		token = token->next;
 	}
 	if (current->command[0] || current->redirs)
