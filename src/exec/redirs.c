@@ -117,14 +117,14 @@ int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_o
 	}
 	if (*fd_in != -1)
 	{
-		if (dup2(*fd_in, STDIN_FILENO) == -1)
+		if (node->cmd->command[0] && dup2(*fd_in, STDIN_FILENO) == -1)
 			return (perror("minishell: dup2"), 1);
 		close(*fd_in);
 		*fd_in = -1;
 	}
 	if (*fd_out != -1)
 	{
-		if (dup2(*fd_out, STDOUT_FILENO) == -1)
+		if (node->cmd->command[0] && dup2(*fd_out, STDOUT_FILENO) == -1)
 			return (perror("minishell: dup2"), 1);
 		close(*fd_out);
 		*fd_out = -1;

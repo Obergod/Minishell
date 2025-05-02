@@ -1,0 +1,164 @@
+# **************************************************************************** #$
+#                                                                              #$
+#                                                         :::      ::::::::    #$
+#    Makefile                                           :+:      :+:    :+:    #$
+#                                                     +:+ +:+         +:+      #$
+#    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #$
+#                                                 +#+#+#+#+#+   +#+            #$
+#    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #$
+#    Updated: 2025/04/27 19:09:44 by ufalzone         ###   ########.fr        #$
+#                                                                              #$
+# **************************************************************************** #$
+$
+$
+# Couleurs$
+RED = \033[31m$
+GREEN = \033[32m$
+YELLOW = \033[33m$
+BLUE = \033[34m$
+CYAN = \033[36m$
+PURPLE = \033[35m$
+BOLD = \033[1m$
+RESET = \033[0m$
+$
+# Nom de l'exM-CM-)cutable$
+NAME = minishell$
+$
+# RM-CM-)pertoires$
+SRC_DIR = src$
+INCLUDE_DIR = includes$
+OBJ_DIR = obj$
+DEPFLAGS = -MMD -MP$
+$
+# Libft$
+LIBFT_DIR = full_libft$
+LIBFT = $(LIBFT_DIR)/libftfull.a$
+$
+# Fichiers sources et objets$
+SRC_FILES = $(shell find $(SRC_DIR) -type f -name "*.c")$
+OBJ_FILES = $(SRC_FILES:%.c=$(OBJ_DIR)/%.o)$
+DEP_FILES = $(OBJ_FILES:.o=.d) $(OBJ_FILES_BONUS:.o=.d)$
+$
+# Flags de compilation$
+CC = cc$
+CFLAGS = -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -Wall -Wextra -Werror -O3 -g3$
+LDFLAGS = -lreadline$
+$
+# RM-CM-(gles$
+.PHONY: all clean fclean re libft test$
+$
+# Compilation principale$
+all: banner $(OBJ_DIR) libft $(NAME)$
+	@echo "$(BOLD)$(YELLOW)M-bM-^\M-( $(GREEN)MINISHELL $(CYAN)PRM-CM-^JT M-CM-^@ L'EMPLOI ! $(YELLOW)PROFITEZ DE CETTE MERVEILLE TECHNOLOGIQUE ! M-bM-^\M-($(RESET)"$
+$
+# BanniM-CM-(re stylM-CM-)e$
+banner:$
+	@echo "\n$(BOLD)$(CYAN)M-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^A$(RESET)"$
+	@echo "$(BOLD)$(PURPLE)                         M-bM-^\M-' MINISHELL EXTRAORDINAIRE M-bM-^\M-'                         $(RESET)"$
+	@echo "$(BOLD)$(BLUE)                 LE SHELL ULTIME QUI REDM-CM-^IFINIT L'EXCELLENCE                     $(RESET)"$
+	@echo "$(BOLD)$(CYAN)M-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^AM-bM-^TM-^A$(RESET)\n"$
+$
+# Compilation de la libft$
+libft:$
+	@echo "$(BOLD)$(YELLOW)M-pM-^_M-^TM-. Compilation de la libft lM-CM-)gendaire...$(RESET)"$
+	@$(MAKE) -C $(LIBFT_DIR)$
+	@echo "$(BOLD)$(GREEN)M-pM-^_M-^RM-^N Libft compilM-CM-)e avec brio ! Une merveille d'ingM-CM-)nierie !$(RESET)"$
+$
+# CrM-CM-)ation du dossier obj et ses sous-dossiers$
+$(OBJ_DIR):$
+	@mkdir -p $(OBJ_DIR)$
+	@mkdir -p $(dir $(OBJ_FILES))$
+	@echo "$(BOLD)$(BLUE)M-pM-^_M-^OM-^WM-oM-8M-^O  CrM-CM-)ation des structures de dossiers ultra-optimisM-CM-)es...$(RESET)"$
+$
+# Compile le projet minishell$
+$(NAME): $(OBJ_FILES) $(LIBFT)$
+	@printf "$(BOLD)$(GREEN)M-bM-^ZM-! Compilation du lM-CM-)gendaire MINISHELL en cours...$(RESET)                       \r"$
+	@sleep 0.5$
+	@printf "$(BOLD)$(CYAN)M-bM-^ZM-! Optimisation du code M-CM-  la perfection...$(RESET)                               \r"$
+	@sleep 0.5$
+	@printf "$(BOLD)$(PURPLE)M-bM-^ZM-! IntM-CM-)gration des technologies de pointe...$(RESET)                           \r"$
+	@sleep 0.5$
+	@$(CC) $(OBJ_FILES) $(LIBFT) $(CFLAGS) $(LDFLAGS) -o $(NAME)$
+	@printf "\n$(BOLD)$(YELLOW)M-pM-^_M-^ZM-^@ COMPILATION RM-CM-^IUSSIE AVEC BRIO ! $(GREEN)$(NAME) $(YELLOW)EST MAINTENANT PRM-CM-^JT M-CM-^@ RM-CM-^IVOLUTIONNER VOTRE MONDE !$(RESET)\n"$
+	@echo "$(BOLD)$(CYAN)M-pM-^_M-^LM-^_ Une expM-CM-)rience utilisateur inM-CM-)galM-CM-)e vous attend...$(RESET)"$
+$
+# RM-CM-(gle de compilation des fichiers objets$
+$(OBJ_DIR)/%.o: %.c$
+	@printf "$(BOLD)$(CYAN)M-pM-^_M-^TM-' Transformation magique de $<...$(RESET)\r"$
+	@$(CC) $(CFLAGS) $(DEPFLAGS) -c $< -o $@$
+$
+# Nettoyage des fichiers objets$
+clean:$
+	@echo "$(BOLD)$(RED)M-pM-^_M-'M-9 Nettoyage cosmique des fichiers temporaires...$(RESET)"$
+	@rm -rf $(OBJ_DIR)$
+	@$(MAKE) -C $(LIBFT_DIR) clean$
+	@echo "$(BOLD)$(GREEN)M-bM-^\M-( Espace nettoyM-CM-) avec une prM-CM-)cision chirurgicale !$(RESET)"$
+$
+# Nettoyage complet$
+fclean: clean$
+	@echo "$(BOLD)$(RED)M-pM-^_M-^WM-^QM-oM-8M-^O Suppression stratM-CM-)gique de $(NAME) pour prM-CM-)parer une nouvelle M-CM-(re...$(RESET)"$
+	@rm -f $(NAME)$
+	@rm -f builtin_test$
+	@$(MAKE) -C $(LIBFT_DIR) fclean$
+	@echo "$(BOLD)$(GREEN)M-pM-^_M-^LM-^H Tout est prM-CM-*t pour une renaissance M-CM-)clatante !$(RESET)"$
+$
+# Recompile tout$
+re: fclean all$
+$
+#Compile tous les tests disponibles$
+test: $(LIBFT)$
+	@echo "$(BOLD)$(YELLOW)M-pM-^_M-'M-* Compilation de tous les tests disponibles...$(RESET)"$
+	@mkdir -p test_dir/bin$
+	@for test in $(wildcard test_dir/*.c); do \$
+		test_name=$$(basename $$test .c); \$
+		echo "$(BOLD)$(CYAN)M-pM-^_M-^SM-^] Compilation de $$test_name...$(RESET)"; \$
+		$(CC) -o $$test_name $$test \$
+			$(shell find $(SRC_DIR)/token -name "*.c") \$
+			$(shell find $(SRC_DIR)/garbage_collector -name "*.c") \$
+			$(shell find $(SRC_DIR)/env_parsing -name "*.c") \$
+			$(shell find $(SRC_DIR)/exec -name "*.c") \$
+			$(shell find $(SRC_DIR)/parsing -name "*.c") \$
+			$(shell find $(SRC_DIR)/expansion -name "*.c") \$
+			$(shell find $(SRC_DIR)/builtin -name "*.c") \$
+			$(shell find $(SRC_DIR)/readline -name "*.c") \$
+			$(shell find $(SRC_DIR)/utils -name "*.c") \$
+			-I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -g3 $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \$
+	done$
+	@echo "$(BOLD)$(GREEN)M-bM-^\M-^E Tous les tests ont M-CM-)tM-CM-) compilM-CM-)s avec succM-CM-(s !$(RESET)"$
+$
+# Teste les commandes builtin$
+test_builtin: $(LIBFT)$
+	@echo "$(BOLD)$(YELLOW)M-pM-^_M-'M-* Test des commandes builtin en cours...$(RESET)"$
+	@if [ -f $(SRC_DIR)/builtin/main.c ]; then \$
+		echo "$(BOLD)$(CYAN)M-pM-^_M-^SM-^] Compilation des tests builtin...$(RESET)"; \$
+		$(CC) -o builtin_test $(SRC_DIR)/builtin/main.c \$
+			$(shell find $(SRC_DIR)/builtin -type f -name "*.c" ! -name "main.c") \$
+			$(shell find $(SRC_DIR)/garbage_collector -maxdepth 1 -name "*.c") \$
+			$(shell find $(SRC_DIR)/garbage_collector/utils -name "*.c") \$
+			$(shell find $(SRC_DIR)/env_parsing -name "*.c") \$
+			$(shell find $(SRC_DIR)/utils -name "*.c") \$
+			-g3\$
+			$(CFLAGS) $(LDFLAGS) -L$(LIBFT_DIR) -lftfull || exit 1; \$
+		echo "$(BOLD)$(GREEN)M-bM-^\M-^E Tests builtin compilM-CM-)s avec succM-CM-(s !$(RESET)"; \$
+		echo "$(BOLD)$(PURPLE)M-pM-^_M-^ZM-^@ ExM-CM-)cution des tests builtin...$(RESET)"; \$
+		./builtin_test; \$
+		echo "$(BOLD)$(GREEN)M-bM-^\M-^E Tests builtin exM-CM-)cutM-CM-)s avec succM-CM-(s !$(RESET)"; \$
+	else \$
+		echo "$(BOLD)$(RED)M-bM-^]M-^L Fichier main.c introuvable dans $(SRC_DIR)/builtin/ !$(RESET)"; \$
+		echo "$(BOLD)$(YELLOW)M-bM-^DM-9M-oM-8M-^O Veuillez crM-CM-)er un fichier main.c dans le dossier builtin pour tester les commandes.$(RESET)"; \$
+	fi$
+$
+# Compile le test AST$
+ast_test:$
+	@if [ -f tests/ast_test.c ]; then \$
+		echo "$(BOLD)$(YELLOW)M-pM-^_M-'M-* Compilation des tests AST...$(RESET)"; \$
+		$(CC) -o ast_test tests/ast_test.c -I./tests -I$(LIBFT_DIR)/include $(CFLAGS) && \$
+		echo "$(BOLD)$(GREEN)M-bM-^\M-^E Tests AST compilM-CM-)s avec succM-CM-(s !$(RESET)" && \$
+		echo "$(BOLD)$(PURPLE)M-pM-^_M-^ZM-^@ ExM-CM-)cution des tests AST...$(RESET)" && \$
+		./ast_test && \$
+		rm -f ast_test; \$
+	else \$
+		echo "$(BOLD)$(YELLOW)M-bM-^ZM- M-oM-8M-^O Fichier tests/ast_test.c non trouvM-CM-), test AST ignorM-CM-)$(RESET)"; \$
+	fi$
+$
+-include $(DEP_FILES)$

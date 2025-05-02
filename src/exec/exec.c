@@ -108,8 +108,6 @@ void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	t_fds	fds;
 	exec_setup_signals();
 	
-	fds.fd_in == -1;
-	fds.fd_out == -1;
 	if (node->type == NODE_PIPE)
 		minishell->exit_status = exec_pipes(node, head, minishell);
 	else if (node->type == NODE_CMD)
