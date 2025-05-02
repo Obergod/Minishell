@@ -69,14 +69,15 @@ enum e_token_type	handle_operator(const char *input, int *i);
 void				add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state, t_minishell *minishell);
 int					quotes_verif(const char *input);
 int					verif_quotes(const char *input);
+int					verif_op(const char *input, int	i);
 
 /*****		token_process	*****/
 t_token				*tokenize(const char *input, t_minishell *minishell);
 void				init_tokenizer(t_tokenizer *tok, const char *input, t_minishell *minishell);
-void				handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minishell);
+int					handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minishell);
 void				handle_quotes(const char *input, t_tokenizer *tok, char quote);
 void				finalize_token(t_tokenizer *tok, t_minishell *minishell, const char *input);
 void				process_space(t_tokenizer *tok, t_minishell *minishell);
-void				process_operator(const char *input, t_tokenizer *tok, t_minishell *minishell);
+int					process_operator(const char *input, t_tokenizer *tok, t_minishell *minishell);
 
 #endif

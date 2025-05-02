@@ -16,7 +16,6 @@
 
 
 static char	*ft_add_readline(const char *prompt, char **stock, t_minishell *minishell)
-static char	*ft_add_readline(const char *prompt, char **stock, t_minishell *minishell)
 {
 	(*stock) = readline(prompt);
 	update_exit_status_from_signal(minishell);
@@ -251,7 +250,6 @@ void parcours_suffixe(t_ast_node *node)
 }
 
 int	get_input(char *input, t_minishell *minishell)
-int	get_input(char *input, t_minishell *minishell)
 {
 	if (isatty(STDIN_FILENO))
 	{
@@ -285,7 +283,6 @@ int	main(int ac, char **av, char **envp)
 	{
 		update_exit_status_from_signal(&minishell);
 		if (isatty(STDIN_FILENO))
-			ft_add_readline(PROMPT, &input, &minishell);
 			ft_add_readline(PROMPT, &input, &minishell);
 		else
 			input = get_next_line(0);

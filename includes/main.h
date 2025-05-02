@@ -28,7 +28,7 @@
 # include "exec.h"
 # include "wildcard.h"
 
-#define PROMPT "bash-5.2$ "
+#define PROMPT "pizzshell$ "
 
 extern int g_sig_received;
 /* Function declarations for main */

@@ -33,7 +33,7 @@ void	process_space(t_tokenizer *tok, t_minishell *minishell)
 	}
 }
 
-void	handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minishell)
+int	handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minishell)
 {
 	if (input[tok->i] == '\'')
 		tok->state = IN_SQUOTE;
@@ -42,13 +42,17 @@ void	handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minis
 	if (input[tok->i] == ' ' || input[tok->i] == '\t')
 		process_space(tok, minishell);
 	else if (is_operator(input[tok->i]))
-		process_operator(input, tok, minishell);
+	{
+		if (process_operator(input, tok, minishell) == 1)
+			return (1);
+	}
 	else
 	{
 		if (tok->nb_tok == 0)
 			tok->token_state = tok->state;
 		tok->buff[tok->nb_tok++] = input[tok->i];
 	}
+	return (0);
 }
 
 void	handle_quotes(const char *input, t_tokenizer *tok, char quote)
@@ -71,7 +75,10 @@ t_token	*tokenize(const char *input, t_minishell *minishell)
 	while (input[++tok.i])
 	{
 		if (tok.state == NORMAL)
-			handle_normal_state(input, &tok, minishell);
+		{
+			if (handle_normal_state(input, &tok, minishell) == 1)
+				return (NULL);
+		}
 		else if (tok.state == IN_SQUOTE)
 			handle_quotes(input, &tok, '\'');
 		else if (tok.state == IN_DQUOTE)
