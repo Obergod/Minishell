@@ -37,6 +37,8 @@ int	verif_op(const char *input, int	i)
 		return (1);
 	if (input[i + 2] && is_operator(input[i + 2]))
 		return (1);
+	if (input[i] == '&' && input[i + 1] && input[i + 1] != input[i])
+		return (1);
 	return (0);
 }
 
