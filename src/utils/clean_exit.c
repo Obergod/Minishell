@@ -12,7 +12,7 @@
 
 #include "../../includes/main.h"
 
-int clean_exit(int exit_code, t_minishell *minishell)
+int	clean_exit(int exit_code, t_minishell *minishell)
 {
 	if (minishell)
 	{

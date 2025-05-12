@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 16:44:02 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 18:07:29 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/12 20:09:13 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,17 @@ enum error_parsing	check_parenthesis(t_token *token_p)
 	return (SUCCESS);
 }
 
+static enum error_parsing	check_word_parenthesis(t_token *token)
+{
+	if (token->type == T_WORD && token->next->type == T_PARANTHESIS
+		&& ft_strcmp(token->next->str, "(") == 0)
+		return (ERR_SYNTAX_TOKEN);
+	else if (token->type == T_PARANTHESIS && ft_strcmp(token->str, ")") == 0
+		&& token->next->type == T_WORD)
+		return (ERR_SYNTAX_TOKEN);
+	return (SUCCESS);
+}
+
 enum error_parsing	check_parsing(t_token *token_p)
 {
 	t_token	*token;
@@ -72,7 +83,9 @@ enum error_parsing	check_parsing(t_token *token_p)
 		return (start_end_check_parsing(token, 0));
 	while (token->next)
 	{
-		if (token->type == T_PIPE && token->next->type == T_PIPE)
+		if (check_word_parenthesis(token) != SUCCESS)
+			return (ERR_SYNTAX_TOKEN);
+		else if (token->type == T_PIPE && token->next->type == T_PIPE)
 			return (ERR_SYNTAX_PIPE);
 		else if (token->type == T_REDIR && token->next->type != T_WORD)
 			return (ERR_SYNTAX_REDIRECT);

@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 15:20:50 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 19:12:10 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/12 20:06:56 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,6 @@ static int handle_parenthesis(t_cmd **cmd_list, t_ast_node **ast,
 		
 		t_redir *saved_redirs = (*cmd_list)->redirs;
 		
-		t_cmd *prev_cmd = *cmd_list;
 		*cmd_list = (*cmd_list)->next;
 		
 		if (saved_redirs && *cmd_list)
@@ -201,7 +200,6 @@ t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
 		if (*parenthesis_count < 0)
 			return (NULL);
 		
-		t_redir *temp_redirs = (*cmd_list)->redirs;
 		*cmd_list = (*cmd_list)->next;
 		return (NULL);
 	}
@@ -297,7 +295,7 @@ t_ast_node *build_ast(t_cmd *cmd_list, t_minishell *minishell)
 {
 	int parenthesis_count;
 	t_ast_node *root;
-	t_cmd *orig_cmd_list = cmd_list;  // Save original list for debugging
+	t_cmd *current;
 
 	if (!cmd_list)
 		return (NULL);
@@ -310,7 +308,8 @@ t_ast_node *build_ast(t_cmd *cmd_list, t_minishell *minishell)
 		return (NULL);
 
 	parenthesis_count = 0;
-	root = build_ast_recursive(&cmd_list, minishell, &parenthesis_count);
+	current = cmd_list;
+	root = build_ast_recursive(&current, minishell, &parenthesis_count);
 
 	if (parenthesis_count != 0)
 		return (NULL);
