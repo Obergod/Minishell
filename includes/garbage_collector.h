@@ -13,9 +13,9 @@
 #ifndef GARBAGE_COLLECTOR_H
 # define GARBAGE_COLLECTOR_H
 
-# include <stdlib.h>
-# include <stdio.h>
 # include "minishell.h"
+# include <stdio.h>
+# include <stdlib.h>
 
 /*
 	@brief Test du garbage collector
@@ -23,10 +23,12 @@
 
 	gc_init() -> Initialise le garbage collector
 	gc_alloc() -> Ajoute un pointeur au garbage collector
-	gc_malloc() -> Alloue de la mémoire et l'enregistre dans le garbage collector
+	gc_malloc()
+		-> Alloue de la mémoire et l'enregistre dans le garbage collector
 	gc_free() -> Libère une allocation du garbage collector
 	gc_destroy() -> Détruit le garbage collector
-	gc_contains() -> Vérifie si une allocation est présente dans le garbage collector
+	gc_contains()
+		-> Vérifie si une allocation est présente dans le garbage collector
 	gc_count() -> Compte le nombre d'allocations dans le garbage collector
 
 */
@@ -65,7 +67,8 @@ char			*gc_strjoin(char *s1, char *s2, t_gc_head *gc);
 char			*gc_strjoin_three(char *s1, char *s2, char *s3, t_gc_head *gc);
 char			**gc_split(const char *str, char c, t_gc_head *gc);
 char			**gc_split_first_word(const char *str, char c, t_gc_head *gc);
-char			*gc_substr(char const *s, unsigned int start, size_t len, t_gc_head *gc);
+char			*gc_substr(char const *s, unsigned int start, size_t len,
+					t_gc_head *gc);
 char			**gc_strndup_array(char **s1, size_t size, t_gc_head *gc);
 void			*gc_calloc(size_t count, size_t size, t_gc_head *gc);
 char			**gc_strdup_array(char **s1, t_gc_head *gc);

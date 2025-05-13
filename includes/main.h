@@ -13,24 +13,23 @@
 #ifndef MAIN_H
 # define MAIN_H
 
-#include <errno.h>
-#include "../full_libft/include/ft_printf.h"
-
+# include "../full_libft/include/ft_printf.h"
 # include "ast.h"
-# include "minishell.h"
-# include "garbage_collector.h"
-# include "token.h"
-# include "env_parsing.h"
-# include "expand.h"
-# include "readline.h"
-# include "parsing.h"
 # include "builtin.h"
+# include "env_parsing.h"
 # include "exec.h"
+# include "expand.h"
+# include "garbage_collector.h"
+# include "minishell.h"
+# include "parsing.h"
+# include "readline.h"
+# include "token.h"
 # include "wildcard.h"
+# include <errno.h>
 
-#define PROMPT "pizzshell-5.2$ "
+# define PROMPT "pizzshell-5.2$ "
 
-extern int g_sig_received;
+extern int	g_sig_received;
 /* Function declarations for main */
 
 #endif

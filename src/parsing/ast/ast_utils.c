@@ -12,7 +12,7 @@
 
 #include "../../../includes/ast.h"
 
-t_ast_node *init_ast_node(enum node_type type, t_cmd *cmd, t_minishell *minishell)
+t_ast_node *init_ast_node(enum e_node_type type, t_cmd *cmd, t_minishell *minishell)
 {
 	t_ast_node *node;
 

@@ -6,14 +6,14 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:55:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/25 19:17:49 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:07:37 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/ast.h"
 #include <stdio.h>
 
-static const char *get_node_type_str(enum node_type type)
+static const char *get_node_type_str(enum e_node_type type)
 {
 	switch (type)
 	{

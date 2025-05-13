@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 16:45:13 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 13:36:46 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:03:14 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ void	t_redir_parsing(t_token *token, t_cmd **current_cmd,
 		add_redir_to_cmd(*current_cmd, redir);
 	}
 }
+
 void	t_logic_parsing(t_token *token, t_cmd **current_cmd)
 {
 	if (ft_strcmp(token->str, "&&") == 0)

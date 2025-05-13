@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 15:20:50 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 13:33:51 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:07:53 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 // Prototypes des utilitaires
 int check_parenthesis_balance(t_cmd *cmd_list);
-t_ast_node *init_ast_node(enum node_type type, t_cmd *cmd, t_minishell *minishell);
+t_ast_node *init_ast_node(enum e_node_type type, t_cmd *cmd, t_minishell *minishell);
 
 // Prototype pour éviter l'implicite
 static t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
@@ -107,7 +107,7 @@ static t_ast_node *handle_pipes(t_cmd **cmd_list, t_minishell *minishell, int *p
 
 static t_ast_node *init_logic_node(t_ast_node *left, t_cmd **cmd_list, t_minishell *minishell, int *paren_count)
 {
-	enum node_type op_type;
+	enum e_node_type op_type;
 	t_cmd *op_cmd;
 	t_ast_node *logic_node;
 

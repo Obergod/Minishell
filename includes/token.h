@@ -6,19 +6,19 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:16:52 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/05 19:50:05 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:13:26 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TOKEN_H
 # define TOKEN_H
 
-# include <string.h>
-# include "minishell.h"
 # include "env_parsing.h"
 # include "garbage_collector.h"
+# include "minishell.h"
+# include <string.h>
 
-enum		e_state
+enum					e_state
 {
 	NORMAL,
 	IN_SQUOTE,
@@ -26,7 +26,7 @@ enum		e_state
 };
 
 // Gerer Wildcards
-enum		e_token_type
+enum					e_token_type
 {
 	T_WORD,
 	T_PIPE,
@@ -35,32 +35,31 @@ enum		e_token_type
 	T_PARANTHESIS
 };
 
-typedef struct	s_token
+typedef struct s_token
 {
 	char				*str;
 	enum e_token_type	type;
 	enum e_state		state;
 	enum e_state		initial_state;
 	struct s_token		*next;
-}	t_token;
+}						t_token;
 
 typedef struct s_tokenizer
 {
-	int				i;
-	t_token			*token_list;
-	enum e_state	state;
-	enum e_state	token_state;
-	int				nb_tok;
-	char			*buff;
-}	t_tokenizer;
+	int					i;
+	t_token				*token_list;
+	enum e_state		state;
+	enum e_state		token_state;
+	int					nb_tok;
+	char				*buff;
+}						t_tokenizer;
 
-typedef struct	s_wildcard
+typedef struct s_wildcard
 {
-	char	*file;
-	int		index;
-	struct s_wildcard *next;
-}	t_wildcard;
-
+	char				*file;
+	int					index;
+	struct s_wildcard	*next;
+}						t_wildcard;
 
 /*****		token_utils		*****/
 int					is_operator(char c);
