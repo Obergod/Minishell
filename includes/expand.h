@@ -14,8 +14,8 @@
 # define EXPAND_H
 
 # include "../full_libft/include/libft.h"
-#include "main.h"
-#include <string.h>
+# include "main.h"
+# include <string.h>
 
 /****		A trier		****/
 char	**expand_vars(char **cmd, t_minishell *minishell);

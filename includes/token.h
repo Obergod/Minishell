@@ -13,12 +13,12 @@
 #ifndef TOKEN_H
 # define TOKEN_H
 
-# include <string.h>
-# include "minishell.h"
 # include "env_parsing.h"
 # include "garbage_collector.h"
+# include "minishell.h"
+# include <string.h>
 
-enum		e_state
+enum					e_state
 {
 	NORMAL,
 	IN_SQUOTE,
@@ -26,7 +26,7 @@ enum		e_state
 };
 
 // Gerer Wildcards
-enum		e_token_type
+enum					e_token_type
 {
 	T_WORD,
 	T_PIPE,
@@ -35,48 +35,54 @@ enum		e_token_type
 	T_PARANTHESIS
 };
 
-typedef struct	s_token
+typedef struct s_token
 {
 	char				*str;
 	enum e_token_type	type;
 	enum e_state		state;
 	enum e_state		initial_state;
 	struct s_token		*next;
-}	t_token;
+}						t_token;
 
 typedef struct s_tokenizer
 {
-	int				i;
-	t_token			*token_list;
-	enum e_state	state;
-	enum e_state	token_state;
-	int				nb_tok;
-	char			*buff;
-}	t_tokenizer;
+	int					i;
+	t_token				*token_list;
+	enum e_state		state;
+	enum e_state		token_state;
+	int					nb_tok;
+	char				*buff;
+}						t_tokenizer;
 
-typedef struct	s_wildcard
+typedef struct s_wildcard
 {
-	char	*file;
-	int		index;
-	struct s_wildcard *next;
-}	t_wildcard;
-
+	char				*file;
+	int					index;
+	struct s_wildcard	*next;
+}						t_wildcard;
 
 /*****		token_utils		*****/
-int					is_operator(char c);
-void				operator_str(const char *input, char *buff, int i);
-enum e_token_type	handle_operator(const char *input, int *i);
-void				add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state, t_minishell *minishell);
-int					quotes_verif(const char *input);
-int					verif_quotes(const char *input);
+int						is_operator(char c);
+void					operator_str(const char *input, char *buff, int i);
+enum e_token_type		handle_operator(const char *input, int *i);
+void					add_token(t_token **token, char *buff,
+							enum e_token_type type, enum e_state state,
+							t_minishell *minishell);
+int						quotes_verif(const char *input);
+int						verif_quotes(const char *input);
 
 /*****		token_process	*****/
-t_token				*tokenize(const char *input, t_minishell *minishell);
-void				init_tokenizer(t_tokenizer *tok, const char *input, t_minishell *minishell);
-void				handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minishell);
-void				handle_quotes(const char *input, t_tokenizer *tok, char quote);
-void				finalize_token(t_tokenizer *tok, t_minishell *minishell, const char *input);
-void				process_space(t_tokenizer *tok, t_minishell *minishell);
-void				process_operator(const char *input, t_tokenizer *tok, t_minishell *minishell);
+t_token					*tokenize(const char *input, t_minishell *minishell);
+void					init_tokenizer(t_tokenizer *tok, const char *input,
+							t_minishell *minishell);
+void					handle_normal_state(const char *input, t_tokenizer *tok,
+							t_minishell *minishell);
+void					handle_quotes(const char *input, t_tokenizer *tok,
+							char quote);
+void					finalize_token(t_tokenizer *tok, t_minishell *minishell,
+							const char *input);
+void					process_space(t_tokenizer *tok, t_minishell *minishell);
+void					process_operator(const char *input, t_tokenizer *tok,
+							t_minishell *minishell);
 
 #endif

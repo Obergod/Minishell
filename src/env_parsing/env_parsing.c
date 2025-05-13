@@ -19,7 +19,7 @@ t_env	*init_env(t_minishell *minishell)
 {
 	t_env	*head;
 	t_env	*current;
-	char *pwd;
+	char	*pwd;
 
 	head = NULL;
 	gc_alloc(pwd = getcwd(NULL, 0), minishell->gc);
@@ -40,7 +40,7 @@ void	check_env(t_env *head, t_minishell *minishell)
 {
 	t_env	*current;
 	int		check[3];
-	char *pwd;
+	char	*pwd;
 
 	current = head;
 	check[0] = 0;

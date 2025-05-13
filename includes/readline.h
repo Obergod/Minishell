@@ -11,21 +11,21 @@
 /* ************************************************************************** */
 
 #ifndef READLINE_H
-#define READLINE_H
+# define READLINE_H
 
-#include <readline/history.h>
-#include <readline/readline.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "minishell.h"
+# include "minishell.h"
+# include <readline/history.h>
+# include <readline/readline.h>
+# include <signal.h>
+# include <stdio.h>
+# include <stdlib.h>
 
-void reset_signals_child(void);
-void update_exit_status_from_signal(t_minishell *minishell);
-void exec_setup_signals(void);
-void interactive_setup_signals(void);
-char	*ft_add_readline(const char *prompt, char **stock, t_minishell *minishell);
+void	reset_signals_child(void);
+void	update_exit_status_from_signal(t_minishell *minishell);
+void	exec_setup_signals(void);
+void	interactive_setup_signals(void);
+char	*ft_add_readline(const char *prompt, char **stock,
+			t_minishell *minishell);
 void	handle_interactive_signal(int sig);
-
 
 #endif

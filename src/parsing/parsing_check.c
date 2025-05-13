@@ -6,13 +6,13 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 16:44:02 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/12 20:09:13 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:09:35 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/parsing.h"
 
-enum error_parsing	start_end_check_parsing(t_token *token, int status)
+enum e_error_parsing	start_end_check_parsing(t_token *token, int status)
 {
 	if (status == 0)
 	{
@@ -33,7 +33,7 @@ enum error_parsing	start_end_check_parsing(t_token *token, int status)
 	return (SUCCESS);
 }
 
-enum error_parsing	check_parenthesis(t_token *token_p)
+enum e_error_parsing	check_parenthesis(t_token *token_p)
 {
 	t_token	*token;
 	int		is_parenthesis;
@@ -61,7 +61,7 @@ enum error_parsing	check_parenthesis(t_token *token_p)
 	return (SUCCESS);
 }
 
-static enum error_parsing	check_word_parenthesis(t_token *token)
+static enum e_error_parsing	check_word_parenthesis(t_token *token)
 {
 	if (token->type == T_WORD && token->next->type == T_PARANTHESIS
 		&& ft_strcmp(token->next->str, "(") == 0)
@@ -72,7 +72,7 @@ static enum error_parsing	check_word_parenthesis(t_token *token)
 	return (SUCCESS);
 }
 
-enum error_parsing	check_parsing(t_token *token_p)
+enum e_error_parsing	check_parsing(t_token *token_p)
 {
 	t_token	*token;
 
