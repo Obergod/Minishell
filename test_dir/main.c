@@ -6,25 +6,13 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/27 19:11:54 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 15:56:01 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/main.h"
 #include <sys/select.h>
 #include <sys/select.h>
-
-
-static char	*ft_add_readline(const char *prompt, char **stock, t_minishell *minishell)
-{
-	(*stock) = readline(prompt);
-	update_exit_status_from_signal(minishell);
-	update_exit_status_from_signal(minishell);
-	if (*stock == NULL)
-		return (NULL);
-	return (*stock);
-}
-
 
 int	init_minishell(t_minishell *minishell, char **envp)
 {

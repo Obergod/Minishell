@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 14:00:33 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/27 15:11:14 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 15:55:50 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 # include "exec.h"
 # include "wildcard.h"
 
-#define PROMPT "pizzshell$ "
+#define PROMPT "pizzshell-5.2$ "
 
 extern int g_sig_received;
 /* Function declarations for main */

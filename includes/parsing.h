@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 15:54:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 19:08:06 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 13:36:58 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,5 +85,7 @@ t_redir	*new_redir(enum e_redir_type type, char *file_or_delimiter,
 void	add_redir_to_cmd(t_cmd *cmd, t_redir *redir);
 void	t_redir_parsing(t_token *token, t_cmd **current_cmd,
 		t_minishell *minishell);
+void	handle_parsing_operator(t_token *token, t_cmd **list,
+		t_cmd **current, t_minishell *minishell);		
 
 #endif

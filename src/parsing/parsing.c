@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ugo <ugo@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/01 19:27:30 by ugo              ###   ########.fr       */
+/*   Updated: 2025/05/13 14:35:10 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,62 +108,35 @@ void	add_cmd_to_list(t_cmd **cmd_list, t_cmd *current)
 	tmp->next = current;
 }
 
-void	t_logic_parsing(t_token *token, t_cmd **current_cmd)
+static void parsing_loop(t_token *token, t_cmd **current, t_cmd **head, t_minishell *minishell)
 {
-	if (ft_strcmp(token->str, "&&") == 0)
-		(*current_cmd)->logic_operator_type = AND;
-	else if (ft_strcmp(token->str, "||") == 0)
-		(*current_cmd)->logic_operator_type = OR;
-	else if (ft_strcmp(token->str, "(") == 0)
-		(*current_cmd)->logic_operator_type = OPEN_PARENTHESIS;
-	else if (ft_strcmp(token->str, ")") == 0)
-		(*current_cmd)->logic_operator_type = CLOSE_PARENTHESIS;
-	else if (ft_strcmp(token->str, "|") == 0)
-		(*current_cmd)->logic_operator_type = PIPE;
-}
-
-static void	handle_parsing_operator(t_token *token, t_cmd **list,
-		t_cmd **current, t_minishell *minishell)
-{
-	if ((*current)->command[0] || (*current)->redirs)
+	while (token)
 	{
-		add_cmd_to_list(list, *current);
-		*current = new_cmd(minishell);
+		if (token->type == T_WORD)
+			add_arg_to_cmd(*current, token->str, minishell->gc);
+		else if (token->type == T_REDIR)
+		{
+			t_redir_parsing(token, &(*current), minishell);
+			token = token->next;
+		}
+		else
+			handle_parsing_operator(token, &(*head), &(*current), minishell);
+		token = token->next;
 	}
-	t_logic_parsing(token, current);
-	add_cmd_to_list(list, *current);
-	*current = new_cmd(minishell);
 }
 
 t_cmd	*parsing(t_token *token, t_minishell *minishell)
 {
 	t_cmd	*current;
 	t_cmd	*head;
+	int	status;
 
 	current = new_cmd(minishell);
 	head = NULL;
-	if (check_parsing(token) != SUCCESS)
-		return (print_error(check_parsing(token)), NULL);
-	while (token)
-	{
-		if (token->type == T_WORD)
-		{
-			add_arg_to_cmd(current, token->str, minishell->gc);
-		}
-		else if (token->type == T_REDIR)
-		{
-			t_redir_parsing(token, &current, minishell);
-			token = token->next->next;
-			continue ;
-		}
-		else
-		{
-			handle_parsing_operator(token, &head, &current, minishell);
-			token = token->next;
-			continue ;
-		}
-		token = token->next;
-	}
+	status = check_parsing(token);
+	if (status != SUCCESS)
+		return (print_error(status), NULL);
+	parsing_loop(token, &current, &head, minishell);
 	if (current->command[0] || current->redirs)
 		add_cmd_to_list(&head, current);
 	return (head);
