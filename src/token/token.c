@@ -12,17 +12,6 @@
 
 #include "../../includes/token.h"
 
-void	init_tokenizer(t_tokenizer *tok, const char *input,
-		t_minishell *minishell)
-{
-	tok->i = -1;
-	tok->nb_tok = 0;
-	tok->buff = gc_malloc((sizeof(char) * ft_strlen(input) + 1), minishell->gc);
-	tok->token_list = NULL;
-	tok->state = NORMAL;
-	tok->token_state = NORMAL;
-}
-
 void	process_space(t_tokenizer *tok, t_minishell *minishell)
 {
 	if (tok->nb_tok > 0)
@@ -98,7 +87,7 @@ void	add_token(t_tokenizer *tok, enum e_token_type type, enum e_state state,
 	t_token	*tmp;
 
 	new_token = gc_malloc((sizeof(t_token)), minishell->gc);
-	if (!new_token->str)
+	if (!new_token)
 		clean_exit(1, minishell);
 	new_token->type = type;
 	new_token->state = state;

@@ -43,7 +43,8 @@ void	finalize_token(t_tokenizer *tok, t_minishell *minishell,
 	}
 	else if ((tok->nb_tok == 0 && tok->i == 0) || is_only_space(input))
 	{
-		tok->buff = NULL;
+		if (tok->buff)
+			tok->buff[0] = '\0';
 		add_token(tok, T_WORD, tok->token_state, minishell);
 	}
 }
@@ -68,4 +69,15 @@ int	verif_quotes(const char *input)
 		return (1);
 	else
 		return (0);
+}
+
+void	init_tokenizer(t_tokenizer *tok, const char *input,
+		t_minishell *minishell)
+{
+	tok->i = -1;
+	tok->nb_tok = 0;
+	tok->buff = gc_malloc((sizeof(char) * ft_strlen(input) + 1), minishell->gc);
+	tok->token_list = NULL;
+	tok->state = NORMAL;
+	tok->token_state = NORMAL;
 }

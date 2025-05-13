@@ -12,8 +12,8 @@
 
 #include "../../includes/main.h"
 
-void	handle_cmd(t_ast_node *node, t_minishell *minishell,
-				int *fd_in, int *fd_out)
+void	handle_cmd(t_ast_node *node, t_minishell *minishell, int *fd_in,
+		int *fd_out)
 {
 	if (handle_redir(node, minishell, fd_in, fd_out) == 1)
 		clean_exit(EXIT_FAILURE, minishell);
@@ -29,8 +29,8 @@ void	handle_cmd(t_ast_node *node, t_minishell *minishell,
 
 int	handle_path(t_minishell *minishell, t_ast_node *node, t_wait *p_s)
 {
-	node->cmd->cmd_path = get_cmd_path(minishell,
-			node->cmd->command[0], &p_s->status);
+	node->cmd->cmd_path = get_cmd_path(minishell, node->cmd->command[0],
+			&p_s->status);
 	if (p_s->status)
 		return (p_s->status);
 	if (!node->cmd->cmd_path)
@@ -38,6 +38,21 @@ int	handle_path(t_minishell *minishell, t_ast_node *node, t_wait *p_s)
 	if (access(node->cmd->cmd_path, X_OK == -1))
 		return (126);
 	return (0);
+}
+
+static int	exec_cmd_as_head(t_ast_node *node, t_minishell *minishell,
+		t_fds *fds, t_wait *p_s)
+{
+	p_s->pid = fork();
+	if (p_s->pid == 0)
+	{
+		reset_signals_child();
+		handle_cmd(node, minishell, &fds->fd_in, &fds->fd_out);
+	}
+	else if (p_s->pid < 0)
+		return (perror("fork failed"), 1);
+	close_fds(&fds->fd_in, &fds->fd_out);
+	return (wait_and_signal(p_s->pid, p_s->status, minishell));
 }
 
 int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
@@ -55,25 +70,13 @@ int	exec_cmd(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 			return (p_s.status);
 	}
 	if (node == head)
-	{
-		p_s.pid = fork();
-		if (p_s.pid == 0)
-		{
-			reset_signals_child();
-			handle_cmd(node, minishell, &fds.fd_in, &fds.fd_out);
-		}
-		else if (p_s.pid < 0)
-			return (perror("fork failed"), 1);
-		close_fds(&fds.fd_in, &fds.fd_out);
-		return (wait_and_signal(p_s.pid, p_s.status, minishell));
-	}
-	else
-		handle_cmd(node, minishell, &fds.fd_in, &fds.fd_out);
+		return (exec_cmd_as_head(node, minishell, &fds, &p_s));
+	handle_cmd(node, minishell, &fds.fd_in, &fds.fd_out);
 	return (0);
 }
 
-int	exec_log_operators(t_ast_node *node,
-		t_ast_node *head, t_minishell *minishell)
+int	exec_log_operators(t_ast_node *node, t_ast_node *head,
+		t_minishell *minishell)
 {
 	head = node->left;
 	prefix_exec(node->left, head, minishell);
