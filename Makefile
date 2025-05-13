@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/05/12 20:17:44 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/05/13 16:41:39 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,8 +34,59 @@ LIBFT_DIR = full_libft
 LIBFT = $(LIBFT_DIR)/libftfull.a
 LIBFT_URL = https://github.com/ufalzone/libft_up.git
 
-# Fichiers sources et objets
-SRC_FILES = $(shell find $(SRC_DIR) -type f -name "*.c")
+# Fichiers sources
+SRC_FILES = \
+	$(SRC_DIR)/exec/exec.c \
+	$(SRC_DIR)/exec/redirs.c \
+	$(SRC_DIR)/exec/pipes.c \
+	$(SRC_DIR)/exec/exec_types.c \
+	$(SRC_DIR)/exec/exec_types_utils.c \
+	$(SRC_DIR)/exec/exec_utils.c \
+	$(SRC_DIR)/exec/builtin.c \
+	$(SRC_DIR)/token/operator.c \
+	$(SRC_DIR)/token/token.c \
+	$(SRC_DIR)/token/token_utils.c \
+	$(SRC_DIR)/env_parsing/env_parsing.c \
+	$(SRC_DIR)/env_parsing/env_parsing_2.c \
+	$(SRC_DIR)/env_parsing/utils_env_parsing.c \
+	$(SRC_DIR)/parsing/parsing.c \
+	$(SRC_DIR)/parsing/parsing_check.c \
+	$(SRC_DIR)/parsing/parsing_cmd.c \
+	$(SRC_DIR)/parsing/parsing_error.c \
+	$(SRC_DIR)/parsing/parsing_logic_redirs.c \
+	$(SRC_DIR)/parsing/ast/ast.c \
+	$(SRC_DIR)/parsing/ast/ast_utils.c \
+	$(SRC_DIR)/parsing/ast/ast_visualizer.c \
+	$(SRC_DIR)/readline/readline.c \
+	$(SRC_DIR)/readline/signals.c \
+	$(SRC_DIR)/readline/signals_2.c \
+	$(SRC_DIR)/utils/clean_exit.c \
+	$(SRC_DIR)/main/main.c \
+	$(SRC_DIR)/builtin/exit.c \
+	$(SRC_DIR)/builtin/cd.c \
+	$(SRC_DIR)/builtin/echo.c \
+	$(SRC_DIR)/builtin/env.c \
+	$(SRC_DIR)/builtin/export.c \
+	$(SRC_DIR)/builtin/pwd.c \
+	$(SRC_DIR)/builtin/unset.c \
+	$(SRC_DIR)/garbage_collector/garbage_collector.c \
+	$(SRC_DIR)/garbage_collector/garbage_collector_2.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_calloc.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_split_first_word.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_strjoin.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_strjoin_three.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_substr.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_strndup.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_strndup_array.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_strdup.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_strdup_array.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_split.c \
+	$(SRC_DIR)/garbage_collector/utils/gc_itoa.c \
+	$(SRC_DIR)/expansion/expansion.c \
+	$(SRC_DIR)/expansion/wildcard/newline_wildcard.c \
+	$(SRC_DIR)/expansion/wildcard/utils_wildcard.c \
+	$(SRC_DIR)/expansion/wildcard/wildcard.c
+
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 DEP_FILES = $(OBJ_FILES:.o=.d)
 

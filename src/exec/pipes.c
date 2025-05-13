@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/04/27 19:11:04 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 18:09:02 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ int	handle_l_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head, t_minishell 
 	}
 	else if (pipes.pid_l == 0)
 	{
-		exec_setup_signals();
 		exec_setup_signals();
 		close(pipes.pipes[0]);
 		if (dup2(pipes.pipes[1], STDOUT_FILENO) == -1)
@@ -78,7 +77,7 @@ int wait_pipe_children(t_pipe *pipes, t_minishell *minishell)
         if (WTERMSIG(pipes->exit_status_l) == SIGQUIT || 
             WTERMSIG(pipes->exit_status_r) == SIGQUIT)
         {
-            minishell->exit_status = 131;
+            minishell->exit_sthandle_latus = 131;
             ft_putendl_fd("Quit (core dumped)", 2);
             return (minishell->exit_status);
         }

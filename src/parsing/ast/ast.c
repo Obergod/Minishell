@@ -6,20 +6,16 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 15:20:50 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 16:07:53 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:35:10 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/ast.h"
 
-// Prototypes des utilitaires
 int check_parenthesis_balance(t_cmd *cmd_list);
 t_ast_node *init_ast_node(enum e_node_type type, t_cmd *cmd, t_minishell *minishell);
-
-// Prototype pour éviter l'implicite
 static t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
 
-// Gère la création d'un noeud d'expression (commande ou sous-shell)
 static t_ast_node *build_expr_parenthesis(t_cmd **cmd_list, t_minishell *minishell, int *paren_count)
 {
 	t_ast_node *subshell;

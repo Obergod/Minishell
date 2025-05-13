@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 16:21:46 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/12 20:06:56 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 18:07:00 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ void	main_loop(t_minishell *minishell)
 		if (isatty(STDIN_FILENO))
 			ft_add_readline(PROMPT, &input, minishell);
 		else
-			input = get_next_line(0);
+			return ;
+			// input = get_next_line(0);
 		if (!input && isatty(STDIN_FILENO))
 			break ;
 		ast = build_ast(parsing(tokenize(input, minishell), minishell),
