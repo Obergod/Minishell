@@ -64,8 +64,8 @@ void	close_fds(int *fd_in, int *fd_out);
 int		wait_and_signal(pid_t pid, int status, t_minishell *minishell);
 
 /****	handle_redirs		*****/
-int here_doc(char *delimiter);
-int	handle_heredoc(t_redir *redir, int *fd_in);
+int here_doc(char *delimiter, t_minishell *minishell);
+int	handle_heredoc(t_redir *redir, int *fd_in, t_minishell *minishell);
 
 /****		errors		*******/
 int		check_file_accesss(char *file, int in_out);
