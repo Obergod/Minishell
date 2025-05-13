@@ -6,352 +6,177 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 15:20:50 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/12 20:06:56 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 13:33:51 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../../../includes/ast.h"
 
-t_ast_node *init_ast_node(enum node_type type, t_cmd *cmd, t_minishell *minishell)
+// Prototypes des utilitaires
+int check_parenthesis_balance(t_cmd *cmd_list);
+t_ast_node *init_ast_node(enum node_type type, t_cmd *cmd, t_minishell *minishell);
+
+// Prototype pour éviter l'implicite
+static t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
+
+// Gère la création d'un noeud d'expression (commande ou sous-shell)
+static t_ast_node *build_expr_parenthesis(t_cmd **cmd_list, t_minishell *minishell, int *paren_count)
 {
-	t_ast_node *node;
+	t_ast_node *subshell;
 
-	node = gc_malloc(sizeof(t_ast_node), minishell->gc);
-	if (!node)
+	(*paren_count)++;
+	*cmd_list = (*cmd_list)->next;
+	subshell = build_ast_recursive(cmd_list, minishell, paren_count);
+	if (!subshell)
 		return (NULL);
-
-	node->type = type;
-	node->cmd = cmd;
-	node->subshell = 0;
-	node->subshell_redir = NULL;
-	node->left = NULL;
-	node->right = NULL;
-	return (node);
+	subshell->subshell = 1;
+	if (*cmd_list && (*cmd_list)->redirs)
+		subshell->subshell_redir = (*cmd_list)->redirs;
+	if (*cmd_list && (*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
+	{
+		(*paren_count)--;
+		*cmd_list = (*cmd_list)->next;
+	}
+	return (subshell);
 }
 
-t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
-								int *parenthesis_count);
-
-static int handle_parenthesis(t_cmd **cmd_list, t_ast_node **ast,
-							t_minishell *minishell, int *parenthesis_count)
-{
-	t_ast_node *subshell_node;
-	t_ast_node *op_node;
-	t_cmd *tmp;
-	int op_type;
-
-	if ((*cmd_list)->logic_operator_type == OPEN_PARENTHESIS)
-	{
-		(*parenthesis_count)++;
-		tmp = *cmd_list;
-		*cmd_list = (*cmd_list)->next;
-		if (!*cmd_list)
-			return (0);
-
-		subshell_node = build_ast_recursive(cmd_list, minishell, parenthesis_count);
-		if (!subshell_node)
-			return (0);
-
-		subshell_node->subshell = 1;
-		
-		if (*cmd_list && (*cmd_list)->redirs)
-		{
-			subshell_node->subshell_redir = (*cmd_list)->redirs;
-		}
-		
-		*ast = subshell_node;
-
-		if (*cmd_list && ((*cmd_list)->logic_operator_type == PIPE ||
-						(*cmd_list)->logic_operator_type == AND ||
-						(*cmd_list)->logic_operator_type == OR))
-		{
-			if ((*cmd_list)->logic_operator_type == PIPE)
-				op_type = NODE_PIPE;
-			else if ((*cmd_list)->logic_operator_type == AND)
-				op_type = NODE_AND;
-			else
-				op_type = NODE_OR;
-
-			op_node = init_ast_node(op_type, *cmd_list, minishell);
-			if (!op_node)
-				return (0);
-
-			op_node->subshell_redir = subshell_node->subshell_redir;
-			
-			op_node->left = *ast;
-
-			*cmd_list = (*cmd_list)->next;
-			if (!*cmd_list)
-				return (0);
-
-			op_node->right = build_ast_recursive(cmd_list, minishell, parenthesis_count);
-			if (!op_node->right)
-				return (0);
-
-			*ast = op_node;
-		}
-
-		return (1);
-	}
-	else if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
-	{
-		(*parenthesis_count)--;
-		if (*parenthesis_count < 0)
-			return (0);
-		
-		t_redir *saved_redirs = (*cmd_list)->redirs;
-		
-		*cmd_list = (*cmd_list)->next;
-		
-		if (saved_redirs && *cmd_list)
-		{
-			(*cmd_list)->redirs = saved_redirs;
-		}
-		
-		return (2);
-	}
-
-	return (1);
-}
-
-static t_ast_node *build_expr(t_cmd **cmd_list, t_minishell *minishell,
-							int *parenthesis_count)
+static t_ast_node *build_expr_cmd(t_cmd **cmd_list, t_minishell *minishell)
 {
 	t_ast_node *node;
-	int result;
-
-	if (!cmd_list || !*cmd_list)
-		return (NULL);
-
-	if ((*cmd_list)->logic_operator_type == OPEN_PARENTHESIS ||
-		(*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
-	{
-		result = handle_parenthesis(cmd_list, &node, minishell, parenthesis_count);
-		if (result == 0)
-			return (NULL);
-		else if (result == 2)
-			return (NULL);
-		return (node);
-	}
-
-	if ((*cmd_list)->logic_operator_type != 0 && !(*cmd_list)->command_raw)
-	{
-		*cmd_list = (*cmd_list)->next;
-		return (build_expr(cmd_list, minishell, parenthesis_count));
-	}
 
 	node = init_ast_node(NODE_CMD, *cmd_list, minishell);
 	if (!node)
 		return (NULL);
-
 	*cmd_list = (*cmd_list)->next;
-
 	return (node);
 }
 
-static t_ast_node *handle_pipes(t_cmd **cmd_list, t_minishell *minishell, int *parenthesis_count)
+static t_ast_node *build_expr(t_cmd **cmd_list, t_minishell *minishell, int *paren_count)
+{
+	t_ast_node *node;
+
+	node = NULL;
+	while (cmd_list && *cmd_list)
+	{
+		if ((*cmd_list)->logic_operator_type == OPEN_PARENTHESIS)
+			return (build_expr_parenthesis(cmd_list, minishell, paren_count));
+		if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
+		{
+			(*paren_count)--;
+			*cmd_list = (*cmd_list)->next;
+			return (NULL);
+		}
+		if ((*cmd_list)->logic_operator_type != 0 && !(*cmd_list)->command_raw)
+		{
+			*cmd_list = (*cmd_list)->next;
+			continue;
+		}
+		return (build_expr_cmd(cmd_list, minishell));
+	}
+	return (NULL);
+}
+
+static t_ast_node *init_pipe_node(t_ast_node *left, t_cmd **cmd_list, t_minishell *minishell, int *paren_count)
+{
+	t_cmd *op_cmd;
+	t_ast_node *pipe_node;
+
+	op_cmd = *cmd_list;
+	*cmd_list = (*cmd_list)->next;
+	pipe_node = init_ast_node(NODE_PIPE, op_cmd, minishell);
+	if (!pipe_node)
+		return (NULL);
+	pipe_node->left = left;
+	pipe_node->right = build_expr(cmd_list, minishell, paren_count);
+	if (!pipe_node->right)
+		return (NULL);
+	return (pipe_node);
+}
+
+static t_ast_node *handle_pipes(t_cmd **cmd_list, t_minishell *minishell, int *paren_count)
 {
 	t_ast_node *left;
-	t_ast_node *root;
-	t_cmd *op_cmd;
 
-	left = build_expr(cmd_list, minishell, parenthesis_count);
-	if (!left)
-		return (NULL);
-
-	while (*cmd_list && (*cmd_list)->logic_operator_type == PIPE)
+	left = build_expr(cmd_list, minishell, paren_count);
+	while (left && *cmd_list && (*cmd_list)->logic_operator_type == PIPE)
 	{
-		op_cmd = *cmd_list;
-		*cmd_list = (*cmd_list)->next;
-		if (!*cmd_list)
-			return (NULL);
-
-		root = init_ast_node(NODE_PIPE, op_cmd, minishell);
-		if (!root)
-			return (NULL);
-
-		root->left = left;
-
-		root->right = build_expr(cmd_list, minishell, parenthesis_count);
-		if (!root->right)
-			return (NULL);
-
-		left = root;
+		left = init_pipe_node(left, cmd_list, minishell, paren_count);
 	}
-
 	return (left);
 }
 
-t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
-								int *parenthesis_count)
+static t_ast_node *init_logic_node(t_ast_node *left, t_cmd **cmd_list, t_minishell *minishell, int *paren_count)
 {
-	t_ast_node *left;
-	t_ast_node *root;
 	enum node_type op_type;
 	t_cmd *op_cmd;
+	t_ast_node *logic_node;
+
+	op_type = (*cmd_list)->logic_operator_type == AND ? NODE_AND : NODE_OR;
+	op_cmd = *cmd_list;
+	*cmd_list = (*cmd_list)->next;
+	logic_node = init_ast_node(op_type, op_cmd, minishell);
+	if (!logic_node)
+		return (NULL);
+	logic_node->left = left;
+	logic_node->right = build_ast_recursive(cmd_list, minishell, paren_count);
+	if (!logic_node->right)
+		return (NULL);
+	return (logic_node);
+}
+
+static t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell, int *paren_count)
+{
+	t_ast_node *left;
 
 	if (!*cmd_list)
 		return (NULL);
-
 	if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
 	{
-		(*parenthesis_count)--;
-		if (*parenthesis_count < 0)
-			return (NULL);
-		
+		(*paren_count)--;
 		*cmd_list = (*cmd_list)->next;
 		return (NULL);
 	}
-
-	left = handle_pipes(cmd_list, minishell, parenthesis_count);
+	left = handle_pipes(cmd_list, minishell, paren_count);
 	if (!left)
 		return (NULL);
-
-	if (!*cmd_list)
-		return (left);
-
-	// Handling closing parentheses
-	if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
+	while (*cmd_list)
 	{
-		(*parenthesis_count)--;
-		if (*parenthesis_count < 0)
-			return (NULL);
-		
-		// DEBUG: Print when we encounter a CLOSE_PARENTHESIS and attach redirs
-		printf("DEBUG: Found CLOSE_PARENTHESIS with redirs %p, attaching to node %p\n", 
-			(void*)(*cmd_list)->redirs, (void*)left);
-		
-		// Attach redirs to left node
-		left->subshell_redir = (*cmd_list)->redirs;
-		
-		// Print debug info about the redirection
-		if (left->subshell_redir)
+		if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
 		{
-			printf("DEBUG: Attached redirection type: %d, file: %s\n", 
-				left->subshell_redir->type, 
-				left->subshell_redir->file_or_delimiter);
+			(*paren_count)--;
+			*cmd_list = (*cmd_list)->next;
+			return (left);
 		}
-		
-		*cmd_list = (*cmd_list)->next;
-		return (left);
+		if ((*cmd_list)->logic_operator_type == AND || (*cmd_list)->logic_operator_type == OR)
+			return (init_logic_node(left, cmd_list, minishell, paren_count));
+		break;
 	}
-
-	// Handling logical operators AND/OR (lower priority than pipes)
-	if ((*cmd_list)->logic_operator_type == AND ||
-		(*cmd_list)->logic_operator_type == OR)
-	{
-		if ((*cmd_list)->logic_operator_type == AND)
-			op_type = NODE_AND;
-		else
-			op_type = NODE_OR;
-
-		op_cmd = *cmd_list;
-
-		*cmd_list = (*cmd_list)->next;
-		if (!*cmd_list)
-			return (NULL);
-
-		root = init_ast_node(op_type, op_cmd, minishell);
-		if (!root)
-			return (NULL);
-
-		root->left = left;
-		root->right = build_ast_recursive(cmd_list, minishell, parenthesis_count);
-		if (!root->right)
-			return (NULL);
-
-		return (root);
-	}
-
 	return (left);
 }
 
-// Compte le nombre de parenthèses ouvertes et fermées pour vérifier l'équilibre
-static int check_parenthesis_balance(t_cmd *cmd_list)
+static int is_invalid_cmd_list(t_cmd *cmd_list)
 {
-	int count;
-	t_cmd *current;
-
-	count = 0;
-	current = cmd_list;
-	while (current)
-	{
-		if (current->logic_operator_type == OPEN_PARENTHESIS)
-			count++;
-		else if (current->logic_operator_type == CLOSE_PARENTHESIS)
-			count--;
-
-		if (count < 0)
-			return (0); // Parenthèse fermante sans ouvrante
-
-		current = current->next;
-	}
-
-	return (count == 0); // Toutes les parenthèses ouvertes sont fermées
+	if (!cmd_list)
+		return (1);
+	if (cmd_list->logic_operator_type == OPEN_PARENTHESIS && !cmd_list->command_raw && !cmd_list->next)
+		return (1);
+	if (!check_parenthesis_balance(cmd_list))
+		return (1);
+	return (0);
 }
 
 t_ast_node *build_ast(t_cmd *cmd_list, t_minishell *minishell)
 {
-	int parenthesis_count;
-	t_ast_node *root;
+	int paren_count;
 	t_cmd *current;
+	t_ast_node *root;
 
-	if (!cmd_list)
+	if (is_invalid_cmd_list(cmd_list))
 		return (NULL);
-
-	if (cmd_list->logic_operator_type == OPEN_PARENTHESIS && !cmd_list->command_raw && !cmd_list->next)
-		return (NULL);
-
-	// Check parenthesis balance before building the AST
-	if (!check_parenthesis_balance(cmd_list))
-		return (NULL);
-
-	parenthesis_count = 0;
+	paren_count = 0;
 	current = cmd_list;
-	root = build_ast_recursive(&current, minishell, &parenthesis_count);
-
-	if (parenthesis_count != 0)
+	root = build_ast_recursive(&current, minishell, &paren_count);
+	if (paren_count != 0)
 		return (NULL);
-
 	return (root);
-}
-
-void print_ast(t_ast_node *node, int depth)
-{
-	int i;
-
-	if (!node)
-		return;
-
-	for (i = 0; i < depth; i++)
-		printf("  ");
-
-	switch (node->type)
-	{
-		case NODE_CMD:
-			printf("CMD: %s\n", node->cmd->command_raw);
-			break;
-		case NODE_PIPE:
-			printf("PIPE\n");
-			break;
-		case NODE_AND:
-			printf("AND\n");
-			break;
-		case NODE_OR:
-			printf("OR\n");
-			break;
-		default:
-			printf("UNKNOWN NODE TYPE\n");
-	}
-
-	if (node->subshell)
-	{
-		for (i = 0; i < depth; i++)
-			printf("  ");
-		printf("(SUBSHELL)\n");
-	}
-
-	print_ast(node->left, depth + 1);
-	print_ast(node->right, depth + 1);
 }

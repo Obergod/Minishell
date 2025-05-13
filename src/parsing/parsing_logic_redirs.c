@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_redirs.c                                   :+:      :+:    :+:   */
+/*   parsing_logic_redirs.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 16:45:13 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 18:50:02 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 13:36:46 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,4 +65,30 @@ void	t_redir_parsing(t_token *token, t_cmd **current_cmd,
 		redir = new_redir(REDIR_HEREDOC, token->next->str, minishell->gc);
 		add_redir_to_cmd(*current_cmd, redir);
 	}
+}
+void	t_logic_parsing(t_token *token, t_cmd **current_cmd)
+{
+	if (ft_strcmp(token->str, "&&") == 0)
+		(*current_cmd)->logic_operator_type = AND;
+	else if (ft_strcmp(token->str, "||") == 0)
+		(*current_cmd)->logic_operator_type = OR;
+	else if (ft_strcmp(token->str, "(") == 0)
+		(*current_cmd)->logic_operator_type = OPEN_PARENTHESIS;
+	else if (ft_strcmp(token->str, ")") == 0)
+		(*current_cmd)->logic_operator_type = CLOSE_PARENTHESIS;
+	else if (ft_strcmp(token->str, "|") == 0)
+		(*current_cmd)->logic_operator_type = PIPE;
+}
+
+void	handle_parsing_operator(t_token *token, t_cmd **list,
+		t_cmd **current, t_minishell *minishell)
+{
+	if ((*current)->command[0] || (*current)->redirs)
+	{
+		add_cmd_to_list(list, *current);
+		*current = new_cmd(minishell);
+	}
+	t_logic_parsing(token, current);
+	add_cmd_to_list(list, *current);
+	*current = new_cmd(minishell);
 }

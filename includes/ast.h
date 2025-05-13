@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 15:47:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/25 18:58:10 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 13:42:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ typedef struct s_ast_node
 /* Fonctions de l'AST */
 t_ast_node *init_ast_node(enum node_type type, t_cmd *cmd, t_minishell *minishell);
 t_ast_node *build_ast(t_cmd *cmd_list, t_minishell *minishell);
-t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell, int *parenthesis_count);
+int check_parenthesis_balance(t_cmd *cmd_list);
 void print_ast(t_ast_node *node, int depth);
 
 /* Fonctions du visualiseur d'AST */
