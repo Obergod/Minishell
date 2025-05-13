@@ -14,8 +14,7 @@
 
 int	is_operator(char c)
 {
-	if (c == '<' || c == '>' || c == '|' || c == '&'
-			|| c == '(' || c == ')')
+	if (c == '<' || c == '>' || c == '|' || c == '&' || c == '(' || c == ')')
 		return (1);
 	return (0);
 }
@@ -33,23 +32,28 @@ int	is_only_space(const char *str)
 	return (1);
 }
 
-void	finalize_token(t_tokenizer *tok, t_minishell *minishell, const char *input)
+void	finalize_token(t_tokenizer *tok, t_minishell *minishell,
+		const char *input)
 {
 	if (tok->nb_tok > 0)
 	{
 		tok->buff[tok->nb_tok] = '\0';
-		add_token(&tok->token_list, tok->buff, T_WORD, tok->token_state, minishell);
+		add_token(tok, T_WORD, tok->token_state,
+			minishell);
 	}
 	else if ((tok->nb_tok == 0 && tok->i == 0) || is_only_space(input))
-		add_token(&tok->token_list, NULL, T_WORD, tok->token_state, minishell);
-
+	{
+		if (tok->buff)
+			tok->buff[0] = '\0';
+		add_token(tok, T_WORD, tok->token_state, minishell);
+	}
 }
 
 int	verif_quotes(const char *input)
 {
 	int	i;
-	int		in_squotes;
-	int		in_dquotes;
+	int	in_squotes;
+	int	in_dquotes;
 
 	in_squotes = 0;
 	in_dquotes = 0;
@@ -65,4 +69,15 @@ int	verif_quotes(const char *input)
 		return (1);
 	else
 		return (0);
+}
+
+void	init_tokenizer(t_tokenizer *tok, const char *input,
+		t_minishell *minishell)
+{
+	tok->i = -1;
+	tok->nb_tok = 0;
+	tok->buff = gc_malloc((sizeof(char) * ft_strlen(input) + 1), minishell->gc);
+	tok->token_list = NULL;
+	tok->state = NORMAL;
+	tok->token_state = NORMAL;
 }

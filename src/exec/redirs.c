@@ -11,49 +11,6 @@
 /* ************************************************************************** */
 
 #include "../../includes/main.h"
-int here_doc(char *delimiter, t_minishell *minishell)
-{
-    int pipes[2];
-    char *line;
-
-    if (pipe(pipes) == -1)
-        return (1);
-    while (1)
-	{
-        line = readline("heredoc> ");
-        if (!line) 
-		{
-			ft_putendl_fd("warning: here-document at line 1 delimited by end-of-file", 2);
-            break;
-		}
-		line = expand_str(line, minishell);
-        if (ft_strcmp(line, delimiter) == 0) {
-            free(line);
-            break;
-        }
-        write(pipes[1], line, ft_strlen(line));
-        write(pipes[1], "\n", 1);
-        free(line);
-    }
-    close(pipes[1]);
-    return (pipes[0]);
-}
-
-int	handle_heredoc(t_redir *redir, int *fd_in, t_minishell *minishell)
-{
-	int	new_fd;
-
-	if (*fd_in != -1)
-		close(*fd_in);
-	new_fd = here_doc(redir->file_or_delimiter, minishell);
-	if (new_fd == -1)
-	{
-		perror("heredoc");
-		return (1);
-	}
-	*fd_in = new_fd;
-	return (0);
-}
 
 int	handle_input(t_redir *redir, int *fd_in)
 {
@@ -97,25 +54,8 @@ int	handle_output(t_redir *redir, int *fd_out)
 	return (0);
 }
 
-int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_out)
+static int	apply_redirections(int *fd_in, int *fd_out, t_ast_node *node)
 {
-	t_redir *cur;
-
-	*fd_in = -1;
-	*fd_out = -1;
-	cur = node->cmd->redirs;
-	if (remove_quotes_redirs(node->cmd->redirs, minishell) == -1)
-		return (1);
-	while (cur)
-	{
-		if (cur->type == REDIR_IN && handle_input(cur, fd_in))
-			return (1);
-		else if (cur->type == REDIR_HEREDOC && handle_heredoc(cur, fd_in, minishell))
-			return (1);
-		else if ((cur->type == REDIR_OUT || cur->type == REDIR_APPEND) && handle_output(cur, fd_out))
-			return (1);
-		cur = cur->next;
-	}
 	if (*fd_in != -1)
 	{
 		if (node->cmd->command[0] && dup2(*fd_in, STDIN_FILENO) == -1)
@@ -131,4 +71,29 @@ int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in, int *fd_o
 		*fd_out = -1;
 	}
 	return (0);
+}
+
+int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in,
+		int *fd_out)
+{
+	t_redir	*cur;
+
+	*fd_in = -1;
+	*fd_out = -1;
+	cur = node->cmd->redirs;
+	if (remove_quotes_redirs(node->cmd->redirs, minishell) == -1)
+		return (1);
+	while (cur)
+	{
+		if (cur->type == REDIR_IN && handle_input(cur, fd_in))
+			return (1);
+		else if (cur->type == REDIR_HEREDOC && handle_heredoc(cur, fd_in,
+				minishell))
+			return (1);
+		else if ((cur->type == REDIR_OUT || cur->type == REDIR_APPEND)
+			&& handle_output(cur, fd_out))
+			return (1);
+		cur = cur->next;
+	}
+	return (apply_redirections(fd_in, fd_out, node));
 }

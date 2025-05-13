@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_types_utils.c                                 :+:      :+:    :+:   */
+/*   file_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/07 18:52:37 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/07 18:52:41 by mafioron         ###   ########.fr       */
+/*   Created: 2025/05/14 18:00:37 by mafioron          #+#    #+#             */
+/*   Updated: 2025/05/14 18:00:41 by mafioron         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ char	*get_cmd_path(t_minishell *minishell, char *cmd, int *err)
 {
 	char	**cmd_path;
 	t_env	*env;
-	char *value;
-	
+	char	*value;
+
 	env = minishell->env;
 	if (!cmd)
 		return (NULL);
@@ -45,10 +45,6 @@ char	*get_cmd_path(t_minishell *minishell, char *cmd, int *err)
 		return (NULL);
 	}
 	value = find_in_env("PATH", minishell);
-	//if (!value)
-	//	cmd_path[0] = gc_strdup("/usr/bin/", minishell->gc);
-	//cmd_path[1] = NULL;
-		//PATH n'existe pas donc surement env -i'
 	cmd_path = gc_split(value, ':', minishell->gc);
 	if (!cmd_path)
 		return (NULL);
@@ -67,8 +63,7 @@ int	check_file_accesss(char *file, int in_out)
 	}
 	else if (in_out == 1)
 	{
-		if (access(file, F_OK) == 0 &&
-				access(file, W_OK) == -1)
+		if (access(file, F_OK) == 0 && access(file, W_OK) == -1)
 		{
 			perror(file);
 			return (1);
@@ -77,75 +72,28 @@ int	check_file_accesss(char *file, int in_out)
 	return (0);
 }
 
-int check_cmd_access(char *cmd)
+int	check_cmd_access(char *cmd)
 {
-	struct stat stat_buffer;
+	struct stat	stat_buffer;
 
-    if (stat(cmd, &stat_buffer) == -1) {
-        if (errno == ENOENT) {
-            return (127);
-        } else {
-            return (126);
-        }
-    }
-    if (S_ISDIR(stat_buffer.st_mode)) {
-        return (126);
-    }
-    if (access(cmd, X_OK) == -1) {
-return (126);
-    }
-
-    return (0);
-}
-
-void	close_pipes(int *pipes)
-{
-	close(pipes[0]);
-	close(pipes[1]);
-}
-
-void	close_fds(int *fd_in, int *fd_out)
-{
-	if (*fd_in != -1)
-		close(*fd_in);
-	if (*fd_out != -1)
-		close(*fd_out);
-	*fd_in = -1;
-	*fd_out = -1;
-}
-
-int	wait_and_signal(pid_t pid, int status, t_minishell *minishell)
-{
-		waitpid(pid, &status, 0);
-		if (WIFSIGNALED(status))
+	if (stat(cmd, &stat_buffer) == -1)
+	{
+		if (errno == ENOENT)
 		{
-			if (WTERMSIG(status) == SIGQUIT)
-			{
-				minishell->exit_status = 131;
-				ft_putendl_fd("Quit (core dumped)", 2);
-			}
-			else if (WTERMSIG(status) == SIGINT)
-            	minishell->exit_status = 130;
-			return (minishell->exit_status);
+			return (127);
 		}
-		return(WEXITSTATUS(status));
+		else
+		{
+			return (126);
+		}
+	}
+	if (S_ISDIR(stat_buffer.st_mode))
+	{
+		return (126);
+	}
+	if (access(cmd, X_OK) == -1)
+	{
+		return (126);
+	}
+	return (0);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

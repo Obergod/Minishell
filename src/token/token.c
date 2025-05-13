@@ -12,28 +12,19 @@
 
 #include "../../includes/token.h"
 
-void	init_tokenizer(t_tokenizer *tok, const char *input, t_minishell *minishell)
-{
-	tok->i = -1;
-	tok->nb_tok = 0;
-	tok->buff = gc_malloc((sizeof(char) * ft_strlen(input) + 1), minishell->gc);
-	tok->token_list = NULL;
-	tok->state = NORMAL;
-	tok->token_state = NORMAL;
-}
-
 void	process_space(t_tokenizer *tok, t_minishell *minishell)
 {
 	if (tok->nb_tok > 0)
 	{
 		tok->buff[tok->nb_tok] = '\0';
-		add_token(&tok->token_list, tok->buff, T_WORD, tok->token_state, minishell);
+		add_token(tok, T_WORD, tok->token_state, minishell);
 		tok->nb_tok = 0;
 		tok->token_state = tok->state;
 	}
 }
 
-int	handle_normal_state(const char *input, t_tokenizer *tok, t_minishell *minishell)
+int	handle_normal_state(const char *input, t_tokenizer *tok,
+		t_minishell *minishell)
 {
 	if (input[tok->i] == '\'')
 		tok->state = IN_SQUOTE;
@@ -86,32 +77,32 @@ t_token	*tokenize(const char *input, t_minishell *minishell)
 	}
 	finalize_token(&tok, minishell, input);
 	result = tok.token_list;
-	//gc_free(tok.buff, minishell->gc);
 	return (result);
 }
 
-void	add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state, t_minishell *minishell)
+void	add_token(t_tokenizer *tok, enum e_token_type type, enum e_state state,
+		t_minishell *minishell)
 {
 	t_token	*new_token;
 	t_token	*tmp;
 
 	new_token = gc_malloc((sizeof(t_token)), minishell->gc);
-//	if (!new_token)
-//		clean_up_and_exit();
+	if (!new_token)
+		clean_exit(1, minishell);
 	new_token->type = type;
 	new_token->state = state;
 	new_token->next = NULL;
-	if (!buff || !buff[0])
+	if (!tok->buff || !tok->buff[0])
 		new_token->str = gc_strdup("", minishell->gc);
 	else
-		new_token->str = gc_strdup((buff), minishell->gc);
-//		if (!new_token->str)
-//			clean_up_and_exit;
-	if (*token == NULL)
-		*token = new_token;
+		new_token->str = gc_strdup((tok->buff), minishell->gc);
+	if (!new_token->str)
+		clean_exit(1, minishell);
+	if (tok->token_list == NULL)
+		tok->token_list = new_token;
 	else
 	{
-		tmp = *token;
+		tmp = tok->token_list;
 		while (tmp->next)
 			tmp = tmp->next;
 		tmp->next = new_token;

@@ -65,10 +65,12 @@ typedef struct s_wildcard
 int					is_operator(char c);
 void				operator_str(const char *input, char *buff, int i);
 enum e_token_type	handle_operator(const char *input, int *i);
-void				add_token(t_token **token, char *buff, enum e_token_type type, enum e_state state, t_minishell *minishell);
+void	add_token(t_tokenizer *tok, enum e_token_type type, enum e_state state, t_minishell *minishell);
 int					quotes_verif(const char *input);
 int					verif_quotes(const char *input);
 int					verif_op(const char *input, int	i);
+int					is_redir(char op, char next_char, int *i);
+int					is_pipe_or_or(char op, char next_char, int *i);
 
 /*****		token_process	*****/
 t_token				*tokenize(const char *input, t_minishell *minishell);
