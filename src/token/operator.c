@@ -12,7 +12,8 @@
 
 #include "../../includes/token.h"
 
-int	process_operator(const char *input, t_tokenizer *tok, t_minishell *minishell)
+int	process_operator(const char *input, t_tokenizer *tok,
+		t_minishell *minishell)
 {
 	enum e_token_type	type;
 
@@ -21,17 +22,17 @@ int	process_operator(const char *input, t_tokenizer *tok, t_minishell *minishell
 	if (tok->nb_tok > 0)
 	{
 		tok->buff[tok->nb_tok] = '\0';
-		add_token(&tok->token_list, tok->buff, T_WORD, tok->token_state, minishell);
+		add_token(tok, T_WORD, tok->token_state, minishell);
 		tok->nb_tok = 0;
 		tok->token_state = tok->state;
 	}
 	operator_str(input, tok->buff, tok->i);
 	type = handle_operator(input, &tok->i);
-	add_token(&tok->token_list, tok->buff, type, NORMAL, minishell);
+	add_token(tok, type, NORMAL, minishell);
 	return (0);
 }
 
-int	verif_op(const char *input, int	i)
+int	verif_op(const char *input, int i)
 {
 	if (is_operator(input[i + 1]) && input[i] != input[i + 1])
 		return (1);
@@ -44,7 +45,6 @@ int	verif_op(const char *input, int	i)
 
 void	operator_str(const char *input, char *buff, int i)
 {
-	
 	if (input[i] == '(' || input[i] == ')')
 	{
 		buff[0] = input[i];
@@ -62,37 +62,6 @@ void	operator_str(const char *input, char *buff, int i)
 		buff[0] = input[i];
 		buff[1] = '\0';
 	}
-}
-
-int	is_redir(char op, char next_char, int *i)
-{
-	if (op == '<')
-	{
-		if (next_char == '<')
-			(*i)++;
-		return (1);
-	}
-	else if (op == '>')
-	{
-		if (next_char == '>')
-			(*i)++;
-		return (1);
-	}
-	return (0);
-}
-
-int	is_pipe_or_or(char op, char next_char, int *i)
-{
-	if (op == '|')
-	{
-		if (next_char == '|')
-		{
-			(*i)++;
-			return (2);
-		}
-		return (1);
-	}
-	return (0);
 }
 
 enum e_token_type	handle_operator(const char *input, int *i)
@@ -117,7 +86,6 @@ enum e_token_type	handle_operator(const char *input, int *i)
 			(*i)++;
 			return (T_LOGIC);
 		}
-//		exit_and_cleanup;
 	}
 	return (-1);
 }
