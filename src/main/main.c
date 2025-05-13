@@ -6,11 +6,12 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 16:21:46 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 18:07:00 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 18:24:34 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/main.h"
+#include <unistd.h>
 
 int	init_minishell(t_minishell *minishell, char **envp)
 {
@@ -51,8 +52,11 @@ void	main_loop(t_minishell *minishell)
 		if (isatty(STDIN_FILENO))
 			ft_add_readline(PROMPT, &input, minishell);
 		else
-			return ;
-			// input = get_next_line(0);
+		{
+			input = get_next_line(0);
+			if (!input)
+				break;
+		}
 		if (!input && isatty(STDIN_FILENO))
 			break ;
 		ast = build_ast(parsing(tokenize(input, minishell), minishell),
@@ -72,7 +76,10 @@ int	main(int ac, char **av, char **envp)
 
 	if (ac < 1 || !av || init_minishell(&minishell, envp) == 1)
 		return (1);
-	interactive_setup_signals();
+	if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO))
+		pipe_setup_signals();
+	else
+		interactive_setup_signals();
 	main_loop(&minishell);
 	clean_exit(EXIT_SUCCESS, &minishell);
 	return (0);

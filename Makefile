@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/05/13 16:41:39 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/05/13 18:30:08 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,57 +35,60 @@ LIBFT = $(LIBFT_DIR)/libftfull.a
 LIBFT_URL = https://github.com/ufalzone/libft_up.git
 
 # Fichiers sources
-SRC_FILES = \
-	$(SRC_DIR)/exec/exec.c \
-	$(SRC_DIR)/exec/redirs.c \
-	$(SRC_DIR)/exec/pipes.c \
-	$(SRC_DIR)/exec/exec_types.c \
-	$(SRC_DIR)/exec/exec_types_utils.c \
-	$(SRC_DIR)/exec/exec_utils.c \
-	$(SRC_DIR)/exec/builtin.c \
-	$(SRC_DIR)/token/operator.c \
-	$(SRC_DIR)/token/token.c \
-	$(SRC_DIR)/token/token_utils.c \
-	$(SRC_DIR)/env_parsing/env_parsing.c \
-	$(SRC_DIR)/env_parsing/env_parsing_2.c \
-	$(SRC_DIR)/env_parsing/utils_env_parsing.c \
-	$(SRC_DIR)/parsing/parsing.c \
-	$(SRC_DIR)/parsing/parsing_check.c \
-	$(SRC_DIR)/parsing/parsing_cmd.c \
-	$(SRC_DIR)/parsing/parsing_error.c \
-	$(SRC_DIR)/parsing/parsing_logic_redirs.c \
-	$(SRC_DIR)/parsing/ast/ast.c \
-	$(SRC_DIR)/parsing/ast/ast_utils.c \
-	$(SRC_DIR)/parsing/ast/ast_visualizer.c \
-	$(SRC_DIR)/readline/readline.c \
-	$(SRC_DIR)/readline/signals.c \
-	$(SRC_DIR)/readline/signals_2.c \
-	$(SRC_DIR)/utils/clean_exit.c \
-	$(SRC_DIR)/main/main.c \
-	$(SRC_DIR)/builtin/exit.c \
-	$(SRC_DIR)/builtin/cd.c \
-	$(SRC_DIR)/builtin/echo.c \
-	$(SRC_DIR)/builtin/env.c \
-	$(SRC_DIR)/builtin/export.c \
-	$(SRC_DIR)/builtin/pwd.c \
-	$(SRC_DIR)/builtin/unset.c \
-	$(SRC_DIR)/garbage_collector/garbage_collector.c \
-	$(SRC_DIR)/garbage_collector/garbage_collector_2.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_calloc.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_split_first_word.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_strjoin.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_strjoin_three.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_substr.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_strndup.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_strndup_array.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_strdup.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_strdup_array.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_split.c \
-	$(SRC_DIR)/garbage_collector/utils/gc_itoa.c \
-	$(SRC_DIR)/expansion/expansion.c \
-	$(SRC_DIR)/expansion/wildcard/newline_wildcard.c \
-	$(SRC_DIR)/expansion/wildcard/utils_wildcard.c \
-	$(SRC_DIR)/expansion/wildcard/wildcard.c
+SRC_FILES = src/builtin/cd.c \
+			src/builtin/echo.c \
+			src/builtin/env.c \
+			src/builtin/exit.c \
+			src/builtin/export.c \
+			src/builtin/pwd.c \
+			src/builtin/unset.c \
+			src/env_parsing/env_parsing_2.c \
+			src/env_parsing/env_parsing.c \
+			src/env_parsing/utils_env_parsing.c \
+			src/exec/builtin.c \
+			src/exec/exec.c \
+			src/exec/exec_process.c \
+			src/exec/exec_types.c \
+			src/exec/exec_utils.c \
+			src/exec/fd_utils.c \
+			src/exec/file_utils.c \
+			src/exec/heredoc.c \
+			src/exec/pipes.c \
+			src/exec/redirs.c \
+			src/expansion/expansion.c \
+			src/expansion/wildcard/newline_wildcard.c \
+			src/expansion/wildcard/utils_wildcard.c \
+			src/expansion/wildcard/wildcard.c \
+			src/garbage_collector/garbage_collector_2.c \
+			src/garbage_collector/garbage_collector.c \
+			src/garbage_collector/utils/gc_calloc.c \
+			src/garbage_collector/utils/gc_itoa.c \
+			src/garbage_collector/utils/gc_split.c \
+			src/garbage_collector/utils/gc_split_first_word.c \
+			src/garbage_collector/utils/gc_strdup_array.c \
+			src/garbage_collector/utils/gc_strdup.c \
+			src/garbage_collector/utils/gc_strjoin.c \
+			src/garbage_collector/utils/gc_strjoin_three.c \
+			src/garbage_collector/utils/gc_strndup_array.c \
+			src/garbage_collector/utils/gc_strndup.c \
+			src/garbage_collector/utils/gc_substr.c \
+			src/main/main.c \
+			src/parsing/ast/ast.c \
+			src/parsing/ast/ast_utils.c \
+			src/parsing/ast/ast_visualizer.c \
+			src/parsing/parsing.c \
+			src/parsing/parsing_check.c \
+			src/parsing/parsing_cmd.c \
+			src/parsing/parsing_error.c \
+			src/parsing/parsing_logic_redirs.c \
+			src/readline/readline.c \
+			src/readline/signals_2.c \
+			src/readline/signals.c \
+			src/token/operator.c \
+			src/token/operator_utils.c \
+			src/token/token.c \
+			src/token/token_utils.c \
+			src/utils/clean_exit.c
 
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 DEP_FILES = $(OBJ_FILES:.o=.d)

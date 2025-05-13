@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 17:35:46 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/13 18:19:51 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 18:22:22 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,6 @@ int	handle_l_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head,
 		close(pipes.pipes[1]);
 		prefix_exec(node->left, head, minishell);
 		interactive_setup_signals();
-		interactive_setup_signals();
-		clean_exit(EXIT_FAILURE, minishell);
 		clean_exit(minishell->exit_status, minishell);
 	}
 	return (0);

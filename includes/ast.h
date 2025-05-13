@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 15:47:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 16:07:16 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 18:20:36 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ enum					e_node_type
 
 typedef struct s_ast_node
 {
-	enum e_node_type	type;
+	enum e_node_type		type;
 	t_cmd				*cmd;
 	int					subshell;
 	t_redir				*subshell_redir;

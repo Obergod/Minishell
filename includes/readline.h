@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 16:53:40 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/12 20:22:55 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/13 18:23:26 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,5 @@ void	interactive_setup_signals(void);
 char	*ft_add_readline(const char *prompt, char **stock,
 			t_minishell *minishell);
 void	handle_interactive_signal(int sig);
-
+void	pipe_setup_signals(void);
 #endif
