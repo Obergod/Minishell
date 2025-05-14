@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:43:18 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/05 19:50:37 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 17:57:32 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ int	process_operator(const char *input, t_tokenizer *tok,
 	operator_str(input, tok->buff, tok->i);
 	type = handle_operator(input, &tok->i);
 	add_token(tok, type, NORMAL, minishell);
+	return (0);
 }
 
 int	verif_op(const char *input, int i)
