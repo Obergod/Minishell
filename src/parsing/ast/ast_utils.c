@@ -25,6 +25,7 @@ t_ast_node *init_ast_node(enum e_node_type type, t_cmd *cmd, t_minishell *minish
 	node->right = NULL;
 	node->subshell = 0;
 	node->subshell_redir = NULL;
+	node->parent = NULL;
 	return (node);
 }
 

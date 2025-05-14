@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main_debug.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/13 15:56:01 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 14:45:36 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,9 +277,7 @@ int	main(int ac, char **av, char **envp)
 		if (!input && isatty(STDIN_FILENO))
 			break ;
 		token = tokenize(input, &minishell);
-		if (token)
-		{}
-		else
+		if (!token)
 			printf("Error: Failed to tokenize input\n");
 		cmd_head = parsing(token, &minishell);
 		//print_cmd_list(cmd_head);
@@ -294,7 +292,7 @@ int	main(int ac, char **av, char **envp)
 		head = ast;
 		// test_ast(ast);
 
-		// visualize_ast(ast, 3);
+		visualize_ast(ast, 3);
 		// visualize_ast(ast, 3);
 
 		// Effectuer les trois types de parcours

@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 16:44:02 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 16:09:35 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 17:52:23 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ enum e_error_parsing	check_parsing(t_token *token_p)
 	{
 		if (check_word_parenthesis(token) != SUCCESS)
 			return (ERR_SYNTAX_TOKEN);
-		else if (token->type == T_PIPE && token->next->type == T_PIPE)
+		if (token->type == T_PIPE && token->next->type == T_PIPE)
 			return (ERR_SYNTAX_PIPE);
 		else if (token->type == T_REDIR && token->next->type != T_WORD)
 			return (ERR_SYNTAX_REDIRECT);

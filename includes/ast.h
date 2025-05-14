@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 15:47:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 18:20:36 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 14:53:38 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ typedef struct s_ast_node
 	t_redir				*subshell_redir;
 	struct s_ast_node	*left;
 	struct s_ast_node	*right;
-
+	struct s_ast_node	*parent;
 }						t_ast_node;
 
 /* Fonctions de l'AST */

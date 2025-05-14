@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/05/13 18:30:08 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/05/14 14:35:22 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -72,7 +72,7 @@ SRC_FILES = src/builtin/cd.c \
 			src/garbage_collector/utils/gc_strndup_array.c \
 			src/garbage_collector/utils/gc_strndup.c \
 			src/garbage_collector/utils/gc_substr.c \
-			src/main/main.c \
+			src/main/main_debug.c \
 			src/parsing/ast/ast.c \
 			src/parsing/ast/ast_utils.c \
 			src/parsing/ast/ast_visualizer.c \
@@ -95,7 +95,7 @@ DEP_FILES = $(OBJ_FILES:.o=.d)
 
 # Flags de compilation
 CC      = cc
-CFLAGS  = -Wall -Wextra -Werror -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include
+CFLAGS  = -Wall -Wextra -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include
 DEPFLAGS= -MMD -MP
 LDFLAGS = -L$(LIBFT_DIR) -lreadline -lftfull
 

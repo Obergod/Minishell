@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:55:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 16:07:37 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 17:51:22 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,7 @@ void visualize_ast(t_ast_node *root, int mode)
 				print_ast_with_commands(root, 0);
 				break;
 			case 2: // Mode ordre d'exécution
-				printf("Execution order:\n");
+				printf("Ordre d'exécution:\n");
 				print_ast_execution_order(root);
 				break;
 			default:
@@ -217,7 +217,7 @@ void visualize_ast(t_ast_node *root, int mode)
 	// Mode 3: génération d'image avec Graphviz
 	else if (mode == 3)
 	{
-		printf("Generating GraphViz visualization...\n");
+		printf("Génération de la visualisation GraphViz...\n");
 
 		// Créer les noms de fichiers
 		snprintf(dot_filename, sizeof(dot_filename), "/tmp/ast_output.dot");
@@ -227,7 +227,7 @@ void visualize_ast(t_ast_node *root, int mode)
 		FILE *dot_file = fopen(dot_filename, "w");
 		if (!dot_file)
 		{
-			printf("Error: Could not create DOT file\n");
+			printf("Erreur: Impossible de créer le fichier DOT\n");
 			return;
 		}
 
@@ -236,12 +236,14 @@ void visualize_ast(t_ast_node *root, int mode)
 		fprintf(dot_file, "  graph [\n");
 		fprintf(dot_file, "    rankdir=TB,\n");
 		fprintf(dot_file, "    fontname=\"Arial\",\n");
-		fprintf(dot_file, "    bgcolor=\"#F8F8F8\",\n");
-		fprintf(dot_file, "    nodesep=1.2,\n");
-		fprintf(dot_file, "    ranksep=1.2,\n");
+		fprintf(dot_file, "    bgcolor=\"#FAFAFA\",\n");
+		fprintf(dot_file, "    nodesep=1.5,\n");
+		fprintf(dot_file, "    ranksep=1.5,\n");
 		fprintf(dot_file, "    splines=polyline,\n");
 		fprintf(dot_file, "    ordering=out,\n");
 		fprintf(dot_file, "    concentrate=true,\n");
+		fprintf(dot_file, "    margin=\"0.5,0.5\",\n");
+		fprintf(dot_file, "    pad=\"0.5,0.5\",\n");
 		fprintf(dot_file, "    overlap=false\n");
 		fprintf(dot_file, "  ];\n");
 		fprintf(dot_file, "  node [\n");
@@ -249,9 +251,9 @@ void visualize_ast(t_ast_node *root, int mode)
 		fprintf(dot_file, "    style=\"filled,rounded\",\n");
 		fprintf(dot_file, "    fontname=\"Arial\",\n");
 		fprintf(dot_file, "    fontsize=13,\n");
-		fprintf(dot_file, "    margin=\"0.5,0.3\",\n");
-		fprintf(dot_file, "    height=0.8,\n");
-		fprintf(dot_file, "    width=1.5\n");
+		fprintf(dot_file, "    margin=\"0.7,0.5\",\n");
+		fprintf(dot_file, "    height=1.0,\n");
+		fprintf(dot_file, "    width=2.0\n");
 		fprintf(dot_file, "  ];\n");
 		fprintf(dot_file, "  edge [\n");
 		fprintf(dot_file, "    fontname=\"Arial\",\n");
@@ -270,17 +272,17 @@ void visualize_ast(t_ast_node *root, int mode)
 
 		// Utiliser la commande dot pour générer l'image avec une meilleure qualité
 		char cmd[512];
-		sprintf(cmd, "dot -Tpng -Gdpi=400 -Gsize=14,10 -Gratio=auto %s -o %s", dot_filename, img_filename);
+		sprintf(cmd, "dot -Tpng -Gdpi=500 -Gsize=16,12 -Gratio=auto %s -o %s", dot_filename, img_filename);
 		int result = system(cmd);
 
 		if (result == 0)
-			printf("Image generated successfully: %s\n", img_filename);
+			printf("Image générée avec succès: %s\n", img_filename);
 		else
-			printf("Error generating image (is GraphViz installed?)\n");
+			printf("Erreur lors de la génération de l'image (GraphViz est-il installé?)\n");
 	}
 	else
 	{
-		printf("Invalid visualization mode.\n");
+		printf("Mode de visualisation invalide.\n");
 	}
 
 	printf("===========================\n\n");
@@ -294,7 +296,6 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 
 	// Déterminer la couleur du nœud en fonction de son type
 	char *color;
-	char final_color[32];
 
 	switch (node->type)
 	{
@@ -315,7 +316,9 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 	}
 
 	// Appliquer une couleur plus foncée pour les sous-shells
+	char final_color[32];
 	strcpy(final_color, color);
+	
 	if (node->subshell)
 	{
 		// Pour les commandes en sous-shell, utiliser des couleurs plus foncées
@@ -329,7 +332,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 			strcpy(final_color, "#5aaad8");  // Bleu plus foncé
 	}
 
-	// Style spécial pour les sous-shells
+	// Style spécial pour les sous-shells avec bordure plus élégante
 	char style[100] = "filled,rounded";
 	if (node->subshell)
 		strcat(style, ",dashed");
@@ -370,10 +373,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 		float border_width = 2.0 + (total_redirs > 3 ? 1.5 : total_redirs * 0.5);
 
 		// Configurer les attributs de bordure
-		if (node->subshell)
-			sprintf(border_attrs, ", penwidth=%.1f, color=\"%s\"", border_width, border_color);
-		else
-			sprintf(border_attrs, ", penwidth=%.1f, color=\"%s\"", border_width, border_color);
+		sprintf(border_attrs, ", penwidth=%.1f, color=\"%s\"", border_width, border_color);
 	}
 
 	// Calculer la taille du nœud en fonction du type
@@ -381,15 +381,15 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 	if (node->type == NODE_CMD)
 	{
 		// Commandes plus grandes pour mieux voir les détails
-		sprintf(size_attrs, ", width=2.0, height=1.2");
+		sprintf(size_attrs, ", width=2.5, height=1.5, fixedsize=false");
 	}
 	else if (node->type == NODE_PIPE || node->type == NODE_AND || node->type == NODE_OR)
 	{
-		// Opérateurs plus petits et carrés
-		sprintf(size_attrs, ", width=1.2, height=0.8, fixedsize=true");
+		// Opérateurs plus adaptés
+		sprintf(size_attrs, ", width=1.5, height=1.0, fixedsize=false");
 	}
 
-	// Écrire le nœud actuel avec des attributs pour centrer et formater le texte
+	// Écrire le nœud actuel
 	fprintf(dot_file, "  node%d [label=<", current_id);
 
 	// Label du nœud avec affichage des redirections en HTML pour un meilleur centrage
@@ -398,44 +398,46 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 		case NODE_CMD:
 			if (node->cmd)
 			{
-				fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">");
+				fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"2\">");
 
 				// En-tête de la commande
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\"><B>COMMANDE</B></FONT></TD></TR>");
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"15\" COLOR=\"#000080\"><B>COMMANDE</B></FONT></TD></TR>");
+				fprintf(dot_file, "<TR><TD><HR COLOR=\"#000080\" /></TD></TR>");
 
 				// Nom de la commande avec formatage
 				if (node->cmd && node->cmd->command && node->cmd->command[0])
 				{
-					fprintf(dot_file, "<TR><TD ALIGN=\"center\" VALIGN=\"center\">");
-					fprintf(dot_file, "<FONT POINT-SIZE=\"13\">≻ %s ≺</FONT>", node->cmd->command[0]);
+					fprintf(dot_file, "<TR><TD ALIGN=\"center\">");
+					fprintf(dot_file, "<FONT POINT-SIZE=\"14\" COLOR=\"#006400\"><B>≻ %s ≺</B></FONT>", node->cmd->command[0]);
 					fprintf(dot_file, "</TD></TR>");
 
 					// Ajouter les arguments supplémentaires
 					int arg_count = 1;
 					while (node->cmd->command[arg_count]) {
 						if (arg_count == 1)
-							fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"12\"><I>Arguments:</I></FONT></TD></TR>");
-						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\">[%d]: %s</FONT></TD></TR>",
+							fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\" COLOR=\"#303030\"><I>Arguments</I></FONT></TD></TR>");
+						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\" COLOR=\"#404040\">[%d]: %s</FONT></TD></TR>",
 							arg_count, node->cmd->command[arg_count]);
 						arg_count++;
 					}
 				}
 				else
 				{
-					fprintf(dot_file, "<TR><TD ALIGN=\"center\">(Vide)</TD></TR>");
+					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#707070\">(Commande vide)</FONT></TD></TR>");
 				}
 
 				// Afficher les redirections
 				if (node->cmd && node->cmd->redirs)
 				{
 					t_redir *redir = node->cmd->redirs;
-					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIRECTIONS</B><HR/></FONT></TD></TR>");
+					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800000\"><B>REDIRECTIONS</B></FONT></TD></TR>");
 					int redir_count = 0;
 					while (redir)
 					{
 						if (redir_count > 0)
 							fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
-						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Type:</B> ");
 						switch (redir->type)
 						{
 							case REDIR_IN:
@@ -454,32 +456,34 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 								fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
 						}
 						fprintf(dot_file, "</FONT></TD></TR>");
-						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
-							redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Fichier:</B> %s</FONT></TD></TR>",
+							redir->file_or_delimiter ? redir->file_or_delimiter : "(aucun)");
 						redir = redir->next;
 						redir_count++;
 					}
 				}
-				else
-				{
-					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir NULL</FONT></TD></TR>");
-				}
 
 				// Indication de subshell si nécessaire
 				if (node->subshell)
-					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\" COLOR=\"#444444\"><I>(subshell)</I></FONT></TD></TR>");
+				{
+					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#444444\"><B>⟦ SUBSHELL ⟧</B></FONT></TD></TR>");
+				}
 
-				// Affichage des redirections de subshell pour tous les types de nœuds
+				// Affichage des redirections de subshell
 				if (node->subshell_redir)
 				{
-					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIR SUBSHELL</B><HR/></FONT></TD></TR>");
+					if (!node->subshell)
+						fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+						
+					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800080\"><B>REDIR SUBSHELL</B></FONT></TD></TR>");
 					t_redir *redir = node->subshell_redir;
 					int redir_count = 0;
 					while (redir)
 					{
 						if (redir_count > 0)
 							fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
-						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Type:</B> ");
 						switch (redir->type)
 						{
 							case REDIR_IN:
@@ -498,40 +502,50 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 								fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
 						}
 						fprintf(dot_file, "</FONT></TD></TR>");
-						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
-							redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+						fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Fichier:</B> %s</FONT></TD></TR>",
+							redir->file_or_delimiter ? redir->file_or_delimiter : "(aucun)");
 						redir = redir->next;
 						redir_count++;
 					}
-				}
-				else
-				{
-					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir_subshell NULL</FONT></TD></TR>");
 				}
 
 				fprintf(dot_file, "</TABLE>");
 			}
 			else
 			{
-				fprintf(dot_file, "<B>COMMANDE</B><BR/>(Aucune cmd)");
+				fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"2\">");
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"15\" COLOR=\"#000080\"><B>COMMANDE</B></FONT></TD></TR>");
+				fprintf(dot_file, "<TR><TD><HR COLOR=\"#000080\" /></TD></TR>");
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#707070\">(Aucune commande)</FONT></TD></TR>");
+				fprintf(dot_file, "</TABLE>");
 			}
 			break;
+			
 		case NODE_PIPE:
-			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">");
-			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\"><B>PIPE</B></FONT></TD></TR>");
+			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"2\">");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"18\" COLOR=\"#000080\"><B>|</B></FONT></TD></TR>");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\" COLOR=\"#000080\"><B>PIPE</B></FONT></TD></TR>");
+			
 			if (node->subshell)
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#444444\"><I>(subshell)</I></FONT></TD></TR>");
+			{
+				fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#444444\"><B>⟦ SUBSHELL ⟧</B></FONT></TD></TR>");
+			}
+			
 			// Affichage des redirections de subshell
 			if (node->subshell_redir)
 			{
+				if (!node->subshell)
+					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800080\"><B>REDIR SUBSHELL</B></FONT></TD></TR>");
 				t_redir *redir = node->subshell_redir;
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIR SUBSHELL</B><HR/></FONT></TD></TR>");
 				int redir_count = 0;
 				while (redir)
 				{
 					if (redir_count > 0)
 						fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
-					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Type:</B> ");
 					switch (redir->type)
 					{
 						case REDIR_IN:
@@ -550,33 +564,40 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 							fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
 					}
 					fprintf(dot_file, "</FONT></TD></TR>");
-					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
-						redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Fichier:</B> %s</FONT></TD></TR>",
+						redir->file_or_delimiter ? redir->file_or_delimiter : "(aucun)");
 					redir = redir->next;
 					redir_count++;
 				}
 			}
-			else
-			{
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir_subshell NULL</FONT></TD></TR>");
-			}
+			
 			fprintf(dot_file, "</TABLE>");
 			break;
+			
 		case NODE_AND:
-			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">");
-			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\"><B>AND</B></FONT></TD></TR>");
+			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"2\">");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"18\" COLOR=\"#000080\"><B>&amp;&amp;</B></FONT></TD></TR>");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\" COLOR=\"#000080\"><B>AND</B></FONT></TD></TR>");
+			
 			if (node->subshell)
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#444444\"><I>(subshell)</I></FONT></TD></TR>");
+			{
+				fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#444444\"><B>⟦ SUBSHELL ⟧</B></FONT></TD></TR>");
+			}
+			
 			if (node->subshell_redir)
 			{
+				if (!node->subshell)
+					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800080\"><B>REDIR SUBSHELL</B></FONT></TD></TR>");
 				t_redir *redir = node->subshell_redir;
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIR SUBSHELL</B><HR/></FONT></TD></TR>");
 				int redir_count = 0;
 				while (redir)
 				{
 					if (redir_count > 0)
 						fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
-					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Type:</B> ");
 					switch (redir->type)
 					{
 						case REDIR_IN:
@@ -595,33 +616,40 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 							fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
 					}
 					fprintf(dot_file, "</FONT></TD></TR>");
-					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
-						redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Fichier:</B> %s</FONT></TD></TR>",
+						redir->file_or_delimiter ? redir->file_or_delimiter : "(aucun)");
 					redir = redir->next;
 					redir_count++;
 				}
 			}
-			else
-			{
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir_subshell NULL</FONT></TD></TR>");
-			}
+			
 			fprintf(dot_file, "</TABLE>");
 			break;
+			
 		case NODE_OR:
-			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">");
-			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\"><B>OR</B></FONT></TD></TR>");
+			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"2\">");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"18\" COLOR=\"#000080\"><B>||</B></FONT></TD></TR>");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\" COLOR=\"#000080\"><B>OR</B></FONT></TD></TR>");
+			
 			if (node->subshell)
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#444444\"><I>(subshell)</I></FONT></TD></TR>");
+			{
+				fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#444444\"><B>⟦ SUBSHELL ⟧</B></FONT></TD></TR>");
+			}
+			
 			if (node->subshell_redir)
 			{
+				if (!node->subshell)
+					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					
+				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800080\"><B>REDIR SUBSHELL</B></FONT></TD></TR>");
 				t_redir *redir = node->subshell_redir;
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\"><HR/><B>REDIR SUBSHELL</B><HR/></FONT></TD></TR>");
 				int redir_count = 0;
 				while (redir)
 				{
 					if (redir_count > 0)
 						fprintf(dot_file, "<TR><TD><FONT POINT-SIZE=\"1\"> </FONT></TD></TR>");
-					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Type:</B> ");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Type:</B> ");
 					switch (redir->type)
 					{
 						case REDIR_IN:
@@ -640,26 +668,35 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 							fprintf(dot_file, "<FONT COLOR=\"gray\">INCONNU (?)</FONT>");
 					}
 					fprintf(dot_file, "</FONT></TD></TR>");
-					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"11\"><B>• Fichier:</B> %s</FONT></TD></TR>",
-						redir->file_or_delimiter ? redir->file_or_delimiter : "(none)");
+					fprintf(dot_file, "<TR><TD ALIGN=\"left\"><FONT POINT-SIZE=\"12\"><B>• Fichier:</B> %s</FONT></TD></TR>",
+						redir->file_or_delimiter ? redir->file_or_delimiter : "(aucun)");
 					redir = redir->next;
 					redir_count++;
 				}
 			}
-			else
-			{
-				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#888888\">redir_subshell NULL</FONT></TD></TR>");
-			}
+			
 			fprintf(dot_file, "</TABLE>");
 			break;
+			
 		case NODE_OPEN_PARENTHESIS:
-			fprintf(dot_file, "<B>PARENTHÈSE</B><BR/><FONT POINT-SIZE=\"20\">(</FONT>");
+			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"2\">");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"25\" COLOR=\"#000080\"><B>(</B></FONT></TD></TR>");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\" COLOR=\"#000080\"><B>OUVERTURE</B></FONT></TD></TR>");
+			fprintf(dot_file, "</TABLE>");
 			break;
+			
 		case NODE_CLOSE_PARENTHESIS:
-			fprintf(dot_file, "<B>PARENTHÈSE</B><BR/><FONT POINT-SIZE=\"20\">)</FONT>");
+			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"2\">");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"25\" COLOR=\"#000080\"><B>)</B></FONT></TD></TR>");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"14\" COLOR=\"#000080\"><B>FERMETURE</B></FONT></TD></TR>");
+			fprintf(dot_file, "</TABLE>");
 			break;
+			
 		default:
-			fprintf(dot_file, "<B>INCONNU</B><BR/>(%d)", node->type);
+			fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"2\">");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"15\" COLOR=\"#880000\"><B>INCONNU</B></FONT></TD></TR>");
+			fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"12\">(%d)</FONT></TD></TR>", node->type);
+			fprintf(dot_file, "</TABLE>");
 	}
 
 	// Fermer le label et définir le style
@@ -669,13 +706,59 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 	// Si ce n'est pas le nœud racine, relier au parent avec des contraintes pour améliorer la symétrie
 	if (parent_id >= 0)
 	{
-		fprintf(dot_file, "  node%d -> node%d [", parent_id, current_id);
+		// Définir les styles de flèche en fonction du type de relation
+		char *edge_style = "solid";
+		char *edge_color = "#444444";
+		float edge_width = 1.5;
+		
+		// Personnaliser les flèches en fonction du type de nœud parent
+		if (node->parent != NULL)
+		{
+			if (node == node->parent->left) // Fils gauche
+			{
+				if (node->parent->type == NODE_PIPE)
+				{
+					edge_color = "#0066CC"; // Bleu pour les pipes
+					edge_width = 2.0;
+				}
+				else if (node->parent->type == NODE_AND)
+				{
+					edge_color = "#009900"; // Vert pour AND
+				}
+				else if (node->parent->type == NODE_OR)
+				{
+					edge_color = "#CC6600"; // Orange pour OR
+				}
+			}
+			else if (node == node->parent->right) // Fils droit
+			{
+				if (node->parent->type == NODE_PIPE)
+				{
+					edge_color = "#0066CC"; // Bleu pour les pipes
+					edge_style = "dashed";
+					edge_width = 2.0;
+				}
+				else if (node->parent->type == NODE_AND)
+				{
+					edge_color = "#009900"; // Vert pour AND
+					edge_style = "dashed";
+				}
+				else if (node->parent->type == NODE_OR)
+				{
+					edge_color = "#CC6600"; // Orange pour OR
+					edge_style = "dashed";
+				}
+			}
+		}
+		
+		fprintf(dot_file, "  node%d -> node%d [color=\"%s\", style=\"%s\", penwidth=%.1f, ",
+			parent_id, current_id, edge_color, edge_style, edge_width);
 
 		// Ajuster les contraintes de placement pour une meilleure symétrie
 		if (current_id == parent_id * 2 + 1) // Si c'est un fils gauche
-			fprintf(dot_file, "weight=10, constraint=true");
+			fprintf(dot_file, "weight=10, constraint=true, headlabel=\"G\", labelfontsize=10, labelangle=-25, labeldistance=2.0");
 		else
-			fprintf(dot_file, "weight=10, constraint=true");
+			fprintf(dot_file, "weight=10, constraint=true, headlabel=\"D\", labelfontsize=10, labelangle=25, labeldistance=2.0");
 
 		fprintf(dot_file, "];\n");
 	}
@@ -686,8 +769,16 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 
 	// Traiter les fils récursivement
 	if (node->left)
+	{
+		// Stocker une référence au parent dans le nœud enfant pour faciliter le stylage des arêtes
+		node->left->parent = node;
 		write_dot_file_recursive(dot_file, node->left, current_id, left_id);
+	}
 
 	if (node->right)
+	{
+		// Stocker une référence au parent dans le nœud enfant
+		node->right->parent = node;
 		write_dot_file_recursive(dot_file, node->right, current_id, right_id);
+	}
 }
