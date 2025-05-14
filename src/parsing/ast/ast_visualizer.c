@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:55:00 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/14 18:05:22 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 18:29:50 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,28 @@ void print_ast_with_commands(t_ast_node *node, int depth)
 		printf(" (SUBSHELL)");
 
 	printf("\n");
+
+	// Afficher les redirections associées au subshell
+	if (node->subshell_redir)
+	{
+		for (i = 0; i <= depth; i++)
+			printf("|  ");
+		printf("   with subshell redirections:");
+		t_redir *sr = node->subshell_redir;
+		while (sr)
+		{
+			printf(" ");
+			switch (sr->type)
+			{
+				case REDIR_IN: printf("<%s", sr->file_or_delimiter); break;
+				case REDIR_OUT: printf(">%s", sr->file_or_delimiter); break;
+				case REDIR_APPEND: printf(">>%s", sr->file_or_delimiter); break;
+				case REDIR_HEREDOC: printf("<<%s", sr->file_or_delimiter); break;
+			}
+			sr = sr->next;
+		}
+		printf("\n");
+	}
 
 	print_ast_with_commands(node->left, depth + 1);
 	print_ast_with_commands(node->right, depth + 1);
@@ -402,7 +424,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 
 				// En-tête de la commande
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"15\" COLOR=\"#000080\"><B>COMMANDE</B></FONT></TD></TR>");
-				fprintf(dot_file, "<TR><TD><HR COLOR=\"#000080\" /></TD></TR>");
+				fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 
 				// Nom de la commande avec formatage
 				if (node->cmd && node->cmd->command && node->cmd->command[0])
@@ -430,7 +452,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 				if (node->cmd && node->cmd->redirs)
 				{
 					t_redir *redir = node->cmd->redirs;
-					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800000\"><B>REDIRECTIONS</B></FONT></TD></TR>");
 					int redir_count = 0;
 					while (redir)
@@ -466,7 +488,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 				// Indication de subshell si nécessaire
 				if (node->subshell)
 				{
-					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#444444\"><B>⟦ SUBSHELL ⟧</B></FONT></TD></TR>");
 				}
 
@@ -474,7 +496,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 				if (node->subshell_redir)
 				{
 					if (!node->subshell)
-						fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+						fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 						
 					fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800080\"><B>REDIR SUBSHELL</B></FONT></TD></TR>");
 					t_redir *redir = node->subshell_redir;
@@ -515,7 +537,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 			{
 				fprintf(dot_file, "<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"2\">");
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"15\" COLOR=\"#000080\"><B>COMMANDE</B></FONT></TD></TR>");
-				fprintf(dot_file, "<TR><TD><HR COLOR=\"#000080\" /></TD></TR>");
+				fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT COLOR=\"#707070\">(Aucune commande)</FONT></TD></TR>");
 				fprintf(dot_file, "</TABLE>");
 			}
@@ -528,7 +550,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 			
 			if (node->subshell)
 			{
-				fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+				fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#444444\"><B>⟦ SUBSHELL ⟧</B></FONT></TD></TR>");
 			}
 			
@@ -536,7 +558,7 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 			if (node->subshell_redir)
 			{
 				if (!node->subshell)
-					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 					
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800080\"><B>REDIR SUBSHELL</B></FONT></TD></TR>");
 				t_redir *redir = node->subshell_redir;
@@ -581,14 +603,14 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 			
 			if (node->subshell)
 			{
-				fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+				fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#444444\"><B>⟦ SUBSHELL ⟧</B></FONT></TD></TR>");
 			}
 			
 			if (node->subshell_redir)
 			{
 				if (!node->subshell)
-					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 					
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800080\"><B>REDIR SUBSHELL</B></FONT></TD></TR>");
 				t_redir *redir = node->subshell_redir;
@@ -633,14 +655,14 @@ void write_dot_file_recursive(FILE *dot_file, t_ast_node *node, int parent_id, i
 			
 			if (node->subshell)
 			{
-				fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+				fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#444444\"><B>⟦ SUBSHELL ⟧</B></FONT></TD></TR>");
 			}
 			
 			if (node->subshell_redir)
 			{
 				if (!node->subshell)
-					fprintf(dot_file, "<TR><TD><HR COLOR=\"#303030\" /></TD></TR>");
+					fprintf(dot_file, "<TR><TD><BR/></TD></TR>");
 					
 				fprintf(dot_file, "<TR><TD ALIGN=\"center\"><FONT POINT-SIZE=\"13\" COLOR=\"#800080\"><B>REDIR SUBSHELL</B></FONT></TD></TR>");
 				t_redir *redir = node->subshell_redir;
