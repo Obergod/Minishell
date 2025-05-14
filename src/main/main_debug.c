@@ -6,11 +6,11 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/14 14:45:36 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 17:56:17 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/main.h"
+#include "../../includes/main.h"
 #include <sys/select.h>
 #include <sys/select.h>
 
@@ -316,7 +316,6 @@ int	main(int ac, char **av, char **envp)
 		// }
 
 		prefix_exec(ast, head, &minishell);
-		update_exit_status_from_signal(&minishell);
 		update_exit_status_from_signal(&minishell);
 		if (*input)
 			add_history(input);
