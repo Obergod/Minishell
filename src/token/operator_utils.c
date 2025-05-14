@@ -42,3 +42,17 @@ int	is_pipe_or_or(char op, char next_char, int *i)
 	}
 	return (0);
 }
+
+int	is_operator(char c)
+{
+	if (c == '<' || c == '>' || c == '|' || c == '&' || c == '(' || c == ')')
+		return (1);
+	return (0);
+}
+
+int	is_paranthesis(char c)
+{
+	if (c == '(' || c == ')')
+		return (1);
+	return (0);
+}

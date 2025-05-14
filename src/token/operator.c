@@ -34,9 +34,9 @@ int	process_operator(const char *input, t_tokenizer *tok,
 
 int	verif_op(const char *input, int i)
 {
-	if (is_operator(input[i + 1]) && input[i] != input[i + 1])
+	if (is_operator(input[i + 1]) && !is_paranthesis(input[i + 1]) && input[i] != input[i + 1])
 		return (1);
-	if (input[i + 2] && is_operator(input[i + 2]))
+	if (input[i + 2] && !is_paranthesis(input[i + 2]) && is_operator(input[i + 2]))
 		return (1);
 	if (input[i] == '&' && input[i + 1] && input[i + 1] != input[i])
 		return (1);
