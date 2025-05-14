@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 15:20:50 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 16:35:10 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 19:22:47 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,10 @@ static t_ast_node *build_expr_parenthesis(t_cmd **cmd_list, t_minishell *minishe
 	if (!subshell)
 		return (NULL);
 	subshell->subshell = 1;
-	if (*cmd_list && (*cmd_list)->redirs)
-		subshell->subshell_redir = (*cmd_list)->redirs;
 	if (*cmd_list && (*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
 	{
+		if ((*cmd_list)->redirs)
+			subshell->subshell_redir = (*cmd_list)->redirs;
 		(*paren_count)--;
 		*cmd_list = (*cmd_list)->next;
 	}
@@ -139,6 +139,8 @@ static t_ast_node *build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
 	{
 		if ((*cmd_list)->logic_operator_type == CLOSE_PARENTHESIS)
 		{
+			if ((*cmd_list)->redirs)
+				left->subshell_redir = (*cmd_list)->redirs;
 			(*paren_count)--;
 			*cmd_list = (*cmd_list)->next;
 			return (left);

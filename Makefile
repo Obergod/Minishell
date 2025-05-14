@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/05/14 17:53:53 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/05/14 19:32:07 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -72,7 +72,7 @@ SRC_FILES = src/builtin/cd.c \
 			src/garbage_collector/utils/gc_strndup_array.c \
 			src/garbage_collector/utils/gc_strndup.c \
 			src/garbage_collector/utils/gc_substr.c \
-			src/main/main_debug.c \
+			src/main/main.c \
 			src/parsing/ast/ast.c \
 			src/parsing/ast/ast_utils.c \
 			src/parsing/ast/ast_visualizer.c \
