@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/14 14:18:27 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 14:29:46 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,9 @@ t_cmd	*parsing(t_token *token, t_minishell *minishell)
 
 	current = new_cmd(minishell);
 	head = NULL;
-	// status = check_parsing(token);
-	// if (status != SUCCESS)
-	// 	return (print_error(status), NULL);
+	status = check_parsing(token);
+	if (status != SUCCESS)
+		return (print_error(status), NULL);
 	parsing_loop(token, &current, &head, minishell);
 	if (current->command[0] || current->redirs)
 		add_cmd_to_list(&head, current);
