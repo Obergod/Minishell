@@ -17,8 +17,8 @@ int	process_operator(const char *input, t_tokenizer *tok,
 {
 	enum e_token_type	type;
 
-	if (verif_op(input, tok->i) == 1)
-		return (1);
+//	if (verif_op(input, tok->i) == 1)
+//		return (1);
 	if (tok->nb_tok > 0)
 	{
 		tok->buff[tok->nb_tok] = '\0';
@@ -29,7 +29,6 @@ int	process_operator(const char *input, t_tokenizer *tok,
 	operator_str(input, tok->buff, tok->i);
 	type = handle_operator(input, &tok->i);
 	add_token(tok, type, NORMAL, minishell);
-	return (0);
 }
 
 int	verif_op(const char *input, int i)
