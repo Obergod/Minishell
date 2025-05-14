@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 16:45:13 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 16:03:14 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 18:30:02 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,5 +91,6 @@ void	handle_parsing_operator(t_token *token, t_cmd **list,
 	}
 	t_logic_parsing(token, current);
 	add_cmd_to_list(list, *current);
-	*current = new_cmd(minishell);
+	if ((*current)->logic_operator_type != CLOSE_PARENTHESIS)
+		*current = new_cmd(minishell);
 }

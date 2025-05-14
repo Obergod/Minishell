@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/14 17:56:17 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/14 18:10:39 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,8 +282,8 @@ int	main(int ac, char **av, char **envp)
 		cmd_head = parsing(token, &minishell);
 		//print_cmd_list(cmd_head);
 		// Appel de la fonction pour imprimer la liste de commandes
-		//if (cmd_head)
-			//print_cmd_list(cmd_head);	
+		if (cmd_head)
+			print_cmd_list(cmd_head);	
 		if (!cmd_head)
 			printf("Aucune commande valide n'a été trouvée.\n");
 		
