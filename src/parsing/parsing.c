@@ -60,7 +60,8 @@ t_cmd	*parsing(t_token *token, t_minishell *minishell)
 	if (status != SUCCESS)
 		return (print_error(status), NULL);
 	parsing_loop(token, &current, &head, minishell);
-	if (current->command[0] || (current->redirs && current->logic_operator_type == NONE))
+	if (current->command[0] || (current->redirs
+			&& current->logic_operator_type == NONE))
 		add_cmd_to_list(&head, current);
 	return (head);
 }

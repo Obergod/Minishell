@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 20:24:48 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 17:51:36 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/15 19:04:07 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
+
 // stock un token (mot ou separateur) stock les separateurs par groupe
 typedef struct s_wc_token
 {

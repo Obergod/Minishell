@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 14:00:33 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/13 15:55:50 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:50:12 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # include "builtin.h"
 # include "env_parsing.h"
 # include "exec.h"
-# include "expand.h"
+# include "expansion.h"
 # include "garbage_collector.h"
 # include "minishell.h"
 # include "parsing.h"

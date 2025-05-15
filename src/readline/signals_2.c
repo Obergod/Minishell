@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 20:21:42 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 18:22:49 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/15 19:06:09 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ void	reset_signals_child(void)
 }
 
 // Pour les processus dans un pipeline
-void pipe_setup_signals(void)
+void	pipe_setup_signals(void)
 {
-    signal(SIGINT, SIG_IGN);
-    signal(SIGQUIT, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 }

@@ -31,8 +31,7 @@ void	finalize_token(t_tokenizer *tok, t_minishell *minishell,
 	if (tok->nb_tok > 0)
 	{
 		tok->buff[tok->nb_tok] = '\0';
-		add_token(tok, T_WORD, tok->token_state,
-			minishell);
+		add_token(tok, T_WORD, tok->token_state, minishell);
 	}
 	else if ((tok->nb_tok == 0 && tok->i == 0) || is_only_space(input))
 	{
