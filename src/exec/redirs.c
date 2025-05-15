@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirs.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 17:34:03 by mafioron          #+#    #+#             */
-/*   Updated: 2025/04/09 17:34:04 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:11:44 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,18 +54,18 @@ int	handle_output(t_redir *redir, int *fd_out)
 	return (0);
 }
 
-static int	apply_redirections(int *fd_in, int *fd_out, t_ast_node *node)
+static int	apply_redirections(int *fd_in, int *fd_out)
 {
 	if (*fd_in != -1)
 	{
-		if (node->cmd->command[0] && dup2(*fd_in, STDIN_FILENO) == -1)
+		if (dup2(*fd_in, STDIN_FILENO) == -1)
 			return (perror("minishell: dup2"), 1);
 		close(*fd_in);
 		*fd_in = -1;
 	}
 	if (*fd_out != -1)
 	{
-		if (node->cmd->command[0] && dup2(*fd_out, STDOUT_FILENO) == -1)
+		if (dup2(*fd_out, STDOUT_FILENO) == -1)
 			return (perror("minishell: dup2"), 1);
 		close(*fd_out);
 		*fd_out = -1;
@@ -95,5 +95,5 @@ int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in,
 			return (1);
 		cur = cur->next;
 	}
-	return (apply_redirections(fd_in, fd_out, node));
+	return (apply_redirections(fd_in, fd_out));
 }

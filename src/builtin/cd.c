@@ -16,8 +16,8 @@
 #include <string.h>
 #include <unistd.h>
 
-// cd doit etre execute dans le shell principal 
-//sinon le changement de dossier ne sera pas garde
+// cd doit etre execute dans le shell principal
+// sinon le changement de dossier ne sera pas garde
 
 static int	access_cd(char *path, t_minishell *minishell)
 {

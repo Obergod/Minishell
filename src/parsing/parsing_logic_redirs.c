@@ -81,8 +81,8 @@ void	t_logic_parsing(t_token *token, t_cmd **current_cmd)
 		(*current_cmd)->logic_operator_type = PIPE;
 }
 
-void	handle_parsing_operator(t_token *token, t_cmd **list,
-		t_cmd **current, t_minishell *minishell)
+void	handle_parsing_operator(t_token *token, t_cmd **list, t_cmd **current,
+		t_minishell *minishell)
 {
 	if ((*current)->command[0] || (*current)->redirs)
 	{

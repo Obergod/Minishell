@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   exec_process.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 17:36:18 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/13 17:36:21 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/05/14 20:16:17 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/main.h"
 
 void	handle_child_process(t_ast_node *node, t_ast_node *head,
-				t_minishell *minishell, t_redir *redirections)
+		t_minishell *minishell, t_redir *redirections)
 {
 	t_ast_node	dummy;
 	t_cmd		dummy_cmd;
@@ -39,7 +39,7 @@ void	handle_child_process(t_ast_node *node, t_ast_node *head,
 }
 
 void	handle_subshell(t_ast_node *node, t_ast_node *head,
-				t_minishell *minishell)
+		t_minishell *minishell)
 {
 	pid_t	pid;
 	int		status;
@@ -59,7 +59,7 @@ void	handle_subshell(t_ast_node *node, t_ast_node *head,
 }
 
 void	handle_cmd_process(t_ast_node *node, t_ast_node *head,
-				t_minishell *minishell)
+		t_minishell *minishell)
 {
 	t_fds	fds;
 

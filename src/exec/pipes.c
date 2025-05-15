@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 17:35:46 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/13 18:22:22 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:09:51 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ int	handle_r_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head,
 	else if (pipes.pid_r == 0)
 	{
 		exec_setup_signals();
-		exec_setup_signals();
 		close(pipes.pipes[1]);
 		if (dup2(pipes.pipes[0], STDIN_FILENO) == -1)
 		{
@@ -58,9 +57,7 @@ int	handle_r_pipe(t_pipe pipes, t_ast_node *node, t_ast_node *head,
 		close(pipes.pipes[0]);
 		prefix_exec(node->right, head, minishell);
 		interactive_setup_signals();
-		interactive_setup_signals();
 		clean_exit(EXIT_FAILURE, minishell);
-		clean_exit(minishell->exit_status, minishell);
 	}
 	return (0);
 }

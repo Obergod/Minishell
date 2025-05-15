@@ -13,7 +13,7 @@
 #include "../../../includes/garbage_collector.h"
 
 /**
- * @brief Alloue et initialise à zéro un 
+ * @brief Alloue et initialise à zéro un
  bloc de mémoire avec le garbage collector
  *
  * @param count Nombre d'éléments à allouer

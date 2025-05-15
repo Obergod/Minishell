@@ -12,9 +12,10 @@
 
 #include "../../../includes/ast.h"
 
-t_ast_node *init_ast_node(enum e_node_type type, t_cmd *cmd, t_minishell *minishell)
+t_ast_node	*init_ast_node(enum e_node_type type, t_cmd *cmd,
+		t_minishell *minishell)
 {
-	t_ast_node *node;
+	t_ast_node	*node;
 
 	node = gc_malloc(sizeof(t_ast_node), minishell->gc);
 	if (!node)
@@ -29,10 +30,10 @@ t_ast_node *init_ast_node(enum e_node_type type, t_cmd *cmd, t_minishell *minish
 	return (node);
 }
 
-int check_parenthesis_balance(t_cmd *cmd_list)
+int	check_parenthesis_balance(t_cmd *cmd_list)
 {
-	int count;
-	t_cmd *cur;
+	int		count;
+	t_cmd	*cur;
 
 	count = 0;
 	cur = cmd_list;
@@ -47,4 +48,16 @@ int check_parenthesis_balance(t_cmd *cmd_list)
 		cur = cur->next;
 	}
 	return (count == 0);
-} 
+}
+
+int	is_invalid_cmd_list(t_cmd *cmd_list)
+{
+	if (!cmd_list)
+		return (1);
+	if (cmd_list->logic_operator_type == OPEN_PARENTHESIS
+		&& !cmd_list->command_raw && !cmd_list->next)
+		return (1);
+	if (!check_parenthesis_balance(cmd_list))
+		return (1);
+	return (0);
+}

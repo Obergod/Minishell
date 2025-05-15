@@ -55,7 +55,7 @@ void	main_loop(t_minishell *minishell)
 		{
 			input = get_next_line(0);
 			if (!input)
-				break;
+				break ;
 		}
 		if (!input && isatty(STDIN_FILENO))
 			break ;

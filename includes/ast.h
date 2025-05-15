@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 15:47:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/14 14:53:38 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/15 19:23:14 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,15 @@ t_ast_node				*init_ast_node(enum e_node_type type, t_cmd *cmd,
 t_ast_node				*build_ast(t_cmd *cmd_list, t_minishell *minishell);
 int						check_parenthesis_balance(t_cmd *cmd_list);
 void					print_ast(t_ast_node *node, int depth);
-
-/* Fonctions du visualiseur d'AST */
-void					print_ast_compact(t_ast_node *node);
-void					print_ast_with_commands(t_ast_node *node, int depth);
-void					print_ast_execution_order(t_ast_node *node);
-void					visualize_ast(t_ast_node *root, int mode);
-
+t_ast_node	*build_ast_recursive(t_cmd **cmd_list,
+		t_minishell *minishell, int *paren_count);
+t_ast_node	*build_ast_recursive_loop(t_ast_node *left, t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
+t_ast_node	*build_expr_parenthesis(t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
+t_ast_node	*build_expr_cmd(t_cmd **cmd_list, t_minishell *minishell);
+t_ast_node	*build_expr(t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
+int	is_invalid_cmd_list(t_cmd *cmd_list);
+t_ast_node	*init_pipe_node(t_ast_node *left, t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
+t_ast_node	*handle_pipes(t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
+t_ast_node	*init_logic_node(t_ast_node *left, t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
+t_ast_node	*build_ast(t_cmd *cmd_list, t_minishell *minishell);
 #endif

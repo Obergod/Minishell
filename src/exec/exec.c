@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 17:36:18 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/13 17:36:21 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/05/15 17:56:17 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,5 @@ void	process(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	else if (node->type == NODE_AND || node->type == NODE_OR)
 		exec_log_operators(node, head, minishell);
 	handle_command_not_found(node, minishell);
-	interactive_setup_signals();
 	interactive_setup_signals();
 }
