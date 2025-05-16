@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
+#    By: ugo <ugo@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/05/15 19:23:57 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/05/16 16:44:44 by ugo              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -148,11 +148,7 @@ $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
 	@printf " $(GREEN)OK$(RESET)\n"
 
-# Création des sous-répertoires du dossier obj (même structure que src/)
-$(OBJ_DIR)/%/:
-	@mkdir -p $@
-
-# Compilation des .c -> .o
+# Modification de la règle de compilation des .c -> .o
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	@printf "$(CYAN)Compilation $<$(RESET)"
 	@for i in 1 2 3; do printf "."; done

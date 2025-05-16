@@ -1,1 +1,16 @@
-/workspace
+Makefile
+ast_visualizer.c
+full_libft
+includes
+main_debug.c
+minishell
+o
+obj
+out
+rl_remove
+save
+src
+test
+test_dir
+test_env.c
+test_tok.c

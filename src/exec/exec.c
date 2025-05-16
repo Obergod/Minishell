@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ugo <ugo@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 17:36:18 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/15 17:56:17 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:59:39 by ugo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,20 @@ t_redir	*find_redirections_in_ast(t_ast_node *node)
 
 void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
+	t_fds	fds;
+
+	fds.fd_in = -1;
+	fds.fd_out = -1;
 	if (!node)
 		return ;
 	if (node->subshell == 1)
 		handle_subshell(node, head, minishell);
+	else if (node->type == NODE_CMD && node->cmd->command[0] == NULL && node->cmd->logic_operator_type == NONE && node->cmd->redirs)
+		{
+			handle_input
+			handle_output(node->cmd->redirs, fds.fd_out);
+			return ;
+		}
 	else if (node == head && skip_cmd(node) && node->cmd->is_redirect != 1)
 		return ;
 	else

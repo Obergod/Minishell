@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ugo <ugo@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/15 19:30:49 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:40:43 by ugo              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ static void	parsing_loop(t_token *token, t_cmd **current, t_cmd **head,
 		{
 			if ((*current)->command[0] == NULL && (*current)->logic_operator_type == NONE && *head)
 			{
-
 				last = *head;
 				while (last->next)
 					last = last->next;
