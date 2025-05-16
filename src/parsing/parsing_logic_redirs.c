@@ -91,6 +91,5 @@ void	handle_parsing_operator(t_token *token, t_cmd **list, t_cmd **current,
 	}
 	t_logic_parsing(token, current);
 	add_cmd_to_list(list, *current);
-	if ((*current)->logic_operator_type != CLOSE_PARENTHESIS)
-		*current = new_cmd(minishell);
+	*current = new_cmd(minishell);
 }

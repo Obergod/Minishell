@@ -29,21 +29,29 @@
 // status : 1 = fin
 
 static void	parsing_loop(t_token *token, t_cmd **current, t_cmd **head,
-		t_minishell *minishell)
+	t_minishell *minishell)
 {
+	t_cmd   *last;
 	while (token)
 	{
 		if (token->type == T_WORD)
 			add_arg_to_cmd(*current, token->str, minishell->gc);
 		else if (token->type == T_REDIR)
 		{
-			t_redir_parsing(token, &(*current), minishell);
+			if ((*current)->command[0] == NULL && (*current)->logic_operator_type == NONE && *head)
+			{
+
+				last = *head;
+				while (last->next)
+					last = last->next;
+				t_redir_parsing(token, &last, minishell);
+			}
+			else
+				t_redir_parsing(token, &(*current), minishell);
 			token = token->next;
 		}
 		else
-		{
 			handle_parsing_operator(token, &(*head), &(*current), minishell);
-		}
 		token = token->next;
 	}
 }
