@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ugo <ugo@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 18:01:47 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/16 16:40:43 by ugo              ###   ########.fr       */
+/*   Updated: 2025/05/16 17:15:09 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,16 +29,18 @@
 // status : 1 = fin
 
 static void	parsing_loop(t_token *token, t_cmd **current, t_cmd **head,
-	t_minishell *minishell)
+		t_minishell *minishell)
 {
-	t_cmd   *last;
+	t_cmd	*last;
+
 	while (token)
 	{
 		if (token->type == T_WORD)
 			add_arg_to_cmd(*current, token->str, minishell->gc);
 		else if (token->type == T_REDIR)
 		{
-			if ((*current)->command[0] == NULL && (*current)->logic_operator_type == NONE && *head)
+			if ((*current)->command[0] == NULL
+				&& (*current)->logic_operator_type == NONE && *head)
 			{
 				last = *head;
 				while (last->next)

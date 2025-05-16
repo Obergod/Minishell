@@ -12,8 +12,8 @@
 
 #include "../../../includes/ast.h"
 
-t_ast_node	*build_ast_recursive_loop(t_ast_node *left,
-		t_cmd **cmd_list, t_minishell *minishell, int *paren_count)
+t_ast_node	*build_ast_recursive_loop(t_ast_node *left, t_cmd **cmd_list,
+		t_minishell *minishell, int *paren_count)
 {
 	while (*cmd_list)
 	{
@@ -33,9 +33,8 @@ t_ast_node	*build_ast_recursive_loop(t_ast_node *left,
 	return (left);
 }
 
-
-t_ast_node	*build_ast_recursive(t_cmd **cmd_list,
-		t_minishell *minishell, int *paren_count)
+t_ast_node	*build_ast_recursive(t_cmd **cmd_list, t_minishell *minishell,
+		int *paren_count)
 {
 	t_ast_node	*left;
 
@@ -53,9 +52,8 @@ t_ast_node	*build_ast_recursive(t_cmd **cmd_list,
 	return (build_ast_recursive_loop(left, cmd_list, minishell, paren_count));
 }
 
-
-t_ast_node	*build_expr_parenthesis(t_cmd **cmd_list,
-		t_minishell *minishell, int *paren_count)
+t_ast_node	*build_expr_parenthesis(t_cmd **cmd_list, t_minishell *minishell,
+		int *paren_count)
 {
 	t_ast_node	*subshell;
 
@@ -77,7 +75,7 @@ t_ast_node	*build_expr_parenthesis(t_cmd **cmd_list,
 
 t_ast_node	*build_expr_cmd(t_cmd **cmd_list, t_minishell *minishell)
 {
-	t_ast_node *node;
+	t_ast_node	*node;
 
 	node = init_ast_node(NODE_CMD, *cmd_list, minishell);
 	if (!node)
@@ -87,7 +85,7 @@ t_ast_node	*build_expr_cmd(t_cmd **cmd_list, t_minishell *minishell)
 }
 
 t_ast_node	*build_expr(t_cmd **cmd_list, t_minishell *minishell,
-							 int *paren_count)
+		int *paren_count)
 {
 	t_ast_node	*node;
 

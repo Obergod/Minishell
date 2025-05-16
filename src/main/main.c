@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 16:21:46 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 18:24:34 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:26:06 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,21 @@ int	init_minishell(t_minishell *minishell, char **envp)
 	return (0);
 }
 
+static char	*get_input(t_minishell *minishell)
+{
+	char	*input;
+
+	if (isatty(STDIN_FILENO))
+		ft_add_readline(PROMPT, &input, minishell);
+	else
+	{
+		input = get_next_line(0);
+		if (!input)
+			return (NULL);
+	}
+	return (input);
+}
+
 void	main_loop(t_minishell *minishell)
 {
 	t_ast_node	*ast;
@@ -49,14 +64,7 @@ void	main_loop(t_minishell *minishell)
 	while (1)
 	{
 		update_exit_status_from_signal(minishell);
-		if (isatty(STDIN_FILENO))
-			ft_add_readline(PROMPT, &input, minishell);
-		else
-		{
-			input = get_next_line(0);
-			if (!input)
-				break ;
-		}
+		input = get_input(minishell);
 		if (!input && isatty(STDIN_FILENO))
 			break ;
 		ast = build_ast(parsing(tokenize(input, minishell), minishell),
@@ -77,7 +85,7 @@ int	main(int ac, char **av, char **envp)
 	if (ac < 1 || !av || init_minishell(&minishell, envp) == 1)
 		return (1);
 	if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO))
-		pipe_setup_signals();
+		return (1);
 	else
 		interactive_setup_signals();
 	main_loop(&minishell);

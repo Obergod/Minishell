@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:43:18 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/15 19:32:39 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:14:37 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,11 @@ int	verif_op(const char *input, int i)
 	{
 		if (is_operator(input[i + 1]) && input[i] != input[i + 1])
 			return (1);
-		if (input[i + 2] && !is_paranthesis(input[i + 2]) && is_operator(input[i + 1]) && is_operator(input[i + 2]))
+		if (input[i + 2] && !is_paranthesis(input[i + 2])
+			&& is_operator(input[i + 1]) && is_operator(input[i + 2]))
 			return (1);
-		if (input[i] == '&' && input[i + 1] && !is_paranthesis(input[i + 1]) && input[i + 1] != input[i])
+		if (input[i] == '&' && input[i + 1] && !is_paranthesis(input[i + 1])
+			&& input[i + 1] != input[i])
 			return (1);
 	}
 	return (0);

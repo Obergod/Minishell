@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 15:16:18 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 16:08:13 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:18:03 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 # include "../full_libft/include/libft.h"
 
-// Forward declarations
 struct	s_env;
 struct	s_cmd;
 struct	s_gc_head;

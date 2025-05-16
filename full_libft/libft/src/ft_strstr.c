@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strstr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mafioron <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 18:07:48 by mafioron          #+#    #+#             */
-/*   Updated: 2025/03/19 18:07:49 by mafioron         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:19:28 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,4 +33,3 @@ char	*ft_strstr(const char *big, const char *little)
 	}
 	return (NULL);
 }
-

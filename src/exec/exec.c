@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ugo <ugo@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 17:36:18 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/16 16:59:39 by ugo              ###   ########.fr       */
+/*   Updated: 2025/05/16 17:12:17 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,30 @@ t_redir	*find_redirections_in_ast(t_ast_node *node)
 	return (find_redirections_in_ast(node->right));
 }
 
+void	handle_empty_cmd_redirs(t_redir *redirs)
+{
+	t_redir	*current;
+	int		fd;
+
+	current = redirs;
+	while (current)
+	{
+		if (current->type == REDIR_IN || current->type == REDIR_HEREDOC)
+			fd = open(current->file_or_delimiter, O_RDONLY | O_CREAT, 0644);
+		else if (current->type == REDIR_OUT)
+			fd = open(current->file_or_delimiter, O_WRONLY | O_CREAT | O_TRUNC,
+					0644);
+		else if (current->type == REDIR_APPEND)
+			fd = open(current->file_or_delimiter, O_WRONLY | O_CREAT | O_APPEND,
+					0644);
+		else
+			fd = -1;
+		if (fd != -1)
+			close(fd);
+		current = current->next;
+	}
+}
+
 void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 {
 	t_fds	fds;
@@ -49,12 +73,12 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 		return ;
 	if (node->subshell == 1)
 		handle_subshell(node, head, minishell);
-	else if (node->type == NODE_CMD && node->cmd->command[0] == NULL && node->cmd->logic_operator_type == NONE && node->cmd->redirs)
-		{
-			handle_input
-			handle_output(node->cmd->redirs, fds.fd_out);
-			return ;
-		}
+	else if (node->type == NODE_CMD && node->cmd->command[0] == NULL
+		&& node->cmd->logic_operator_type == NONE && node->cmd->redirs)
+	{
+		handle_empty_cmd_redirs(node->cmd->redirs);
+		return ;
+	}
 	else if (node == head && skip_cmd(node) && node->cmd->is_redirect != 1)
 		return ;
 	else

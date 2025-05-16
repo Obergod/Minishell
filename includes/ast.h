@@ -29,7 +29,7 @@ enum					e_node_type
 
 typedef struct s_ast_node
 {
-	enum e_node_type		type;
+	enum e_node_type	type;
 	t_cmd				*cmd;
 	int					subshell;
 	t_redir				*subshell_redir;
@@ -44,15 +44,23 @@ t_ast_node				*init_ast_node(enum e_node_type type, t_cmd *cmd,
 t_ast_node				*build_ast(t_cmd *cmd_list, t_minishell *minishell);
 int						check_parenthesis_balance(t_cmd *cmd_list);
 void					print_ast(t_ast_node *node, int depth);
-t_ast_node	*build_ast_recursive(t_cmd **cmd_list,
-		t_minishell *minishell, int *paren_count);
-t_ast_node	*build_ast_recursive_loop(t_ast_node *left, t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
-t_ast_node	*build_expr_parenthesis(t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
-t_ast_node	*build_expr_cmd(t_cmd **cmd_list, t_minishell *minishell);
-t_ast_node	*build_expr(t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
-int	is_invalid_cmd_list(t_cmd *cmd_list);
-t_ast_node	*init_pipe_node(t_ast_node *left, t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
-t_ast_node	*handle_pipes(t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
-t_ast_node	*init_logic_node(t_ast_node *left, t_cmd **cmd_list, t_minishell *minishell, int *paren_count);
-t_ast_node	*build_ast(t_cmd *cmd_list, t_minishell *minishell);
+t_ast_node				*build_ast_recursive(t_cmd **cmd_list,
+							t_minishell *minishell, int *paren_count);
+t_ast_node				*build_ast_recursive_loop(t_ast_node *left,
+							t_cmd **cmd_list, t_minishell *minishell,
+							int *paren_count);
+t_ast_node				*build_expr_parenthesis(t_cmd **cmd_list,
+							t_minishell *minishell, int *paren_count);
+t_ast_node				*build_expr_cmd(t_cmd **cmd_list,
+							t_minishell *minishell);
+t_ast_node				*build_expr(t_cmd **cmd_list, t_minishell *minishell,
+							int *paren_count);
+int						is_invalid_cmd_list(t_cmd *cmd_list);
+t_ast_node				*init_pipe_node(t_ast_node *left, t_cmd **cmd_list,
+							t_minishell *minishell, int *paren_count);
+t_ast_node				*handle_pipes(t_cmd **cmd_list, t_minishell *minishell,
+							int *paren_count);
+t_ast_node				*init_logic_node(t_ast_node *left, t_cmd **cmd_list,
+							t_minishell *minishell, int *paren_count);
+t_ast_node				*build_ast(t_cmd *cmd_list, t_minishell *minishell);
 #endif

@@ -6,19 +6,11 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 19:15:46 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/15 19:20:11 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:16:55 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/ast.h"
-
-// Déclaration de la fonction utilisée
-t_ast_node	*build_expr(t_cmd **cmd_list, t_minishell *minishell,
-						int *paren_count);
-t_ast_node	*init_pipe_node(t_ast_node *left, t_cmd **cmd_list,
-		t_minishell *minishell, int *paren_count);
-t_ast_node	*handle_pipes(t_cmd **cmd_list, t_minishell *minishell,
-		int *paren_count);
 
 t_ast_node	*init_pipe_node(t_ast_node *left, t_cmd **cmd_list,
 		t_minishell *minishell, int *paren_count)
@@ -41,7 +33,7 @@ t_ast_node	*init_pipe_node(t_ast_node *left, t_cmd **cmd_list,
 t_ast_node	*handle_pipes(t_cmd **cmd_list, t_minishell *minishell,
 		int *paren_count)
 {
-	t_ast_node *left;
+	t_ast_node	*left;
 
 	left = build_expr(cmd_list, minishell, paren_count);
 	while (left && *cmd_list && (*cmd_list)->logic_operator_type == PIPE)
