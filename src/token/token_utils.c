@@ -71,7 +71,8 @@ void	init_tokenizer(t_tokenizer *tok, const char *input,
 	tok->i = -1;
 	tok->nb_tok = 0;
 	if (input)
-		tok->buff = gc_malloc((sizeof(char) * ft_strlen(input) + 1), minishell->gc);
+		tok->buff = gc_malloc((sizeof(char) * ft_strlen(input) + 1),
+				minishell->gc);
 	else
 		tok->buff = NULL;
 	tok->token_list = NULL;

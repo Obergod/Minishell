@@ -54,7 +54,7 @@ int	handle_heredoc(t_redir *redir, int *fd_in, t_minishell *minishell)
 	return (0);
 }
 
-void empty_heredoc(char *delimiter, t_minishell *minishell)
+void	empty_heredoc(char *delimiter, t_minishell *minishell)
 {
 	char	*line;
 
