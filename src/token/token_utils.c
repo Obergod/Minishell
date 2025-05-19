@@ -50,6 +50,8 @@ int	verif_quotes(const char *input)
 	in_squotes = 0;
 	in_dquotes = 0;
 	i = -1;
+	if (!input)
+		return (0);
 	while (input[++i])
 	{
 		if (input[i] == '\'' && !in_dquotes)
@@ -68,7 +70,10 @@ void	init_tokenizer(t_tokenizer *tok, const char *input,
 {
 	tok->i = -1;
 	tok->nb_tok = 0;
-	tok->buff = gc_malloc((sizeof(char) * ft_strlen(input) + 1), minishell->gc);
+	if (input)
+		tok->buff = gc_malloc((sizeof(char) * ft_strlen(input) + 1), minishell->gc);
+	else
+		tok->buff = NULL;
 	tok->token_list = NULL;
 	tok->state = NORMAL;
 	tok->token_state = NORMAL;

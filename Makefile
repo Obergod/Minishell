@@ -101,7 +101,7 @@ DEP_FILES = $(OBJ_FILES:.o=.d)
 
 # Flags de compilation
 CC      = cc
-CFLAGS  = -Wall -Wextra -Werror -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include
+CFLAGS  = -Wall -Wextra -Werror -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -g3
 DEPFLAGS= -MMD -MP
 LDFLAGS = -L$(LIBFT_DIR) -lreadline -lftfull
 

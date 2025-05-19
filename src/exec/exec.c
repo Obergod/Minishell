@@ -39,7 +39,7 @@ t_redir	*find_redirections_in_ast(t_ast_node *node)
 	return (find_redirections_in_ast(node->right));
 }
 
-void	handle_empty_cmd_redirs(t_redir *redirs)
+void	handle_empty_cmd_redirs(t_redir *redirs, t_minishell *minishell)
 {
 	t_redir	*current;
 	int		fd;
@@ -47,7 +47,7 @@ void	handle_empty_cmd_redirs(t_redir *redirs)
 	current = redirs;
 	while (current)
 	{
-		if (current->type == REDIR_IN || current->type == REDIR_HEREDOC)
+		if (current->type == REDIR_IN)
 			fd = open(current->file_or_delimiter, O_RDONLY | O_CREAT, 0644);
 		else if (current->type == REDIR_OUT)
 			fd = open(current->file_or_delimiter, O_WRONLY | O_CREAT | O_TRUNC,
@@ -55,6 +55,8 @@ void	handle_empty_cmd_redirs(t_redir *redirs)
 		else if (current->type == REDIR_APPEND)
 			fd = open(current->file_or_delimiter, O_WRONLY | O_CREAT | O_APPEND,
 					0644);
+		else if (current->type == REDIR_HEREDOC)
+			handle_heredoc(redirs, &fd, minishell);
 		else
 			fd = -1;
 		if (fd != -1)
@@ -76,7 +78,7 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	else if (node->type == NODE_CMD && node->cmd->command[0] == NULL
 		&& node->cmd->logic_operator_type == NONE && node->cmd->redirs)
 	{
-		handle_empty_cmd_redirs(node->cmd->redirs);
+		handle_empty_cmd_redirs(node->cmd->redirs, minishell);
 		return ;
 	}
 	else if (node == head && skip_cmd(node) && node->cmd->is_redirect != 1)

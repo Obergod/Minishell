@@ -22,6 +22,7 @@ int	here_doc(char *delimiter, t_minishell *minishell)
 	while (1)
 	{
 		line = readline("heredoc> ");
+		gc_alloc(line, minishell->gc);
 		if (!line)
 		{
 			ft_putstr_fd("warning: here-document at", 2);
@@ -30,13 +31,9 @@ int	here_doc(char *delimiter, t_minishell *minishell)
 		}
 		line = expand_str(line, minishell);
 		if (ft_strcmp(line, delimiter) == 0)
-		{
-			free(line);
 			break ;
-		}
 		write(pipes[1], line, ft_strlen(line));
 		write(pipes[1], "\n", 1);
-		free(line);
 	}
 	return (close(pipes[1]), pipes[0]);
 }

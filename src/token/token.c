@@ -60,6 +60,8 @@ t_token	*tokenize(const char *input, t_minishell *minishell)
 	t_tokenizer	tok;
 	t_token		*result;
 
+	if (!input)
+		return (NULL);
 	if (verif_quotes(input) == 1)
 		return (NULL);
 	init_tokenizer(&tok, input, minishell);

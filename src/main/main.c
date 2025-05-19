@@ -48,7 +48,7 @@ static char	*get_input(t_minishell *minishell)
 		ft_add_readline(PROMPT, &input, minishell);
 	else
 	{
-		input = get_next_line(0);
+		input = get_next_line(STDIN_FILENO);
 		if (!input)
 			return (NULL);
 	}
@@ -61,6 +61,7 @@ void	main_loop(t_minishell *minishell)
 	t_ast_node	*head;
 	char		*input;
 
+	input = NULL;
 	while (1)
 	{
 		update_exit_status_from_signal(minishell);
@@ -72,9 +73,12 @@ void	main_loop(t_minishell *minishell)
 		head = ast;
 		prefix_exec(ast, head, minishell);
 		update_exit_status_from_signal(minishell);
+		if (!input)
+			break ;
 		if (*input)
 			add_history(input);
-		free(input);
+		if (input)
+			free(input);
 	}
 }
 
