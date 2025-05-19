@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:17:04 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/19 15:23:22 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/19 18:55:58 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int	ft_cd(char **args, t_minishell *minishell)
 
 	if (!args || !args[0] || ft_strcmp(args[0], "cd") != 0)
 		return (1);
-	if (args[2])
+	if (args[1] && args[2])
 	{
 		ft_putstr_fd(PROMPT, 2);
 		ft_putendl_fd("cd: too many arguments", 2);

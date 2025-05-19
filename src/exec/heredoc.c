@@ -53,3 +53,23 @@ int	handle_heredoc(t_redir *redir, int *fd_in, t_minishell *minishell)
 	*fd_in = new_fd;
 	return (0);
 }
+
+void	empty_heredoc(char *delimiter, t_minishell *minishell)
+{
+	char	*line;
+
+	while (1)
+	{
+		line = readline("heredoc> ");
+		gc_alloc(line, minishell->gc);
+		if (!line)
+		{
+			ft_putstr_fd("warning: here-document at", 2);
+			ft_putendl_fd("at line 1 delimited by end-of-file", 2);
+			break ;
+		}
+		line = expand_str(line, minishell);
+		if (ft_strcmp(line, delimiter) == 0)
+			break ;
+	}
+}

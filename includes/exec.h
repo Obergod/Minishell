@@ -95,5 +95,6 @@ int			handle_output(t_redir *redir, int *fd_out);
 /*****		heredoc.c		*****/
 int			here_doc(char *delimiter, t_minishell *minishell);
 int			handle_heredoc(t_redir *redir, int *fd_in, t_minishell *minishell);
+void		empty_heredoc(char *delimiter, t_minishell *minishell);
 
 #endif
