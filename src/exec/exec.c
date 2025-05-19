@@ -45,6 +45,7 @@ void	handle_empty_cmd_redirs(t_redir *redirs, t_minishell *minishell)
 	int		fd;
 
 	current = redirs;
+	fd = -1;
 	while (current)
 	{
 		if (current->type == REDIR_IN)
@@ -56,7 +57,7 @@ void	handle_empty_cmd_redirs(t_redir *redirs, t_minishell *minishell)
 			fd = open(current->file_or_delimiter, O_WRONLY | O_CREAT | O_APPEND,
 					0644);
 		else if (current->type == REDIR_HEREDOC)
-			handle_heredoc(redirs, &fd, minishell);
+			empty_heredoc(current->file_or_delimiter, minishell);
 		else
 			fd = -1;
 		if (fd != -1)
