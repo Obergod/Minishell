@@ -6,11 +6,12 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 16:51:59 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/22 12:29:26 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/19 19:06:48 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/builtin.h"
+#include "../../includes/main.h"
 
 int	ft_env(t_minishell *minishell)
 {
@@ -19,7 +20,8 @@ int	ft_env(t_minishell *minishell)
 	env = minishell->env;
 	if (!env)
 	{
-		printf("Erreur: ft_env.");
+		ft_putstr_fd(PROMPT, 2);
+		ft_putendl_fd("env: error", 2);
 		return (1);
 	}
 	while (env)
