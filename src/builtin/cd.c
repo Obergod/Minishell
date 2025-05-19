@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:17:04 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/04/27 15:05:08 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/19 15:23:22 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@ static int	access_cd(char *path, t_minishell *minishell)
 	char	*pwd;
 
 	gc_alloc(old_pwd = getcwd(NULL, 0), minishell->gc);
+	if (!old_pwd)
+	{
+		ft_putstr_fd(PROMPT, 2);
+		ft_putendl_fd("cd: too many arguments", 2);
+		return (1);
+	}
 	if (chdir(path) == -1)
 	{
 		perror("chdir:");
@@ -32,6 +38,12 @@ static int	access_cd(char *path, t_minishell *minishell)
 	}
 	edit_in_env("OLDPWD", old_pwd, minishell);
 	gc_alloc(pwd = getcwd(NULL, 0), minishell->gc);
+	if (!pwd)
+	{
+		ft_putstr_fd(PROMPT, 2);
+		ft_putendl_fd("cd: too many arguments", 2);
+		return (1);
+	}
 	edit_in_env("PWD", pwd, minishell);
 	return (0);
 }
