@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 19:10:03 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/19 15:28:41 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/19 19:33:00 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ int	here_doc(char *delimiter, t_minishell *minishell)
 		return (1);
 	while (1)
 	{
-		line = readline("heredoc> ");
+		ft_putstr_fd("heredoc> ", 1);
+		line = get_next_line(0);
 		gc_alloc(line, minishell->gc);
 		if (!line)
 		{
@@ -29,11 +30,15 @@ int	here_doc(char *delimiter, t_minishell *minishell)
 			ft_putendl_fd("at line 1 delimited by end-of-file", 2);
 			break ;
 		}
-		line = expand_str(line, minishell);
-		if (ft_strcmp(line, delimiter) == 0)
+		char *trimmed = ft_strtrim(line, "\n");
+		if (ft_strcmp(trimmed, delimiter) == 0)
+		{
+			free(trimmed);
 			break ;
+		}
+		free(trimmed);
+		line = expand_str(line, minishell);
 		write(pipes[1], line, ft_strlen(line));
-		write(pipes[1], "\n", 1);
 	}
 	return (close(pipes[1]), pipes[0]);
 }
