@@ -77,7 +77,7 @@ SRC_FILES = src/builtin/cd.c \
 			src/garbage_collector/utils/gc_strndup_array.c \
 			src/garbage_collector/utils/gc_strndup.c \
 			src/garbage_collector/utils/gc_substr.c \
-			src/main/main_debug.c \
+			src/main/main.c \
 			src/parsing/ast/ast.c \
 			src/parsing/ast/ast_utils.c \
 			src/parsing/ast/ast_build.c \

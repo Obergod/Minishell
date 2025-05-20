@@ -30,6 +30,7 @@ t_cmd	*new_cmd(t_minishell *minishell)
 	new->is_redirect = 0;
 	new->redirs = NULL;
 	new->heredoc = NULL;
+	new->heredoc_fd = -1;
 	new->next = NULL;
 	return (new);
 }

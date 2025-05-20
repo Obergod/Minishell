@@ -52,6 +52,7 @@ typedef struct s_cmd
 	enum e_logic_operator_type	logic_operator_type;
 	int							is_redirect;
 	struct s_redir				*redirs;
+	int							heredoc_fd;
 	char						*heredoc;
 	struct s_cmd				*next;
 }								t_cmd;
