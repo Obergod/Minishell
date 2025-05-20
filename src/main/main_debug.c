@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 13:59:20 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/14 18:10:39 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 13:37:12 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,7 +292,7 @@ int	main(int ac, char **av, char **envp)
 		head = ast;
 		// test_ast(ast);
 
-		visualize_ast(ast, 3);
+		// visualize_ast(ast, 3);
 		// visualize_ast(ast, 3);
 
 		// Effectuer les trois types de parcours
@@ -314,8 +314,9 @@ int	main(int ac, char **av, char **envp)
 		// 	parcours_suffixe(ast);
 		// 	printf("\n");
 		// }
-
-		prefix_exec(ast, head, &minishell);
+		ast_heredoc(ast, &minishell);
+		print_heredoc(ast, &minishell);
+		// prefix_exec(ast, head, &minishell);
 		update_exit_status_from_signal(&minishell);
 		if (*input)
 			add_history(input);

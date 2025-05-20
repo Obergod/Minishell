@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:04:32 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/19 19:29:33 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 13:37:45 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct s_cmd
 	enum e_logic_operator_type	logic_operator_type;
 	int							is_redirect;
 	struct s_redir				*redirs;
+	char						*heredoc;
 	struct s_cmd				*next;
 }								t_cmd;
 

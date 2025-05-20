@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/05/19 19:28:48 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/05/20 13:36:42 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -55,6 +55,7 @@ SRC_FILES = src/builtin/cd.c \
 			src/exec/heredoc.c \
 			src/exec/pipes.c \
 			src/exec/redirs.c \
+			src/exec/test_heredoc.c \
 			src/expansion/expansion.c \
 			src/expansion/expansion_var.c \
 			src/expansion/expansion_remove.c \
@@ -76,7 +77,7 @@ SRC_FILES = src/builtin/cd.c \
 			src/garbage_collector/utils/gc_strndup_array.c \
 			src/garbage_collector/utils/gc_strndup.c \
 			src/garbage_collector/utils/gc_substr.c \
-			src/main/main.c \
+			src/main/main_debug.c \
 			src/parsing/ast/ast.c \
 			src/parsing/ast/ast_utils.c \
 			src/parsing/ast/ast_build.c \

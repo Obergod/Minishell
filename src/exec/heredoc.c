@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 19:10:03 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/19 19:33:00 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 13:55:47 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	here_doc(char *delimiter, t_minishell *minishell)
 		if (!line)
 		{
 			ft_putstr_fd("warning: here-document at", 2);
-			ft_putendl_fd("at line 1 delimited by end-of-file", 2);
+			ft_putendl_fd(" line 1 delimited by end-of-file", 2);
 			break ;
 		}
 		char *trimmed = ft_strtrim(line, "\n");
@@ -70,7 +70,7 @@ void	empty_heredoc(char *delimiter, t_minishell *minishell)
 		if (!line)
 		{
 			ft_putstr_fd("warning: here-document at", 2);
-			ft_putendl_fd("at line 1 delimited by end-of-file", 2);
+			ft_putendl_fd(" line 1 delimited by end-of-file", 2);
 			break ;
 		}
 		line = expand_str(line, minishell);

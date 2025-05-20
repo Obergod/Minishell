@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 15:47:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/15 19:23:14 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 13:37:49 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,8 @@ t_ast_node				*handle_pipes(t_cmd **cmd_list, t_minishell *minishell,
 t_ast_node				*init_logic_node(t_ast_node *left, t_cmd **cmd_list,
 							t_minishell *minishell, int *paren_count);
 t_ast_node				*build_ast(t_cmd *cmd_list, t_minishell *minishell);
+void							ast_heredoc(t_ast_node *node,
+									t_minishell *minishell);
+void							print_heredoc(t_ast_node *node,
+									t_minishell *minishell);
 #endif

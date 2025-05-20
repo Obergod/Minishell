@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 17:36:18 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/19 19:29:29 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 13:40:15 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,8 @@ void	handle_empty_cmd_redirs(t_redir *redirs, t_minishell *minishell)
 		else if (current->type == REDIR_APPEND)
 			fd = open(current->file_or_delimiter, O_WRONLY | O_CREAT | O_APPEND,
 					0644);
-		else if (current->type == REDIR_HEREDOC)
-			empty_heredoc(current->file_or_delimiter, minishell);
+		// else if (current->type == REDIR_HEREDOC)
+		// 	empty_heredoc(current->file_or_delimiter, minishell);
 		else
 			fd = -1;
 		if (fd != -1)

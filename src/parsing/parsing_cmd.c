@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:01:36 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/13 16:02:58 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 13:36:28 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ t_cmd	*new_cmd(t_minishell *minishell)
 	new->logic_operator_type = NONE;
 	new->is_redirect = 0;
 	new->redirs = NULL;
+	new->heredoc = NULL;
 	new->next = NULL;
 	return (new);
 }
