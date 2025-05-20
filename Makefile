@@ -6,7 +6,7 @@
 #    By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/30 18:16:42 by ufalzone          #+#    #+#              #
-#    Updated: 2025/05/20 13:36:42 by ufalzone         ###   ########.fr        #
+#    Updated: 2025/05/20 18:53:37 by ufalzone         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,9 +53,9 @@ SRC_FILES = src/builtin/cd.c \
 			src/exec/fd_utils.c \
 			src/exec/file_utils.c \
 			src/exec/heredoc.c \
+			src/exec/heredoc_ast.c \
 			src/exec/pipes.c \
 			src/exec/redirs.c \
-			src/exec/test_heredoc.c \
 			src/expansion/expansion.c \
 			src/expansion/expansion_var.c \
 			src/expansion/expansion_remove.c \
@@ -77,7 +77,7 @@ SRC_FILES = src/builtin/cd.c \
 			src/garbage_collector/utils/gc_strndup_array.c \
 			src/garbage_collector/utils/gc_strndup.c \
 			src/garbage_collector/utils/gc_substr.c \
-			src/main/main_debug.c \
+			src/main/main.c \
 			src/parsing/ast/ast.c \
 			src/parsing/ast/ast_utils.c \
 			src/parsing/ast/ast_build.c \
@@ -88,6 +88,7 @@ SRC_FILES = src/builtin/cd.c \
 			src/parsing/parsing_cmd.c \
 			src/parsing/parsing_error.c \
 			src/parsing/parsing_logic_redirs.c \
+			src/parsing/ast/ast_fix.c \
 			src/readline/readline.c \
 			src/readline/signals_2.c \
 			src/readline/signals.c \
@@ -102,7 +103,7 @@ DEP_FILES = $(OBJ_FILES:.o=.d)
 
 # Flags de compilation
 CC      = cc
-CFLAGS  = -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -O3
+CFLAGS  = -Wall -Werror -Wextra -I$(INCLUDE_DIR) -I$(LIBFT_DIR)/include -O3
 DEPFLAGS= -MMD -MP
 LDFLAGS = -L$(LIBFT_DIR) -lreadline -lftfull
 

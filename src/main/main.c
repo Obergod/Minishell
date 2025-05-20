@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 16:21:46 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/19 19:29:32 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 18:30:16 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,11 @@ void	main_loop(t_minishell *minishell)
 		update_exit_status_from_signal(minishell);
 		input = get_input(minishell);
 		if (!input && isatty(STDIN_FILENO))
-			clean_exit(1, minishell) ;
+			clean_exit(1, minishell);
 		ast = build_ast(parsing(tokenize(input, minishell), minishell),
 				minishell);
 		head = ast;
+		ast_heredoc(ast, minishell);
 		prefix_exec(ast, head, minishell);
 		update_exit_status_from_signal(minishell);
 		if (*input)

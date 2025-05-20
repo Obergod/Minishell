@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 20:04:08 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/19 19:29:38 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 18:25:15 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 # define EXEC_H
 
 # include "../full_libft/include/get_next_line.h"
+# include "ast.h"
+# include "minishell.h"
+# include "parsing.h"
 # include <stdlib.h>
 # include <sys/wait.h>
 
@@ -96,5 +99,8 @@ int			handle_output(t_redir *redir, int *fd_out);
 int			here_doc(char *delimiter, t_minishell *minishell);
 int			handle_heredoc(t_redir *redir, int *fd_in, t_minishell *minishell);
 void		empty_heredoc(char *delimiter, t_minishell *minishell);
+void		ast_heredoc(t_ast_node *node, t_minishell *minishell);
+int			process_heredoc_redir(t_ast_node *node, t_redir *cur, int *fd_in,
+				t_minishell *minishell);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 17:34:03 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/20 14:36:40 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 18:24:54 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,9 +87,11 @@ int	handle_redir(t_ast_node *node, t_minishell *minishell, int *fd_in,
 	{
 		if (cur->type == REDIR_IN && handle_input(cur, fd_in))
 			return (1);
-		else if (cur->type == REDIR_HEREDOC && handle_heredoc(cur, fd_in,
-				minishell))
-			return (1);
+		else if (cur->type == REDIR_HEREDOC)
+		{
+			if (process_heredoc_redir(node, cur, fd_in, minishell))
+				return (1);
+		}
 		else if ((cur->type == REDIR_OUT || cur->type == REDIR_APPEND)
 			&& handle_output(cur, fd_out))
 			return (1);

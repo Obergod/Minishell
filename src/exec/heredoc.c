@@ -6,41 +6,49 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 19:10:03 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/20 13:55:47 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 18:50:03 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/main.h"
 
+static int	handle_heredoc_eof(char *delimiter)
+{
+	ft_putstr_fd("minishell: warning: here-document delimited by end-of-file",
+		2);
+	ft_putstr_fd(" (wanted '", 2);
+	ft_putstr_fd(delimiter, 2);
+	ft_putendl_fd("')", 2);
+	return (1);
+}
+
 int	here_doc(char *delimiter, t_minishell *minishell)
 {
 	int		pipes[2];
 	char	*line;
+	char	*trimmed_line;
 
 	if (pipe(pipes) == -1)
-		return (1);
+		return (perror("minishell: pipe"), -1);
 	while (1)
 	{
-		ft_putstr_fd("heredoc> ", 1);
-		line = get_next_line(0);
-		gc_alloc(line, minishell->gc);
+		ft_putstr_fd("heredoc> ", STDOUT_FILENO);
+		line = get_next_line(STDIN_FILENO);
 		if (!line)
 		{
-			ft_putstr_fd("warning: here-document at", 2);
-			ft_putendl_fd(" line 1 delimited by end-of-file", 2);
-			break ;
+			if (handle_heredoc_eof(delimiter))
+				break ;
 		}
-		char *trimmed = ft_strtrim(line, "\n");
-		if (ft_strcmp(trimmed, delimiter) == 0)
-		{
-			free(trimmed);
+		gc_alloc(line, minishell->gc);
+		trimmed_line = ft_strtrim(line, "\n");
+		gc_alloc(trimmed_line, minishell->gc);
+		if (ft_strcmp(trimmed_line, delimiter) == 0)
 			break ;
-		}
-		free(trimmed);
 		line = expand_str(line, minishell);
 		write(pipes[1], line, ft_strlen(line));
 	}
-	return (close(pipes[1]), pipes[0]);
+	close(pipes[1]);
+	return (pipes[0]);
 }
 
 int	handle_heredoc(t_redir *redir, int *fd_in, t_minishell *minishell)

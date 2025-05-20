@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 17:36:18 by mafioron          #+#    #+#             */
-/*   Updated: 2025/05/20 13:40:15 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 18:52:52 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ t_redir	*find_redirections_in_ast(t_ast_node *node)
 	return (find_redirections_in_ast(node->right));
 }
 
-void	handle_empty_cmd_redirs(t_redir *redirs, t_minishell *minishell)
+void	handle_empty_cmd_redirs(t_redir *redirs)
 {
 	t_redir	*current;
 	int		fd;
@@ -56,8 +56,6 @@ void	handle_empty_cmd_redirs(t_redir *redirs, t_minishell *minishell)
 		else if (current->type == REDIR_APPEND)
 			fd = open(current->file_or_delimiter, O_WRONLY | O_CREAT | O_APPEND,
 					0644);
-		// else if (current->type == REDIR_HEREDOC)
-		// 	empty_heredoc(current->file_or_delimiter, minishell);
 		else
 			fd = -1;
 		if (fd != -1)
@@ -79,7 +77,7 @@ void	prefix_exec(t_ast_node *node, t_ast_node *head, t_minishell *minishell)
 	else if (node->type == NODE_CMD && node->cmd->command[0] == NULL
 		&& node->cmd->logic_operator_type == NONE && node->cmd->redirs)
 	{
-		handle_empty_cmd_redirs(node->cmd->redirs, minishell);
+		handle_empty_cmd_redirs(node->cmd->redirs);
 		return ;
 	}
 	else if (node == head && skip_cmd(node) && node->cmd->is_redirect != 1)

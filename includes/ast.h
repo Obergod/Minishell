@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 15:47:55 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/20 13:37:49 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 17:16:17 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,6 @@ t_ast_node				*init_ast_node(enum e_node_type type, t_cmd *cmd,
 t_ast_node				*build_ast(t_cmd *cmd_list, t_minishell *minishell);
 int						check_parenthesis_balance(t_cmd *cmd_list);
 void					print_ast(t_ast_node *node, int depth);
-t_ast_node				*build_ast_recursive(t_cmd **cmd_list,
-							t_minishell *minishell, int *paren_count);
-t_ast_node				*build_ast_recursive_loop(t_ast_node *left,
-							t_cmd **cmd_list, t_minishell *minishell,
-							int *paren_count);
 t_ast_node				*build_expr_parenthesis(t_cmd **cmd_list,
 							t_minishell *minishell, int *paren_count);
 t_ast_node				*build_expr_cmd(t_cmd **cmd_list,
@@ -62,9 +57,14 @@ t_ast_node				*handle_pipes(t_cmd **cmd_list, t_minishell *minishell,
 							int *paren_count);
 t_ast_node				*init_logic_node(t_ast_node *left, t_cmd **cmd_list,
 							t_minishell *minishell, int *paren_count);
-t_ast_node				*build_ast(t_cmd *cmd_list, t_minishell *minishell);
-void							ast_heredoc(t_ast_node *node,
-									t_minishell *minishell);
-void							print_heredoc(t_ast_node *node,
-									t_minishell *minishell);
+t_ast_node				*process_logic_node(t_ast_node *left, t_cmd **cmd_list,
+							t_minishell *minishell, int *paren_count);
+void					process_closing_paren(t_ast_node **left,
+							t_cmd **cmd_list, int *paren_count);
+t_ast_node				*build_ast_recursive_loop(t_ast_node *left,
+							t_cmd **cmd_list, t_minishell *minishell,
+							int *paren_count);
+t_ast_node				*build_ast_recursive(t_cmd **cmd_list,
+							t_minishell *minishell, int *paren_count);
+
 #endif

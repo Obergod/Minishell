@@ -6,7 +6,7 @@
 /*   By: ufalzone <ufalzone@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 16:44:02 by ufalzone          #+#    #+#             */
-/*   Updated: 2025/05/20 13:54:53 by ufalzone         ###   ########.fr       */
+/*   Updated: 2025/05/20 18:45:32 by ufalzone         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,30 +72,29 @@ static enum e_error_parsing	check_word_parenthesis(t_token *token)
 	return (SUCCESS);
 }
 
-enum e_error_parsing	check_parsing(t_token *token_p)
+enum e_error_parsing	check_parsing(t_token *token)
 {
-	t_token	*token;
-
-	token = token_p;
 	if (!token)
 		return (ERR_SYNTAX_TOKEN);
 	if (start_end_check_parsing(token, 0) != SUCCESS)
 		return (start_end_check_parsing(token, 0));
+	if (check_parenthesis(token) != SUCCESS)
+		return (ERR_SYNTAX_TOKEN);
 	while (token->next)
 	{
 		if (check_word_parenthesis(token) != SUCCESS)
 			return (ERR_SYNTAX_TOKEN);
-		if (token->type == T_PIPE && (token->next->type == T_PIPE || token->next->type == T_REDIR))
+		if (token->type == T_PIPE && (token->next->type == T_PIPE
+				|| token->next->type == T_REDIR))
 			return (ERR_SYNTAX_PIPE);
 		else if (token->type == T_REDIR && token->next->type != T_WORD)
 			return (ERR_SYNTAX_REDIRECT);
-		else if (token->type == T_LOGIC && (token->next->type == T_LOGIC || token->next->type == T_REDIR))
+		else if (token->type == T_LOGIC && (token->next->type == T_LOGIC
+				|| token->next->type == T_REDIR))
 			return (ERR_SYNTAX_LOGIC);
 		token = token->next;
 	}
 	if (start_end_check_parsing(token, 1) != SUCCESS)
 		return (start_end_check_parsing(token, 1));
-	if (check_parenthesis(token_p) != SUCCESS)
-		return (ERR_SYNTAX_TOKEN);
 	return (SUCCESS);
 }
